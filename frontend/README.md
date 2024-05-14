@@ -1,4 +1,4 @@
-# Free Tailwind dashboard template
+# SkillsBooster Tailwind dashboard 
 
 ## Design files
 
