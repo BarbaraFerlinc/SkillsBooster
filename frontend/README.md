@@ -1,107 +1,80 @@
-<p align="center">
-<a href="https://designrevision.com/downloads/shards-dashboard-lite-react/">
-<img src="assets/preview.png" width="250" />
-</a>
-</p>
+# Free Tailwind dashboard template
 
-<h1 align="center" style="border-bottom: none !important; margin-bottom: 5px !important;"><a href="https://designrevision.com/downloads/shards-dashboard-lite-react/">Shards Dashboard React</a></h1>
-<p align="center">
-  <a href="#">
-    <img src="https://img.shields.io/badge/License-MIT-brightgreen.svg" />
-  </a>
-  <a href="https://twitter.com/designrevision">
-    <img src="https://img.shields.io/twitter/follow/DesignRevision.svg?style=social&label=Follow" />
-  </a>
-</p>
+![Mosaic TailwindCSS template preview](https://github.com/cruip/tailwind-dashboard-template/assets/2683512/d252e308-8869-4b70-bce8-bb44071f8b2e)
 
-<p align="center">
-A free React admin dashboard template pack featuring a modern design system <br />  and lots of custom templates and components.
-</p>
+**Mosaic Lite** is a responsive dashboard template built on top of TailwindCSS and fully coded in React. It comes with several pre-coded charts (built with Chart.js 3) and widgets, and it's a great starting for anyone who wants to create a user interface for SaaS products, administrator dashboards, modern web apps, and more.
 
-<p align="center">
-  <a href="https://designrevision.com/demo/shards-dashboard-lite-react">
-    <img height="55px" src="assets/btn-live-preview.png" />
-  </a>
-  <a href="https://designrevision.com/downloads/shards-dashboard-lite-react">
-    <img height="55px" src="assets/btn-learn-more.png" />
-  </a>
-</p>
+Use it for whatever you want, and be sure to reach us out on [Twitter](https://twitter.com/Cruip_com) if you build anything cool/useful with it.
 
-<br />
+Created and maintained with ❤️ by [Cruip.com](https://cruip.com/).
 
-<p align="center">
-<a href="https://designrevision.com/downloads/shards-dashboard-lite-react">
-<img src="assets/demo-preview.gif" width="650" />
-</a>
-</p>
+## Live demo
 
-<br />
+Check the live demo here 👉️ [https://mosaic.cruip.com/](https://mosaic.cruip.com/)
 
-> ✨ **Note:** You can download the Sketch files from the official product page.
+## Mosaic Pro
 
-<br />
+[![Mosaic Pro](https://user-images.githubusercontent.com/2683512/151177026-3d063355-976d-4fdb-a5ed-9c1501c58af2.png)](https://cruip.com/mosaic/)
 
-### Quick Start
+## Design files
 
-* Install dependencies by running `yarn` or `npm install`.
-* Run `yarn start` or `npm run start` to start the local development server.
-* 😎 **That's it!** You're ready to start building awesome dashboards.
+If you need the design files, you can download them from Figma's Community 👉 https://bit.ly/3sigqHe
 
-<br />
+## Table of contents
 
-### Project Structure
+* [Usage](#usage)
+  * [Project setup](#project-setup)
+  * [Compiles and hot-reloads for development](#compiles-and-hot-reloads-for-development)
+  * [Compiles and minifies for production](#compiles-and-minifies-for-production)
+  * [Customize configuration](#customize-configuration)
+* [Support notes](#support-notes)            
+* [Credits](#credits)
+* [Terms and License](#terms-and-license)
+* [About Us](#about-us)
+* [Stay in the loop](#stay-in-the-loop)
 
-- This project is bootstrapped using [Create React App](https://github.com/facebook/create-react-app).
-- **Flux** is used for state management and all Flux specific files are located inside `src/flux`. Transitioning to a more robust solution such as Redux is also fairly simple.
-- All primary templates are located inside `src/views`.
-- There is only one single layout defined (Default) inside `src/layouts`, however, the current structure provides an easy way of extending the UI kit. 
-- The `src/components` directory hosts all template-specific subcomponents in their own subdirectory.
-- The layout styles inherited from Shards Dashboard are pulled in from the `src/shards-dashboard` submodule inside `src/App.js`.
-- Other extra styles specific to the libraries used are located inside `src/assets`.
-- The `src/utils` directory contains generic Chart.js utilities.
+## Usage
 
-<br />
+This project was bootstrapped with [Vite](https://vitejs.dev/).
 
-### Available Scripts
+### Project setup
+```
+npm install
+```
 
-### `npm start`
+#### Compiles and hot-reloads for development
+```
+npm run dev
+```
 
-Runs the app in the development mode.
+#### Compiles and minifies for production
+```
+npm run build
+```
 
-### `npm test`
+#### Customize configuration
+See [Configuration Reference](https://vitejs.dev/guide/).
 
-Launches the test runner in the interactive watch mode.
+### Support notes
+We are shipping our templates with a very basic React configuration to let you quickly get into the development process, but we don't discourage you from using any other configuration or framework built on the top of React. So, please note that any request dealing with React (e.g. extra features, customisations, et cetera) is to be considered out of the support scope.
 
-### `npm run build`
+For more information about what support covers, please see our (FAQs)[https://cruip.com/faq/].
 
-Builds the app for production to the `build` folder.
+## Credits
 
-### `npm run eject`
+- [Nucleo](https://nucleoapp.com/)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Terms and License
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Released under the [GPL](https://www.gnu.org/licenses/gpl-3.0.html).
+- Copyright 2020 [Cruip](https://cruip.com/).
+- Use it for personal and commercial projects, but please don’t republish, redistribute, or resell the template.
+- Attribution is not required, although it is really appreciated.
 
+## About Us
 
-<br />
+We're an Italian developer/designer duo creating high-quality design/code resources for developers, makers, and startups.
 
-### 🌟 Pro Version
+## Stay in the loop
 
-If you're looking for something more, check out [Shards Dashboard Pro React](https://designrevision.com/downloads/shards-dashboard-pro-react/) which features many more custom templates and components. Use the `GITHUB15` coupon code for a **15% discount off the current price**.
-
-<br />
-
-### Built using
-
-- [Shards React](https://github.com/designrevision/shards-react)
-- [Chart.js](https://www.chartjs.org/)
-- [Flux](https://facebook.github.io/flux/)
-- [No UI Slider](https://refreshless.com/nouislider/)
-- [React Datepicker](https://www.npmjs.com/package/react-datepicker)
-- [Quill](https://quilljs.com/)
-
-<br />
-
-### Changelog
-
-Please check out the [CHANGELOG](CHANGELOG.md).
+If you would like to know when we release new resources, you can follow us on [Twitter](https://twitter.com/Cruip_com), or you can subscribe to our monthly [newsletter](https://cruip.com/#subscribe).
