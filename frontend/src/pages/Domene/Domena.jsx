@@ -4,6 +4,7 @@ import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
 import reading from "../../images/read-svgrepo-com.png"
 import writing from "../../images/writing-svgrepo-com.png"
+import PropTypes from "prop-types";
 
 function Domena() {
 
@@ -60,6 +61,13 @@ function Domena() {
             </div>
         </div>
     );
+}
+
+Domena.propTypes = {
+    id:PropTypes.number,
+    naziv: PropTypes.string.isRequired,
+    avtor: PropTypes.string.isRequired
+
 }
 
 export default Domena;
