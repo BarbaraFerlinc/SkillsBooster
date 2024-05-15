@@ -14,6 +14,8 @@ import Dashboard from './pages/Dashboard';
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
+import Domena from "./pages/Domene/Domena";
+import DodajDomeno from "./pages/Domene/DodajDomeno";
 
 function App() {
 
@@ -33,7 +35,8 @@ function App() {
         <Route exact path="/login" element={<Login />} />
 
         <Route exact path="/profile" element={<Profile />} />
-        <Route exact path="/domena" element={<Profile />} />
+        <Route exact path="/domena" element={<Domena/>} />
+        <Route exact path="/addDomena" element={<DodajDomeno/>} />
 
 
       </Routes>
