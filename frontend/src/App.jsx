@@ -33,6 +33,7 @@ function App() {
         <Route exact path="/login" element={<Login />} />
 
         <Route exact path="/profile" element={<Profile />} />
+        <Route exact path="/domena" element={<Profile />} />
 
 
       </Routes>
