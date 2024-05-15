@@ -4,7 +4,8 @@ import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 
 import DashboardCard10 from '../partials/dashboard/DashboardCard10';
-import DynamicHeader from "../partials/dashboard/DynamicHeader.jsx";
+import DynamicHeader from "../partials/dashboard/DynamicHeader";
+
 
 
 function Profile() {

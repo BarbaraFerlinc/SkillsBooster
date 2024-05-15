@@ -13,49 +13,30 @@ import './charts/ChartjsConfig';
 import Dashboard from './pages/Dashboard';
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
-import Registration from "./pages/Registrarion";
+import Registration from "./pages/Registration";
 
 function App() {
+
   const location = useLocation();
 
   useEffect(() => {
-    document.querySelector('html').style.scrollBehavior = 'auto';
-    window.scroll({ top: 0 });
-    document.querySelector('html').style.scrollBehavior = '';
+    document.querySelector('html').style.scrollBehavior = 'auto'
+    window.scroll({ top: 0 })
+    document.querySelector('html').style.scrollBehavior = ''
   }, [location.pathname]); // triggered on route change
 
-  // Function to handle login action
-  const handleLogin = (formData) => {
-    // Logic to handle login action goes here
-    console.log('Login data:', formData);
-    // Redirect to Dashboard after successful login
-    // You can use history object to navigate programmatically
-  };
-
-  // Function to handle registration action
-  const handleRegistration = (formData) => {
-    // Logic to handle registration action goes here
-    console.log('Registration data:', formData);
-    // Redirect to Dashboard after successful registration
-    // You can use history object to navigate programmatically
-  };
-
   return (
+    <>
       <Routes>
-        <Route path="/" element={<Dashboard />} >
-          <Route path="profile" element={<Profile />} />
-          {/*
-          <Route
-              path="login"
-              element={<Login onLogin={handleLogin} />}
-          />
-          <Route
-              path="register"
-              element={<Registration onRegister={handleRegistration} />}
-          />*/}
+        <Route exact path="/" element={<Dashboard />} />
+        <Route exact path="/register" element={<Registration />} />
+        <Route exact path="/login" element={<Login />} />
 
-        </Route>
+        <Route exact path="/profile" element={<Profile />} />
+
+
       </Routes>
+    </>
   );
 }
 
