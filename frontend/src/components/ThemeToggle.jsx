@@ -3,8 +3,6 @@ import { useThemeProvider } from '../utils/ThemeContext';
 
 export default function ThemeToggle() {
   const { currentTheme, changeCurrentTheme } = useThemeProvider();
-// To je switch to dark mode page
-
 
   return (
     <div>

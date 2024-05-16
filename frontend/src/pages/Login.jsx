@@ -1,50 +1,70 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import { NavLink } from 'react-router-dom';
 
-function Login({ onLogin }) {
-    // State to store user input
-    const [credentials, setCredentials] = useState({
-        username: '',
-        password: ''
-    });
+function Login() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [agreed, setAgreed] = useState(false);
 
-    // Handler for input changes
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setCredentials({ ...credentials, [name]: value });
-    };
 
-    // Handler for form submission
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Pass credentials to the parent component for authentication
-        onLogin(credentials);
+        if (!agreed) {
+            alert("You must agree to the terms and conditions.");
+            return;
+        }
+        // Handle login logic here
+        console.log('Email:', email);
+        console.log('Password:', password);
+
+        // Assuming login is successful, redirect to dashboard
+        history.push('/dashboard');
     };
 
     return (
-        <div className="flex h-screen overflow-hidden">
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Username:</label>
-                    <input type="text" name="username" value={credentials.username} onChange={handleChange}/>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
+                <h1 className="text-2xl font-bold mb-6">Login</h1>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            className="mt-1 p-2 border border-gray-300 rounded w-full"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="mt-1 p-2 border border-gray-300 rounded w-full"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded ${!agreed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={!agreed}
+                    >
+                        Login
+                    </button>
+                </form>
+                <div className="mt-4 text-center">
+                    <NavLink to="/register" className="text-blue-500 hover:underline">
+                        Registriraj podjetje
+                    </NavLink>
                 </div>
-                <div>
-                    <label>Password:</label>
-                    <input type="password" name="password" value={credentials.password} onChange={handleChange}/>
-                </div>
-                <button type="submit">Login</button>
-            </form>
+            </div>
         </div>
     );
 }
-
-Login.propTypes = {
-    /**
-     * Callback function to handle login.
-     * It receives the user's credentials as an argument.
-     */
-    onLogin: PropTypes.func.isRequired,
-};
 
 export default Login;
