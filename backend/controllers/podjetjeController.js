@@ -1,0 +1,1 @@
+const Podjetje = require('../models/podjetje');

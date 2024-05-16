@@ -1,0 +1,1 @@
+const Uporabnik = require('../models/uporabnik');

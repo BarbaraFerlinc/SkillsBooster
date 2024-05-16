@@ -1,0 +1,1 @@
+const Domena = require('../models/domena');

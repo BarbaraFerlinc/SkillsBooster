@@ -1,0 +1,1 @@
+const Kviz = require('../models/kviz');
