@@ -16,6 +16,7 @@ import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Domena from "./pages/Domene/Domena";
 import DodajDomeno from "./pages/Domene/DodajDomeno";
+import AddUser from "./pages/AddUser.jsx";
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
         <Route exact path="/profile" element={<Profile />} />
         <Route exact path="/domena" element={<Domena/>} />
         <Route exact path="/addDomena" element={<DodajDomeno/>} />
+        <Route exact path="/addUser" element={<AddUser/>} />
 
 
       </Routes>

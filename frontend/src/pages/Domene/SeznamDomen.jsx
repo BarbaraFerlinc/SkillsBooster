@@ -1,16 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { NavLink } from 'react-router-dom';
 
 function SeznamDomen({ domains }) {
     return (
-        <div>
+        <ul>
             {domains.map((domain) => (
-                <div key={domain.id}>
-                    <h3>{domain.name}</h3>
-                    {/* Render other domain details here */}
-                </div>
+                <li key={domain.id} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                        <NavLink
+                            to={`/domena/${domain.id}`}
+                            className="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 text-slate-200 hover:text-white truncate"
+                        >
+                            {domain.name}
+                        </NavLink>
+                    </div>
+                </li>
             ))}
-        </div>
+        </ul>
     );
 }
 
@@ -19,7 +26,6 @@ SeznamDomen.propTypes = {
         PropTypes.shape({
             id: PropTypes.number.isRequired,
             name: PropTypes.string.isRequired,
-            // Add other propTypes for domain properties here
         })
     ).isRequired,
 };
