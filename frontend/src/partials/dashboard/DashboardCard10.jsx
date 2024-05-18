@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
-import {users} from "../../Data.jsx";
+import {Users} from "../../Data.jsx";
 
 function DashboardCard10() {
 
 
   const changeUserRole = (id, newRole) => {
-    setUsers(users.map(user => user.id === id ? { ...user, role: newRole } : user));
+    setUsers(Users.map(user => user.id === id ? { ...user, role: newRole } : user));
   };
 
   return (
@@ -35,7 +35,7 @@ function DashboardCard10() {
               {/* Table body */}
               <tbody className="text-sm divide-y divide-slate-100 dark:divide-slate-700">
               {
-                users.map(user => (
+                Users.map(user => (
                     <tr key={user.id}>
                       <td className="p-2 whitespace-nowrap">
                         <div className="text-left">{user.email}</div>

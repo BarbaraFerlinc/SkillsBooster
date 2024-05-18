@@ -5,6 +5,8 @@ import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
 import reading from "../../images/read-svgrepo-com.png";
 import writing from "../../images/writing-svgrepo-com.png";
 import PropTypes from "prop-types";
+import {NavLink} from "react-router-dom";
+
 
 function Domena() {
 
@@ -32,10 +34,11 @@ function Domena() {
                         <DynamicHeader domainName={"Domena"}/>
 
                         {/* Secondary Header */}
-                        <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center justify-between  mt-8">
                             <div className="flex items-center">
-                                <img src={reading} alt="Icon" className="w-10 h-10 mr-2"/> {/* Increase width and height */}
-                                <h3 className="text-lg font-semibold text-gray-800">Gradivo</h3>
+                                <img src={reading} alt="Icon"
+                                     className="w-10 h-10 mr-2"/> {/* Increase width and height */}
+                                <h3 className="text-lg font-semibold text-gray-800 ">Gradivo</h3>
                             </div>
                         </div>
                         <input
@@ -46,29 +49,37 @@ function Domena() {
                             id="fileInput"
                             multiple
                         />
-                        <label htmlFor="fileInput" className="btn bg-indigo-500 hover:bg-indigo-600 text-white cursor-pointer">
-                            <span className="hidden xs:block ml-2">Dodaj gradivo</span>
-                        </label>
-                        <div>
+
+                        <div className=" gap-6 mt-4">
                             {files.map((file, index) => (
                                 <div key={index}>
                                     <a href={URL.createObjectURL(file)} download={file.name}>{file.name}</a>
                                 </div>
                             ))}
                         </div>
-                        <div className="flex items-center justify-between mt-4">
+
+                        <label htmlFor="fileInput"
+                               className="btn bg-indigo-500 hover:bg-indigo-600 text-white cursor-pointer mt-8">
+                            <span className="hidden xs:block ml-2">Dodaj gradivo</span>
+                        </label>
+                        <div className="flex items-center justify-between  mt-8">
                             <div className="flex items-center">
-                                <img src={writing} alt="Icon" className="w-10 h-10 mr-2"/>
+                                <img src={writing} alt="Icon" className="w-10 h-10 mr-2 "/>
                                 <h3 className="text-lg font-semibold text-gray-800">Kvizi</h3>
+
                             </div>
                         </div>
-                        <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white">
+
+
+                        {/* Cards */}
+                        <div className="grid grid-cols-12 gap-4 mt-4">
+                            <p>Reši kviz:</p>
+                            <NavLink to={"/quiz"} className="quiz-link">Kviz 1</NavLink>
+                        </div>
+
+                        <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-8">
                             <span className="hidden xs:block ml-2">Ustvari kviz</span>
                         </button>
-                        {/* Cards */}
-                        <div className="grid grid-cols-12 gap-6">
-                            {/* Your cards content here */}
-                        </div>
                     </div>
                 </main>
             </div>

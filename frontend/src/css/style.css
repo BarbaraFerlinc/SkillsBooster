@@ -8,3 +8,9 @@
 @import 'additional-styles/flatpickr.css';
 
 @import 'tailwindcss/utilities';
+
+.quiz-link {
+    text-decoration: underline;
+    color: blue;
+}
+

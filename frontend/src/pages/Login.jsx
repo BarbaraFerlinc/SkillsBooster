@@ -1,31 +1,31 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import {Users} from "../Data.jsx";
+
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [agreed, setAgreed] = useState(false);
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-
-    const handleSubmit = (e) => {
+    const handleLogin = (e) => {
         e.preventDefault();
-        if (!agreed) {
-            alert("You must agree to the terms and conditions.");
-            return;
-        }
-        // Handle login logic here
-        console.log('Email:', email);
-        console.log('Password:', password);
+        const user = Users.find(u => u.email === email && u.password === password);
 
-        // Assuming login is successful, redirect to dashboard
-        history.push('/dashboard');
+        if (user) {
+            navigate(`/profile/${user.id}`, { state: { user } });
+        } else {
+            setError('Invalid email or password');
+        }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
+            <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
                 <h1 className="text-2xl font-bold mb-6">Login</h1>
-                <form onSubmit={handleSubmit}>
+                {error && <div className="mb-4 text-red-500">{error}</div>}
+                <form onSubmit={handleLogin}>
                     <div className="mb-4">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
                         <input
@@ -48,20 +48,13 @@ function Login() {
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
                     </div>
-
                     <button
                         type="submit"
-                        className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded ${!agreed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={!agreed}
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
                     >
                         Login
                     </button>
                 </form>
-                <div className="mt-4 text-center">
-                    <NavLink to="/register" className="text-blue-500 hover:underline">
-                        Registriraj podjetje
-                    </NavLink>
-                </div>
             </div>
         </div>
     );

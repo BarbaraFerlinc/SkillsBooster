@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-//import { useHistory } from "react-router-dom"; // Import useHistory
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Users } from "../Data.jsx";
 
 function Registration() {
     const [name, setName] = useState('');
@@ -9,31 +10,59 @@ function Registration() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [agreed, setAgreed] = useState(false);
-  //  const history = useHistory(); // Initialize useHistory
+    const [users, setUsers] = useState(Users);
+    const [error, setError] = useState('');
+
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle registration logic here
-        console.log('Name:', name);
-        console.log('Email:', email);
-        console.log('Password:', password);
-        console.log('Confirm Password:', confirmPassword);
 
-        // Example registration logic
-        if (password === confirmPassword) {
-            // Assuming registration is successful, redirect to dashboard
-            history.push('/dashboard');
-        } else {
-            // Handle error (e.g., show error message)
-            alert("Passwords do not match");
+        if (password !== confirmPassword) {
+            setError("Passwords do not match");
+            return;
         }
+
+        if (!agreed) {
+            setError("You must agree to the terms and conditions");
+            return;
+        }
+
+        const newUser = {
+            id: users.length.toString(), // Assign a new id
+            name,
+            address,
+            postNumber,
+            email,
+            password,
+            role: 'admin', // Set default role to admin
+            domains: []
+        };
+
+        setUsers([...users, newUser]);
+        console.log('New user registered:', newUser);
+        console.log('All users:', [...users, newUser]);
+
+        // Reset form fields
+        setName('');
+        setAddress('');
+        setPostNumber('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setAgreed(false);
+        setError('');
+
+        // Redirect to profile page
+        navigate(`/profile/${newUser.id}`);
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-6 rounded shadow-md w-full max-w-md ">
+            <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
                 <h1 className="text-2xl font-bold mb-6">Registracija podjetja</h1>
                 <form onSubmit={handleSubmit}>
+                    {error && <div className="mb-4 text-red-500">{error}</div>}
                     <div className="mb-4">
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700">Naziv</label>
                         <input
@@ -57,8 +86,7 @@ function Registration() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="postNumber" className="block text-sm font-medium text-gray-700">Poštna
-                            številka</label>
+                        <label htmlFor="postNumber" className="block text-sm font-medium text-gray-700">Poštna številka</label>
                         <input
                             type="text"
                             id="postNumber"
@@ -93,8 +121,7 @@ function Registration() {
                         />
                     </div>
                     <div className="mb-6">
-                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm
-                            Password</label>
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
                         <input
                             type="password"
                             id="confirmPassword"
@@ -113,13 +140,12 @@ function Registration() {
                                 onChange={(e) => setAgreed(e.target.checked)}
                                 className="form-checkbox"
                             />
-                            <span className="ml-2">I agree to the <NavLink to="/terms"
-                                                                           className="text-blue-500 hover:underline">terms and conditions</NavLink></span>
+                            <span className="ml-2">I agree to the <NavLink to="/terms" className="text-blue-500 hover:underline">terms and conditions</NavLink></span>
                         </label>
                     </div>
-                    <button onClick={handleSubmit}
-                            type="submit"
-                            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
                     >
                         Registracija
                     </button>

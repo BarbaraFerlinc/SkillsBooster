@@ -17,6 +17,8 @@ import Registration from "./pages/Registration";
 import Domena from "./pages/Domene/Domena";
 import DodajDomeno from "./pages/Domene/DodajDomeno";
 import AddUser from "./pages/AddUser.jsx";
+import LogOut from "./pages/LogOut.jsx";
+import Kviz from "./pages/Kviz/Kviz.jsx";
 
 function App() {
 
@@ -35,10 +37,13 @@ function App() {
         <Route exact path="/register" element={<Registration />} />
         <Route exact path="/login" element={<Login />} />
 
-        <Route exact path="/profile" element={<Profile />} />
+        <Route path="/profile/:id" element={<Profile />} />
         <Route exact path="/domena" element={<Domena/>} />
         <Route exact path="/addDomena" element={<DodajDomeno/>} />
         <Route exact path="/addUser" element={<AddUser/>} />
+        <Route exact path="/logout" element={<LogOut/>} />
+        <Route exact path="/quiz" element={<Kviz/>} />
+
 
 
       </Routes>
