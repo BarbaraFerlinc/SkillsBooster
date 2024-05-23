@@ -5,11 +5,14 @@ import Header from '../partials/Header';
 import DashboardCard10 from '../partials/dashboard/DashboardCard10';
 import DynamicHeader from "../partials/dashboard/DynamicHeader";
 import { NavLink } from "react-router-dom";
+//import { UserAuth } from '../context/AuthContext'; --KLARA
 
 function Profile() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const location = useLocation();
     const user = location.state.user;
+
+    //const { user } = UserAuth(); --KLARA
 
     return (
         <div className="flex h-screen overflow-hidden">

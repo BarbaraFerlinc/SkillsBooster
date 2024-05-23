@@ -5,7 +5,14 @@ var logger = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
+var admin = require("firebase-admin");
+var serviceAccount = require("./key.json");
+
 require('dotenv').config();
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
 
 // Routers
 var domenaRouter = require('./routes/domenaRouter');

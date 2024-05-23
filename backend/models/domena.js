@@ -1,3 +1,5 @@
+const db = require('../pb');
+
 class Domena {
 
 }

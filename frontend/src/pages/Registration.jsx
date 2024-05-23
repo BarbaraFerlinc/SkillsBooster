@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Users } from "../Data.jsx";
+//import { UserAuth } from '../context/AuthContext.js'; --KLARA
 
 function Registration() {
     const [name, setName] = useState('');
@@ -13,9 +14,11 @@ function Registration() {
     const [users, setUsers] = useState(Users);
     const [error, setError] = useState('');
 
+    //const { createUser } = UserAuth(); --KLARA
+
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (password !== confirmPassword) {
@@ -42,6 +45,8 @@ function Registration() {
         setUsers([...users, newUser]);
         console.log('New user registered:', newUser);
         console.log('All users:', [...users, newUser]);
+
+        //await createUser(email, password); --KLARA
 
         // Reset form fields
         setName('');

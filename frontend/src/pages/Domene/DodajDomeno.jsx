@@ -4,6 +4,7 @@ import Sidebar from "../../partials/Sidebar.jsx";
 import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
 import SeznamDomen from "./SeznamDomen.jsx";
+//import { UserAuth } from '../../context/AuthContext.js'; --KLARA
 
 function DodajDomeno({ onSubmit, currentUser }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -11,6 +12,8 @@ function DodajDomeno({ onSubmit, currentUser }) {
     const [description, setDescription] = useState("");
     const [domains, setDomains] = useState([]);
     const [showForm, setShowForm] = useState(true);
+
+    //const { user } = UserAuth(); --KLARA
 
     const handleDomainNameChange = (event) => setDomainName(event.target.value);
     const handleDescriptionChange = (event) => setDescription(event.target.value);

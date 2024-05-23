@@ -6,12 +6,15 @@ import reading from "../../images/read-svgrepo-com.png";
 import writing from "../../images/writing-svgrepo-com.png";
 import PropTypes from "prop-types";
 import {NavLink} from "react-router-dom";
+//import { UserAuth } from '../../context/AuthContext.js'; --KLARA
 
 
 function Domena() {
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [files, setFiles] = useState([]);
+
+    //const { user } = UserAuth(); --KLARA
 
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);

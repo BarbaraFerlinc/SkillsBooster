@@ -1,3 +1,5 @@
-require('dotenv').config();
+var admin = require("firebase-admin");
 
-// povezava do baze
+const db = admin.firestore();
+
+module.exports = db;

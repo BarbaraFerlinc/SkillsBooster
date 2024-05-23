@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {Users} from "../Data.jsx";
+//import { UserAuth } from '../context/AuthContext.js'; --KLARA
 
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+
+    //const { signIn } = UserAuth(); --KLARA
+
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         const user = Users.find(u => u.email === email && u.password === password);
 
         if (user) {
+            //await signIn(email, password); --KLARA
+
             navigate(`/profile/${user.id}`, { state: { user } });
         } else {
             setError('Invalid email or password');
