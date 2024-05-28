@@ -1,0 +1,51 @@
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { NavLink } from 'react-router-dom';
+import { collection, getDocs } from 'firebase/firestore';
+import { api } from '../../services/api.js'; // Adjust the import path as necessary
+
+function SeznamDomen() {
+    const [domains, setDomains] = useState([]);
+
+    useEffect(() => {
+        const fetchDomains = async () => {
+            const domainCollection = collection(api, 'Domene_znanja');
+            const domainSnapshot = await getDocs(domainCollection);
+            const domainList = domainSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            setDomains(domainList);
+        };
+
+        fetchDomains();
+    }, []);
+
+    return (
+        <ul>
+            {domains.map((domain) => (
+                <li key={domain.id} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                        <NavLink
+                            to={`/domena/${domain.id}`}
+                            className="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 text-black hover:text-black truncate"
+                        >
+                            {domain.name}
+                        </NavLink>
+                    </div>
+                </li>
+            ))}
+        </ul>
+    );
+}
+
+SeznamDomen.propTypes = {
+    domains: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+        })
+    ),
+};
+
+export default SeznamDomen;

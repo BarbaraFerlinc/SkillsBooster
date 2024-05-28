@@ -100,3 +100,10 @@ export const quizData = {
         }
     ]
 };
+export const quizzes = [
+    { id: 1, name: 'Math Quiz' },
+    { id: 2, name: 'Science Quiz' },
+    // more quizzes...
+];
+
+
