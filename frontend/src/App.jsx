@@ -11,7 +11,7 @@ import './charts/ChartjsConfig';
 
 // Import pages
 import Dashboard from './pages/Dashboard';
-import Profile from "./pages/Profile";
+import Profile from "./pages/Profil/Profile.jsx";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Domena from "./pages/Domene/Domena";
@@ -19,7 +19,7 @@ import DodajDomeno from "./pages/Domene/DodajDomeno";
 import AddUser from "./pages/AddUser.jsx";
 import LogOut from "./pages/LogOut.jsx";
 import Kviz from "./pages/Kviz/Kviz.jsx";
-import SeznamKviz from "./pages/Kviz/SeznamKviz.jsx";
+
 
 function App() {
 
@@ -38,7 +38,7 @@ function App() {
         <Route exact path="/register" element={<Registration />} />
         <Route exact path="/login" element={<Login />} />
 
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:id" element={<Profile />} />
         <Route exact path="/domena/:id" element={<Domena/>} />
         <Route exact path="/addDomena" element={<DodajDomeno/>} />
         <Route exact path="/addUser" element={<AddUser/>} />

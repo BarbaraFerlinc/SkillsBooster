@@ -7,7 +7,8 @@ import writing from "../../images/writing-svgrepo-com.png";
 import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
 import SeznamKviz from "../Kviz/SeznamKviz.jsx";
-import {quizzes} from "../../Data.jsx"; // Make sure to adjust the path according to your project structure
+import { quizzes } from "../../Data.jsx";
+import AIAssistant from "../../partials/AIAssistant.jsx"; // Make sure to adjust the path according to your project structure
 
 function Domena() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,7 +18,6 @@ function Domena() {
         const selectedFiles = Array.from(e.target.files);
         setFiles([...files, ...selectedFiles]);
     };
-
 
     return (
         <div className="flex h-screen overflow-hidden">
@@ -34,11 +34,11 @@ function Domena() {
                         {/* Main Header */}
                         <DynamicHeader domainName={"Domena"} />
 
-                        {/* Secondary Header */}
+                        {/* Gradivo Section */}
                         <div className="flex items-center justify-between mt-8">
                             <div className="flex items-center">
-                                <img src={reading} alt="Icon" className="w-10 h-10 mr-2" />
-                                <h3 className="text-lg font-semibold text-gray-800">Gradivo</h3>
+                                <img src={reading} alt="Icon" className="w-16 h-16 mr-4" />
+                                <h3 className="text-xl font-bold text-gray-800">Gradivo</h3>
                             </div>
                         </div>
                         <input
@@ -62,26 +62,23 @@ function Domena() {
                             <span className="hidden xs:block ml-2">Dodaj gradivo</span>
                         </label>
 
+                        {/* Kvizi Section */}
                         <div className="flex items-center justify-between mt-8">
                             <div className="flex items-center">
-                                <img src={writing} alt="Icon" className="w-10 h-10 mr-2" />
-                                <h3 className="text-lg font-semibold text-gray-800">Kvizi</h3>
+                                <img src={writing} alt="Icon" className="w-16 h-16 mr-4" />
+                                <h3 className="text-xl font-bold text-gray-800">Kvizi</h3>
                             </div>
                         </div>
 
                         {/* SeznamKvizov Component */}
                         <SeznamKviz quizzes={quizzes} />
 
-                        <div className="grid grid-cols-12 gap-4 mt-4">
-                            <p>Reši kviz:</p>
-                            <NavLink to={"/quiz"} className="quiz-link">Ime kviza </NavLink>
-                        </div>
-
                         <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-8">
                             <span className="hidden xs:block ml-2">Ustvari kviz</span>
                         </button>
                     </div>
                 </main>
+                <AIAssistant />
             </div>
         </div>
     );

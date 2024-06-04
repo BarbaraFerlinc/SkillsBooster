@@ -35,17 +35,16 @@ export const Users = [
         email: 'employee1@gmail.com',
         password: '123',
         role: 'user',
-        domains:Domena[{
-            id:1,
-        }]
+        domains: [
+            { name: 'Domain 1', progress: 75 },
+            { name: 'Domain 2', progress: 50 }
+        ]
     },
     { id: 3,
         email: 'employee2@gmail.com',
         password: '1234',
         role: 'user',
-        domains:Domena[{
-        id:2
-        }]
+        domains: ['HR']
     }
 ];
 
