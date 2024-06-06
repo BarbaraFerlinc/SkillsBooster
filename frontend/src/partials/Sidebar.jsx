@@ -115,9 +115,9 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </ul>
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <NavLink to="/domena"
+                  <NavLink to="/addDomena"
                            className="text-sm font-medium ml-3 text-white lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                    Domena
+                    Add Domena
                   </NavLink>
                 </div>
               </div>

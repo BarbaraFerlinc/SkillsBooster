@@ -19,6 +19,9 @@ import DodajDomeno from "./pages/Domene/DodajDomeno";
 import AddUser from "./pages/AddUser.jsx";
 import LogOut from "./pages/LogOut.jsx";
 import Kviz from "./pages/Kviz/Kviz.jsx";
+import DodajKviz from "./pages/Kviz/DodajKviz.jsx";
+import OpenQuestions from "./pages/Kviz/OpenQuestions.jsx";
+import ClosedQuestions from "./pages/Kviz/ClosedQuestions.jsx";
 
 
 function App() {
@@ -44,6 +47,9 @@ function App() {
         <Route exact path="/addUser" element={<AddUser/>} />
         <Route exact path="/logout" element={<LogOut/>} />
         <Route exact path="/quiz/:id" element={<Kviz/>} />
+        <Route exact path="/addQuiz" element={<DodajKviz/>} />
+        {/*  <Route exact path="/open" element={<OpenQuestions/>} />
+        <Route exact path="/closed" element={<ClosedQuestions/>} />*/}
 
 
 

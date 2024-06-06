@@ -73,9 +73,12 @@ function Domena() {
                         {/* SeznamKvizov Component */}
                         <SeznamKviz quizzes={quizzes} />
 
-                        <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-8">
-                            <span className="hidden xs:block ml-2">Ustvari kviz</span>
-                        </button>
+                        <NavLink to={"/addQuiz"}>
+                            <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-8">
+                                <span className="hidden xs:block ml-2">Ustvari kviz</span>
+                            </button>
+                        </NavLink>
+
                     </div>
                 </main>
                 <AIAssistant />
