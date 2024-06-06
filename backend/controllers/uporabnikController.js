@@ -18,7 +18,7 @@ async function dodajUporabnika(req, res) {
     } catch (error) {
       res.status(500).json({ error: 'Napaka pri vstavljanju uporabnika v bazo', details: error.message });
     }
-  }
+}
   
 async function vsiUporabniki(req, res) {
     try {

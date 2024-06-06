@@ -9,15 +9,15 @@ class Uporabnik {
                 const hashedPassword = await bcrypt.hash(geslo, saltRounds);
 
                 const id = email;
-                const newUser = {
+                const novUporabnik = {
                     ime_priimek: ime_priimek,
                     email: email,
                     geslo: hashedPassword,
                     vloga: vloga
                 };
 
-                db.collection("Uporabniki").doc(id).set(newUser);
-                return { message: 'Uspešna registracija', user: newUser };
+                db.collection("Uporabniki").doc(id).set(novUporabnik);
+                return { message: 'Uspešna registracija', user: novUporabnik };
             } else {
                 return { message: 'Neuspešna registracija', user: undefined };
             }
@@ -30,12 +30,12 @@ class Uporabnik {
         try {
             const uporabnikiRef = db.collection("Uporabniki");
             const response = await uporabnikiRef.get();
-            const users = [];
+            const uporabniki = [];
             response.forEach(doc => {
-                users.push(doc.data());
+                uporabniki.push(doc.data());
             });
 
-            return users;
+            return uporabniki;
         } catch (error) {
             throw new Error('Napaka pri pridobivanju uporabnikov iz baze: ' + error.message);
         }
@@ -43,32 +43,32 @@ class Uporabnik {
 
     static async getById(id) {
         try {
-            const uporabnikiRef = db.collection("Uporabniki").doc(id);
-            const response = await uporabnikiRef.get();
-            const user = response.data();
+            const uporabnikRef = db.collection("Uporabniki").doc(id);
+            const response = await uporabnikRef.get();
+            const uporabnik = response.data();
 
-            return user;
+            return uporabnik;
         } catch (error) {
             throw new Error('Napaka pri pridobivanju uporabnika iz baze: ' + error.message);
         }
     }
 
-    static async spremeni(ime_priimek, email, geslo, vloga) {
+    static async spremeni(id, ime_priimek, email, geslo, vloga) {
         try {
             if (this.getById(email) != undefined) {
                 const saltRounds = 10;
                 const hashedPassword = await bcrypt.hash(geslo, saltRounds);
 
-                const id = email;
-                const user = {
+                const id = id;
+                const uporabnik = {
                     ime_priimek: ime_priimek,
                     email: email,
                     geslo: hashedPassword,
                     vloga: vloga
                 };
 
-                db.collection("Uporabniki").doc(id).update(user);
-                return { message: 'Uspešna posodobitev uporabnika', user: user };
+                db.collection("Uporabniki").doc(id).update(uporabnik);
+                return { message: 'Uspešna posodobitev uporabnika', user: uporabnik };
             } else {
                 return { message: 'Neuspešna posodobitev uporabnika', user: undefined };
             }
@@ -79,15 +79,15 @@ class Uporabnik {
 
     static async izbrisi(id) {
         try {
-            const uporabnikiRef = db.collection("Uporabniki").doc(id);
-            const response = await uporabnikiRef.get();
-            const user = response.data();
-            if (user == undefined) {
+            const uporabnikRef = db.collection("Uporabniki").doc(id);
+            const response = await uporabnikRef.get();
+            const uporabnik = response.data();
+            if (uporabnik == undefined) {
                 throw new Error('Uporabnik ne obstaja');
             }
             await db.collection("Uporabniki").doc(id).delete();
 
-            return { message: 'Uporabnik izbrisan', user: user };
+            return { message: 'Uporabnik izbrisan', user: uporabnik };
         } catch (error) {
             throw new Error('Napaka pri brisanju uporabnika iz baze: ' + error.message);
         }
