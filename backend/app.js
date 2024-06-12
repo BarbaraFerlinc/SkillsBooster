@@ -16,7 +16,6 @@ admin.initializeApp({
 
 // Routers
 var domenaRouter = require('./routes/domenaRouter');
-var gradivoRouter = require('./routes/gradivoRouter');
 var kvizRouter = require('./routes/kvizRouter');
 var podjetjeRouter = require('./routes/podjetjeRouter');
 var uporabnikRouter = require('./routes/uporabnikRouter');
@@ -43,7 +42,6 @@ app.use((req, res, next) => {
 
 // Routers' use
 app.use('/domena/', domenaRouter);
-app.use('/gradivo/', gradivoRouter);
 app.use('/kviz/', kvizRouter);
 app.use('/podjetje/', podjetjeRouter);
 app.use('/uporabnik/', uporabnikRouter);
