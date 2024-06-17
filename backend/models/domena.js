@@ -130,7 +130,29 @@ class Domena {
         }
     }
 
-    // v kviz.js??
+    static async odstraniUporabnika(id, uporabnikId) {
+        try {
+            if (this.getById(id) != undefined) {
+                const domenaRef = db.collection("Domene_znanja").doc(id);
+                const response = await domenaRef.get();
+                const domena = response.data();
+    
+                if (domena.zaposleni && domena.zaposleni.includes(uporabnikId)) {
+                    const updatedZaposleni = domena.zaposleni.filter(zaposleniId => zaposleniId !== uporabnikId);
+    
+                    await db.collection("Domene_znanja").doc(id).update({ zaposleni: updatedZaposleni });
+                    return { message: 'Uporabnik uspešno odstranjen iz domene', domena: domena };
+                } else {
+                    return { message: 'Uporabnik ni del te domene', domena: domena };
+                }
+            } else {
+                return { message: 'Domena ne obstaja', domena: undefined };
+            }
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
+
     static async dodajKviz(id, kvizId) {
         try {
             if (this.getById(id) != undefined) {
@@ -147,6 +169,29 @@ class Domena {
                 return { message: 'Uspešna posodobitev domene', domena: domena };
             } else {
                 return { message: 'Neuspešna posodobitev domene', domena: undefined };
+            }
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
+
+    static async odstraniKviz(id, kvizId) {
+        try {
+            if (this.getById(id) != undefined) {
+                const domenaRef = db.collection("Domene_znanja").doc(id);
+                const response = await domenaRef.get();
+                const domena = response.data();
+    
+                if (domena.kvizi && domena.kvizi.includes(kvizId)) {
+                    const updatedKvizi = domena.kvizi.filter(obstojeciKvizId => obstojeciKvizId !== kvizId);
+    
+                    await db.collection("Domene_znanja").doc(id).update({ kvizi: updatedKvizi });
+                    return { message: 'Kviz uspešno odstranjen iz domene', domena: domena };
+                } else {
+                    return { message: 'Kviz ni del te domene', domena: domena };
+                }
+            } else {
+                return { message: 'Domena ne obstaja', domena: undefined };
             }
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);

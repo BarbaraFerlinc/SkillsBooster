@@ -98,7 +98,23 @@ async function dodajUporabnikaDomena(req, res) {
     }
 }
 
-// v kvizController.js??
+async function odstraniUporabnikaDomena(req, res) {
+    const { id } = req.params;
+    const { uporabnikId } = req.body;
+
+    if (!uporabnikId ) {
+        return res.status(400).json({ error: 'Izbran mora biti uporabnik' });
+    }
+
+    try {
+        const updatedDomena = await Domena.odstraniUporabnika(id, uporabnikId);
+        
+        res.status(200).json({ message: 'Uspešno posodobljena domena', domena: updatedDomena });
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri posodabljanju domene v bazi', details: error.message });
+    }
+}
+
 async function dodajKvizDomena(req, res) {
     const { id } = req.params;
     const { kvizId } = req.body;
@@ -109,6 +125,23 @@ async function dodajKvizDomena(req, res) {
 
     try {
         const updatedDomena = await Domena.dodajKviz(id, kvizId);
+        
+        res.status(200).json({ message: 'Uspešno posodobljena domena', domena: updatedDomena });
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri posodabljanju domene v bazi', details: error.message });
+    }
+}
+
+async function odstraniKvizDomena(req, res) {
+    const { id } = req.params;
+    const { kvizId } = req.body;
+
+    if (!kvizId ) {
+        return res.status(400).json({ error: 'Izbran mora biti kviz' });
+    }
+
+    try {
+        const updatedDomena = await Domena.odstraniKviz(id, kvizId);
         
         res.status(200).json({ message: 'Uspešno posodobljena domena', domena: updatedDomena });
     } catch (error) {
@@ -171,7 +204,9 @@ module.exports = {
     najdiDomenoOwner,
     spremeniDomeno,
     dodajUporabnikaDomena,
+    odstraniUporabnikaDomena,
     dodajKvizDomena,
+    odstraniKvizDomena,
     dodajGradivoDomena,
     izbrisiGradivoDomena,
     izbrisiDomeno

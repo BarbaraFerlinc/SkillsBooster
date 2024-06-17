@@ -9,8 +9,9 @@ router.get('/uporabnik/:id', domenaController.najdiDomenoUser);
 router.get('/lastnik/:id', domenaController.najdiDomenoOwner);
 router.put('/:id', domenaController.spremeniDomeno);
 router.put('/uporabnik/:id', domenaController.dodajUporabnikaDomena);
-// v kvizRouter.js??
+router.put('/odstrani-uporabnika/:id', domenaController.odstraniUporabnikaDomena);
 router.put('/kviz/:id', domenaController.dodajKvizDomena);
+router.put('/odstrani-kviz/:id', domenaController.odstraniKvizDomena);
 router.put('/gradivo/:id', domenaController.dodajGradivoDomena);
 router.put('/izbrisi-gradivo/:id', domenaController.izbrisiGradivoDomena);
 router.delete('/:id', domenaController.izbrisiDomeno);
