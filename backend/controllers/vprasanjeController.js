@@ -97,7 +97,7 @@ async function izbrisiVprasanje(req, res) {
         if (!vprasanje) {
         return res.status(404).json({ error: 'Vprašanje ne obstaja' });
         }
-        res.status(200).json({ message: 'Vprašanje izbrisan', vprasanje: vprasanje });
+        res.status(200).json({ message: 'Vprašanje izbrisano', vprasanje: vprasanje });
     } catch (error) {
         res.status(500).json({ error: 'Napaka pri brisanju vprašanja iz baze', details: error.message });
     }

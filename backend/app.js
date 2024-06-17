@@ -5,20 +5,15 @@ var logger = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-var admin = require("firebase-admin");
-var serviceAccount = require("./key.json");
-
 require('dotenv').config();
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
 
 // Routers
 var domenaRouter = require('./routes/domenaRouter');
 var kvizRouter = require('./routes/kvizRouter');
+var odgovorRouter = require('./routes/odgovorRouter');
 var podjetjeRouter = require('./routes/podjetjeRouter');
 var uporabnikRouter = require('./routes/uporabnikRouter');
+var vprasanjeRouter = require('./routes/vprasanjeRouter');
 var znanjeRouter = require('./routes/znanjeRouter');
 
 const app = express();
@@ -43,8 +38,10 @@ app.use((req, res, next) => {
 // Routers' use
 app.use('/domena/', domenaRouter);
 app.use('/kviz/', kvizRouter);
+app.use('/odgovor/', odgovorRouter);
 app.use('/podjetje/', podjetjeRouter);
 app.use('/uporabnik/', uporabnikRouter);
+app.use('/vprasanje/', vprasanjeRouter);
 app.use('/znanje/', znanjeRouter);
 
 app.listen(process.env.PORT || 9000, () => {
