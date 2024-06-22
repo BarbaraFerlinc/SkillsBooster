@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {Users} from "../Data.jsx";
+import { useNavigate, NavLink } from 'react-router-dom';
+import { Users } from "../Data.jsx";
 //import { UserAuth } from '../context/AuthContext.js'; --KLARA
-
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -61,6 +60,11 @@ function Login() {
                         Login
                     </button>
                 </form>
+                <div className="mt-4 text-center">
+                    <NavLink to="/register" className="text-blue-500 hover:underline">
+                        Register your company here
+                    </NavLink>
+                </div>
             </div>
         </div>
     );

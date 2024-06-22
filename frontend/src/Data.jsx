@@ -64,44 +64,53 @@ export const Domains=[
 
     }
 ]
-export const quizData = {
-    name: "General Knowledge Quiz",
-    questions: [
-        {
-            id: 1,
-            question: "What is the capital of France?",
-            answers: [
-                { id: "A", text: "Paris", correct: true },
-                { id: "B", text: "Berlin", correct: false },
-                { id: "C", text: "Rome", correct: false },
-                { id: "D", text: "London", correct: false }
-            ]
-        },
-        {
-            id: 2,
-            question: "Which planet is known as the Red Planet?",
-            answers: [
-                { id: "A", text: "Venus", correct: false },
-                { id: "B", text: "Mars", correct: true },
-                { id: "C", text: "Jupiter", correct: false },
-                { id: "D", text: "Saturn", correct: false }
-            ]
-        },
-        {
-            id: 3,
-            question: "What is the chemical symbol for water?",
-            answers: [
-                { id: "A", text: "H2O", correct: true },
-                { id: "B", text: "CO2", correct: false },
-                { id: "C", text: "N2", correct: false },
-                { id: "D", text: "O2", correct: false }
-            ]
-        }
-    ]
-};
+
 export const quizzes = [
-    { id: 1, name: 'Math Quiz' },
-    { id: 2, name: 'Science Quiz' },
+    {
+        id: 1,
+        name: 'Math Quiz',
+        questions: [
+            {
+                id: 1,
+                question: 'What is 2 + 2?',
+                type: 'closed',
+                options: ['3', '4', '5', '6'],
+                correctAnswer: '4'
+            },
+            {
+                id: 2,
+                question: 'What is the capital of France?',
+                type: 'closed',
+                options: ['London', 'Berlin', 'Paris', 'Madrid'],
+                correctAnswer: 'Paris'
+            },
+            {
+                id: 3,
+                question: 'What is the square root of 25?',
+                type: 'open',
+                correctAnswer: '5'
+            }
+        ]
+    },
+    {
+        id: 2,
+        name: 'Science Quiz',
+        questions: [
+            {
+                id: 1,
+                question: 'What is the chemical symbol for water?',
+                type: 'closed',
+                options: ['H2O', 'CO2', 'N2', 'O2'],
+                correctAnswer: 'H2O'
+            },
+            {
+                id: 2,
+                question: 'Who developed the theory of relativity?',
+                type: 'closed',
+                options: ['Isaac Newton', 'Albert Einstein', 'Galileo Galilei', 'Niels Bohr'],
+                correctAnswer: 'Albert Einstein'
+            }
+        ]}
     // more quizzes...
 ];
 

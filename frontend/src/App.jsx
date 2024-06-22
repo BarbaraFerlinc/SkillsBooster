@@ -22,6 +22,7 @@ import Kviz from "./pages/Kviz/Kviz.jsx";
 import DodajKviz from "./pages/Kviz/DodajKviz.jsx";
 import OpenQuestions from "./pages/Kviz/OpenQuestions.jsx";
 import ClosedQuestions from "./pages/Kviz/ClosedQuestions.jsx";
+import SolveQuiz from "./pages/Kviz/SolveQuiz.jsx";
 
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
         <Route exact path="/logout" element={<LogOut/>} />
         <Route exact path="/quiz/:id" element={<Kviz/>} />
         <Route exact path="/addQuiz" element={<DodajKviz/>} />
+        <Route exact path="/solveQuiz/:id" element={<SolveQuiz/>} />
         {/*  <Route exact path="/open" element={<OpenQuestions/>} />
         <Route exact path="/closed" element={<ClosedQuestions/>} />*/}
 
