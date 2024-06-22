@@ -1,11 +1,28 @@
-// AIAssistant.jsx
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { AiOutlineWechatWork } from "react-icons/ai"; // Using react-icons for the assistant icon
 
 function AIAssistant() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
+    const assistantRef = useRef(null); // Ref for the assistant box
+
+    useEffect(() => {
+        // Function to close the assistant box when clicking outside
+        const handleClickOutside = (event) => {
+            if (assistantRef.current && !assistantRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        // Attach the event listener
+        document.addEventListener('mousedown', handleClickOutside);
+
+        // Clean up the event listener on component unmount
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const toggleChat = () => {
         setIsOpen(!isOpen);
@@ -35,7 +52,7 @@ function AIAssistant() {
             </div>
 
             {isOpen && (
-                <div className="fixed bottom-32 right-16 z-50 w-80 bg-white border border-gray-300 rounded-lg shadow-lg">
+                <div ref={assistantRef} className="fixed bottom-32 right-16 z-50 w-80 bg-white border border-gray-300 rounded-lg shadow-lg">
                     <div className="p-4 border-b border-gray-200">
                         <h2 className="text-lg font-semibold">AI Assistant</h2>
                     </div>

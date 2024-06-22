@@ -26,6 +26,8 @@ import { AuthContextProvider } from './context/AuthContext.jsx';
 import PrivateRouting from './components/PrivateRouting.jsx';
 import BossRouting from './components/BossRouting.jsx';
 import AdminRouting from './components/AdminRouting.jsx';
+import SolveQuiz from "./pages/Kviz/SolveQuiz.jsx";
+
 
 function App() {
 
