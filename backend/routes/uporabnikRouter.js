@@ -5,7 +5,9 @@ const uporabnikController = require('../controllers/uporabnikController');
 router.post('/dodaj', uporabnikController.dodajUporabnika);
 router.get('/vsi', uporabnikController.vsiUporabniki);
 router.get('/:id', uporabnikController.najdiUporabnika);
-router.delete('/:id', uporabnikController.izbrisiUporabnika);
+router.post('/adminEmail', uporabnikController.najdiUporabnikaAdmin);
 router.put('/:id', uporabnikController.spremeniUporabnika);
+router.delete('/:id', uporabnikController.izbrisiUporabnika);
+router.post('/profil', uporabnikController.profilUporabnika);
 
 module.exports = router;

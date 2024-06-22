@@ -4,17 +4,13 @@ class Odgovor {
     static async dodaj(odgovor, tip) {
         try {
             const id = odgovor.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            if (this.getById(id) == undefined) {
-                const novOdgovor = {
-                    odgovor: odgovor,
-                    tip: tip
-                };
+            const novOdgovor = {
+                odgovor: odgovor,
+                tip: tip
+            };
 
-                db.collection("Odgovori").doc(id).set(novOdgovor);
-                return { message: 'Uspešno dodan odgovor', odgovor: novOdgovor };
-            } else {
-                return { message: 'Neuspešno dodan odgovor', odgovor: undefined };
-            }
+            db.collection("Odgovori").doc(id).set(novOdgovor);
+            return { message: 'Uspešno dodan odgovor', odgovor: novOdgovor };
         } catch (error) {
             throw new Error('Napaka pri vstavljanju odgovora v bazo: ' + error.message);
         }
@@ -49,17 +45,13 @@ class Odgovor {
 
     static async spremeni(id, odgovor, tip) {
         try {
-            if (this.getById(id) != undefined) {
-                const spremenjen = {
-                    odgovor: odgovor,
-                    tip: tip
-                };
+            const spremenjen = {
+                odgovor: odgovor,
+                tip: tip
+            };
 
-                db.collection("Odgovori").doc(id).update(spremenjen);
-                return { message: 'Uspešna posodobitev odgovora', odgovor: spremenjen };
-            } else {
-                return { message: 'Neuspešna posodobitev odgovora', odgovor: undefined };
-            }
+            db.collection("Odgovori").doc(id).update(spremenjen);
+            return { message: 'Uspešna posodobitev odgovora', odgovor: spremenjen };
         } catch (error) {
             throw new Error('Napaka pri posodabljanju odgovora v bazi: ' + error.message);
         }

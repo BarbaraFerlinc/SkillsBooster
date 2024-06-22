@@ -1,8 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Users } from "../../Data.jsx";
+import api from '../../services/api.js';
+import { UserAuth } from '../../context/AuthContext.jsx';
 
 function EmployeeProfile({ userId }) {
     const user = Users.find(user => user.id === userId);
+
+    const [currentUser, setCurrentUser] = useState(null);
+
+    const { uporabnik } = UserAuth();
+
+    useEffect(() => {
+        if (user) {
+          const uporabnikovEmail = user.email;
+    
+          api.post('/uporabnik/profil', { id: uporabnikovEmail })
+            .then(res => {
+              const profil = res.data;
+              setCurrentUser(profil);
+            })
+            .catch(err => {
+              console.error(err);
+            });
+        }
+      }, [user]);
+
+    console.log(currentUser);
 
     return (
         <div className="mt-8">

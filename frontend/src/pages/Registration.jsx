@@ -1,65 +1,183 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Users } from "../Data.jsx";
-//import { UserAuth } from '../context/AuthContext.js'; --KLARA
+import { UserAuth } from '../context/AuthContext.jsx';
+import api from "../services/api.js";
 
-function Registration() {
-    const [name, setName] = useState('');
-    const [address, setAddress] = useState('');
-    const [postNumber, setPostNumber] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+const initialCompany = {
+    naslov: "",
+    naziv: "",
+    postna_stevilka: 0,
+    admin_email: ""
+}
+
+const initialUser = {
+    ime_priimek: "Administrator",
+    email: "",
+    geslo: "",
+    vloga: "admin"
+}
+
+function Registration() {    
     const [confirmPassword, setConfirmPassword] = useState('');
     const [agreed, setAgreed] = useState(false);
-    const [users, setUsers] = useState(Users);
-    const [error, setError] = useState('');
+    
+    const [company, setCompany] = useState(initialCompany);
+    const [user, setUser] = useState(initialUser);
+    const [errors, setErrors] = useState({});
 
-    //const { createUser } = UserAuth(); --KLARA
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [companies, setCompanies] = useState([]);
+    const [users, setUsers] = useState([]);
+
+    const { createUser } = UserAuth();
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchPodjetja = async () => {
+            try {
+                const response = await api.get('/podjetje/vsa');
+                setCompanies(response.data);
+            } catch (er) {
+                console.log("Napaka pri pridobivanju podjetij", er);
+            }
+        }
+        
+        const fetchUporabniki = async () => {
+            try {
+                const response = await api.get('/uporabnik/vsi');
+                setUsers(response.data);
+            } catch (er) {
+                console.log("Napaka pri pridobivanju uporabnikov", er);
+            }
+        }
+    
+        fetchPodjetja();
+        fetchUporabniki();
+    }, [])
+
+    const validateForm = () => {
+        let formErrors = {};
+        let formIsValid = true;
+    
+        if (!company.naziv) {
+            formIsValid = false;
+            formErrors["naziv"] = "Prosimo, vnesite naziv.";
+        }
+
+        if (!company.naslov) {
+            formIsValid = false;
+            formErrors["naslov"] = "Prosimo, vnesite naslov.";
+        }
+        
+        if (!company.postna_stevilka) {
+            formIsValid = false;
+            formErrors["postna_stevilka"] = "Prosimo, vnesite poštno številko.";
+        }
+    
+        if (!email) {
+            formIsValid = false;
+            formErrors["email"] = "Prosimo, vnesite email.";
+        }
+    
+        for (let i = 0; i < users.length; i++) {
+          if (users[i].email == email) {
+            formIsValid = false;
+            formErrors["email"] = "Ta email je ze v uporabi.";
+          }
+        }
+    
+        if (!password) {
+            formIsValid = false;
+            formErrors["geslo"] = "Prosimo, vnesite geslo.";
+        }
+    
+        if (password && password.length < 6) {
+            formIsValid = false;
+            formErrors["geslo"] = "Prosimo, vnesite geslo z vsaj 6 znaki.";
+        }
+
+        if (password !== confirmPassword) {
+            formIsValid = false;
+            formErrors["geslo_enako"] = "Prosimo, vnesite ujemajoče geslo.";
+        }
+
+        if (!agreed) {
+            formIsValid = false;
+            formErrors["agreed"] = "Prosimo. potrdite da se strinjate s pogoji uporabe.";
+        }
+
+        setErrors(formErrors);
+        return formIsValid;
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (password !== confirmPassword) {
-            setError("Passwords do not match");
-            return;
+        if (validateForm()) {
+            setLoading(true);
+            setIsSubmitting(true);
+
+            try {
+                user.email = email;
+                user.geslo = password;
+                company.admin_email = email;
+
+                console.log('Sending user data:', user);
+                const response1 = await api.post("/uporabnik/dodaj", user, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                });
+                console.log('User response:', response1.data);
+
+                console.log('Sending company data:', company);
+                const response2 = await api.post("/podjetje/dodaj", company, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                });
+                console.log('Company response:', response2.data);
+
+                if (response1.status === 200 && response2.status === 200) {
+                    // pokaže se okno in piše 'Uspešno ste registrirali podjetje.'
+                    console.log('Both requests successful');
+                }
+
+                console.log('Uspešno registrirano podjetje');
+                console.log(user);
+                console.log(company);
+                setCompany(initialCompany);
+                setUser(initialUser);
+
+                await createUser(email, password);
+
+                setTimeout(() => {
+                    navigate('/profile');
+                }, 3000);
+            } catch (er) {
+                setError(er.message);
+            }
         }
+    };
 
-        if (!agreed) {
-            setError("You must agree to the terms and conditions");
-            return;
-        }
-
-        const newUser = {
-            id: users.length.toString(), // Assign a new id
-            name,
-            address,
-            postNumber,
-            email,
-            password,
-            role: 'admin', // Set default role to admin
-            domains: []
-        };
-
-        setUsers([...users, newUser]);
-        console.log('New user registered:', newUser);
-        console.log('All users:', [...users, newUser]);
-
-        //await createUser(email, password); --KLARA
-
-        // Reset form fields
-        setName('');
-        setAddress('');
-        setPostNumber('');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-        setAgreed(false);
-        setError('');
-
-        // Redirect to profile page
-        navigate(`/profile/${newUser.id}`);
+    const handleChange = (e) => {
+        const { value, name } = e.target;
+    
+        setCompany((prevState) => {
+          const nextState = {
+            ...prevState,
+            [name]: value,
+          };
+          return nextState;
+        });
     };
 
     return (
@@ -67,39 +185,41 @@ function Registration() {
             <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
                 <h1 className="text-2xl font-bold mb-6">Registracija podjetja</h1>
                 <form onSubmit={handleSubmit}>
-                    {error && <div className="mb-4 text-red-500">{error}</div>}
                     <div className="mb-4">
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Naziv</label>
+                        <label htmlFor="naziv" className="block text-sm font-medium text-gray-700">Naziv</label>
                         <input
                             type="text"
-                            id="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
+                            id="naziv"
+                            name='naziv'
+                            onChange={handleChange}
+                            disabled={isSubmitting}
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
+                        <small className="text-red-500">{errors.naziv}</small>
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="address" className="block text-sm font-medium text-gray-700">Naslov</label>
+                        <label htmlFor="naslov" className="block text-sm font-medium text-gray-700">Naslov</label>
                         <input
                             type="text"
-                            id="address"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            required
+                            id="naslov"
+                            name='naslov'
+                            onChange={handleChange}
+                            disabled={isSubmitting}
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
+                        <small className="text-red-500">{errors.naslov}</small>
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="postNumber" className="block text-sm font-medium text-gray-700">Poštna številka</label>
+                        <label htmlFor="postna_stevilka" className="block text-sm font-medium text-gray-700">Poštna številka</label>
                         <input
                             type="text"
-                            id="postNumber"
-                            value={postNumber}
-                            onChange={(e) => setPostNumber(e.target.value)}
-                            required
+                            id="postna_stevilka"
+                            name='postna_stevilka'
+                            onChange={handleChange}
+                            disabled={isSubmitting}
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
+                        <small className="text-red-500">{errors.postna_stevilka}</small>
                     </div>
 
                     <h1 className="text-2xl font-bold mb-6">Admin registracija</h1>
@@ -108,33 +228,35 @@ function Registration() {
                         <input
                             type="email"
                             id="email"
-                            value={email}
+                            name='email'
                             onChange={(e) => setEmail(e.target.value)}
-                            required
+                            disabled={isSubmitting}
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
+                        <small className="text-red-500">{errors.email}</small>
                     </div>
                     <div className="mb-4">
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
                         <input
                             type="password"
                             id="password"
-                            value={password}
+                            name='password'
                             onChange={(e) => setPassword(e.target.value)}
-                            required
+                            disabled={isSubmitting}
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
+                        <small className="text-red-500">{errors.geslo}</small>
                     </div>
                     <div className="mb-6">
                         <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
                         <input
                             type="password"
                             id="confirmPassword"
-                            value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
+                            disabled={isSubmitting}
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
+                        <small className="text-red-500">{errors.geslo_enako}</small>
                     </div>
 
                     <div className="mb-6">
@@ -142,11 +264,14 @@ function Registration() {
                             <input
                                 type="checkbox"
                                 checked={agreed}
-                                onChange={(e) => setAgreed(e.target.checked)}
+                                onChange={(e) => setAgreed(e.target.value)}
+                                disabled={isSubmitting}
                                 className="form-checkbox"
                             />
                             <span className="ml-2">I agree to the <NavLink to="/terms" className="text-blue-500 hover:underline">terms and conditions</NavLink></span>
                         </label>
+                        <br />
+                        <small className="text-red-500">{errors.agreed}</small>
                     </div>
                     <button
                         type="submit"

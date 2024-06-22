@@ -22,7 +22,10 @@ import Kviz from "./pages/Kviz/Kviz.jsx";
 import DodajKviz from "./pages/Kviz/DodajKviz.jsx";
 import OpenQuestions from "./pages/Kviz/OpenQuestions.jsx";
 import ClosedQuestions from "./pages/Kviz/ClosedQuestions.jsx";
-
+import { AuthContextProvider } from './context/AuthContext.jsx';
+import PrivateRouting from './components/PrivateRouting.jsx';
+import BossRouting from './components/BossRouting.jsx';
+import AdminRouting from './components/AdminRouting.jsx';
 
 function App() {
 
@@ -34,27 +37,26 @@ function App() {
     document.querySelector('html').style.scrollBehavior = ''
   }, [location.pathname]); // triggered on route change
 
-  return (
-    <>
-      <Routes>
-        <Route exact path="/" element={<Dashboard />} />
-        <Route exact path="/register" element={<Registration />} />
-        <Route exact path="/login" element={<Login />} />
+  return (<>
+      <AuthContextProvider>
+        <Routes>
+          <Route exact path="/" element={<Dashboard />} />
+          <Route exact path="/register" element={<Registration />} />
+          <Route exact path="/login" element={<Login />} />
 
-        <Route path="/profile/:id" element={<Profile />} />
-        <Route exact path="/domena/:id" element={<Domena/>} />
-        <Route exact path="/addDomena" element={<DodajDomeno/>} />
-        <Route exact path="/addUser" element={<AddUser/>} />
-        <Route exact path="/logout" element={<LogOut/>} />
-        <Route exact path="/quiz/:id" element={<Kviz/>} />
-        <Route exact path="/addQuiz" element={<DodajKviz/>} />
-        {/*  <Route exact path="/open" element={<OpenQuestions/>} />
-        <Route exact path="/closed" element={<ClosedQuestions/>} />*/}
+          <Route path="/profile" element={<Profile />} />
+          <Route exact path="/domena/:id" element={<Domena/>} />
+          <Route exact path="/addDomena" element={<DodajDomeno/>} />
+          <Route exact path="/addUser" element={<AddUser/>} />
+          <Route exact path="/logout" element={<LogOut/>} />
+          <Route exact path="/quiz/:id" element={<Kviz/>} />
+          <Route exact path="/addQuiz" element={<DodajKviz/>} />
+          
+          {/*  <Route exact path="/open" element={<OpenQuestions/>} />
+          <Route exact path="/closed" element={<ClosedQuestions/>} />*/}
 
-
-
-
-      </Routes>
+        </Routes>
+      </AuthContextProvider>
     </>
   );
 }

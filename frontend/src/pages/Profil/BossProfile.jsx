@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '../../services/api.js';
+import { UserAuth } from '../../context/AuthContext.jsx';
 
 const testUsers = [
     { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'admin', domains: [] },
@@ -11,6 +13,27 @@ const availableDomains = ['Finance', 'HR', 'IT', 'Marketing'];
 
 function BossProfile() {
     const [users, setUsers] = useState(testUsers);
+
+    const [currentUser, setCurrentUser] = useState(null);
+
+    const { user } = UserAuth();
+
+    useEffect(() => {
+        if (user) {
+          const uporabnikovEmail = user.email;
+    
+          api.post('/uporabnik/profil', { id: uporabnikovEmail })
+            .then(res => {
+              const profil = res.data;
+              setCurrentUser(profil);
+            })
+            .catch(err => {
+              console.error(err);
+            });
+        }
+      }, [user]);
+
+    console.log(currentUser);
 
     const handleDomainChange = (userId, newDomain) => {
         setUsers(users.map(user => user.id === userId ? { ...user, domains: [newDomain] } : user));

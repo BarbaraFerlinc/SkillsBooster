@@ -43,6 +43,19 @@ async function najdiUporabnika(req, res) {
     }
 }
 
+async function najdiUporabnikaAdmin(req, res) {
+    const { adminEmail } = req.body;
+    try {
+        const uporabniki = await Uporabnik.getByAdmin(adminEmail);
+        if (!uporabniki) {
+        return res.status(404).json({ error: 'Uporabniki ne obstajajo' });
+        }
+        res.status(200).json(uporabniki);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju uporabnikov iz baze', details: error.message });
+    }
+}
+
 async function spremeniUporabnika(req, res) {
     const { id } = req.params;
     const { ime_priimek, email, geslo, vloga } = req.body;
@@ -76,10 +89,30 @@ async function izbrisiUporabnika(req, res) {
     }
 }
 
+async function profilUporabnika(req, res) {
+    const id = req.body.id;
+    if (!id) {
+        return res.status(400).send({ error: 'Email is required' });
+    }
+
+    try {
+        const user = await Uporabnik.getById(id);
+        console.log(user)
+        if (!user) {
+        return res.status(404).json({ error: 'Uporabnik ne obstaja' });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju uporabnika iz baze', details: error.message });
+    }
+}
+
 module.exports = {
     dodajUporabnika,
     vsiUporabniki,
     najdiUporabnika,
+    najdiUporabnikaAdmin,
+    spremeniUporabnika,
     izbrisiUporabnika,
-    spremeniUporabnika
+    profilUporabnika
 };

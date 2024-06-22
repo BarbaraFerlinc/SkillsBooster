@@ -16,6 +16,15 @@ async function dodajPodjetje(req, res) {
     }
 }
 
+async function vsaPodjetja(req, res) {
+    try {
+        const podjetja = await Podjetje.vsa();
+        res.status(200).json(podjetja);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju podjetij iz baze', details: error.message });
+    }
+}
+
 async function najdiPodjetje(req, res) {
     const { id } = req.params;
     try {
@@ -62,6 +71,7 @@ async function spremeniPodjetje(req, res) {
 
 module.exports = {
     dodajPodjetje,
+    vsaPodjetja,
     najdiPodjetje,
     izbrisiPodjetje,
     spremeniPodjetje

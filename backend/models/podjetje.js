@@ -3,22 +3,32 @@ const db = require('../pb');
 class Podjetje {
     static async dodaj(naziv, naslov, postna_stevilka, admin_email) {
         try {
-            if (this.getById(admin_email) == undefined) {
+            const id = admin_email.split('@')[1];
+            const novoPodjetje = {
+                naziv: naziv,
+                naslov: naslov,
+                postna_stevilka: postna_stevilka
+            };
 
-                const id = admin_email.split('@')[1];
-                const novoPodjetje = {
-                    naziv: naziv,
-                    naslov: naslov,
-                    postna_stevilka: postna_stevilka
-                };
-
-                db.collection("Podjetja").doc(id).set(novoPodjetje);
-                return { message: 'Uspešno dodano podjetje', podjetje: novoPodjetje };
-            } else {
-                return { message: 'Neuspešno dodano podejtje', podjetje: undefined };
-            }
+            db.collection("Podjetja").doc(id).set(novoPodjetje);
+            return { message: 'Uspešno dodano podjetje', podjetje: novoPodjetje };
         } catch (error) {
             throw new Error('Napaka pri vstavljanju podjetja v bazo: ' + error.message);
+        }
+    }
+
+    static async vsa() {
+        try {
+            const podjetjaRef = db.collection("Podjetja");
+            const response = await podjetjaRef.get();
+            const podjetja = [];
+            response.forEach(doc => {
+                podjetja.push(doc.data());
+            });
+
+            return podjetja;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju podjetij iz baze: ' + error.message);
         }
     }
 
@@ -36,19 +46,14 @@ class Podjetje {
 
     static async spremeni(id, naziv, naslov, postna_stevilka) {
         try {
-            if (this.getById(id) != undefined) {
+            const podjetje = {
+                naziv: naziv,
+                naslov: naslov,
+                postna_stevilka: postna_stevilka
+            };
 
-                const podjetje = {
-                    naziv: naziv,
-                    naslov: naslov,
-                    postna_stevilka: postna_stevilka
-                };
-
-                db.collection("Podjetja").doc(id).update(podjetje);
-                return { message: 'Uspešna posodobitev podjetja', podjetje: podjetje };
-            } else {
-                return { message: 'Neuspešna posodobitev podjetja', podjetje: undefined };
-            }
+            db.collection("Podjetja").doc(id).update(podjetje);
+            return { message: 'Uspešna posodobitev podjetja', podjetje: podjetje };
         } catch (error) {
             throw new Error('Napaka pri posodabljanju podjetja v bazi: ' + error.message);
         }

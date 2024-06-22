@@ -1,14 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {Users} from "../../Data.jsx";
-
-
+import api from '../../services/api.js';
+import { UserAuth } from '../../context/AuthContext.jsx';
 
 function AdminProfile() {
-    const [users, setUsers] = useState(Users);
+    //const [users, setUsers] = useState(Users);
 
-    const handleRoleChange = (userId, newRole) => {
+    const [currentUser, setCurrentUser] = useState(null);
+    const [users, setUsers] = useState([]);
+
+    const { user } = UserAuth();
+
+    useEffect(() => {
+        if (user) {
+          const uporabnikovEmail = user.email;
+    
+          api.post('/uporabnik/profil', { id: uporabnikovEmail })
+            .then(res => {
+              const profil = res.data;
+              setCurrentUser(profil);
+            })
+            .catch(err => {
+              console.error(err);
+            });
+        }
+      }, [user]);
+
+    console.log(currentUser);
+
+    useEffect(() => {        
+        const fetchUporabniki = async () => {
+            try {
+                const response = await api.post('/uporabnik/adminEmail', { adminEmail: user.email });
+                setUsers(response.data);
+            } catch (er) {
+                console.log("Napaka pri pridobivanju uporabnikov", er);
+            }
+        }
+    
+        fetchUporabniki();
+    }, [user]);
+
+    /*const handleRoleChange = (userId, newRole) => {
         setUsers(users.map(user => user.id === userId ? { ...user, role: newRole } : user));
-    };
+    };*/
 
     return (
         <div className="overflow-x-auto mt-8">
@@ -24,13 +59,12 @@ function AdminProfile() {
                 <tbody>
                 {users.map(user => (
                     <tr key={user.id}>
-                        <td className="py-2 px-4 border-b">{user.name}</td>
+                        <td className="py-2 px-4 border-b">{user.ime_priimek}</td>
                         <td className="py-2 px-4 border-b">{user.email}</td>
-                        <td className="py-2 px-4 border-b">{user.role}</td>
+                        <td className="py-2 px-4 border-b">{user.vloga}</td>
                         <td className="py-2 px-4 border-b">
                             <select
-                                value={user.role}
-                                onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                value={user.vloga}
                                 className="bg-gray-200 border rounded p-1"
                             >
                                 <option value="employee">Employee</option>

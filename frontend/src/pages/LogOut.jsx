@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-//import { UserAuth } from '../context/AuthContext'; --KLARA
+import { UserAuth } from '../context/AuthContext';
 
 function Logout() {
-    //const { logout } = UserAuth(); --KLARA
+    const { logout } = UserAuth();
 
     const navigate = useNavigate();
 
@@ -11,10 +11,12 @@ function Logout() {
         // Perform logout logic here, e.g., clearing authentication tokens or user data
         console.log('User logged out');
 
-        //await logout(); --KLARA
+        await logout();
         
         // Redirect to the initial dashboard (login page)
-        navigate('/');
+        setTimeout(() => {
+            navigate('/');
+        }, 3000);
     }, [navigate]);
 
     return (
