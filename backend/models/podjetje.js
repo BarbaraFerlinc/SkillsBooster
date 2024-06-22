@@ -34,11 +34,10 @@ class Podjetje {
         }
     }
 
-    static async spremeni(id, naziv, naslov, postna_stevilka, admin_email) {
+    static async spremeni(id, naziv, naslov, postna_stevilka) {
         try {
-            if (this.getById(admin_email) != undefined) {
+            if (this.getById(id) != undefined) {
 
-                const id = admin_email;
                 const podjetje = {
                     naziv: naziv,
                     naslov: naslov,

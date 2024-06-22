@@ -55,11 +55,10 @@ class Uporabnik {
 
     static async spremeni(id, ime_priimek, email, geslo, vloga) {
         try {
-            if (this.getById(email) != undefined) {
+            if (this.getById(id) != undefined) {
                 const saltRounds = 10;
                 const hashedPassword = await bcrypt.hash(geslo, saltRounds);
 
-                const id = id;
                 const uporabnik = {
                     ime_priimek: ime_priimek,
                     email: email,
