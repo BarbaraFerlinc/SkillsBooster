@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {Users} from "../../Data.jsx";
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 
 function AdminProfile() {
-    //const [users, setUsers] = useState(Users);
-
     const [currentUser, setCurrentUser] = useState(null);
     const [users, setUsers] = useState([]);
 
-    const { user } = UserAuth();
+    const { user, createUser } = UserAuth();
 
     useEffect(() => {
         if (user) {
@@ -26,12 +23,10 @@ function AdminProfile() {
         }
       }, [user]);
 
-    console.log(currentUser);
-
     useEffect(() => {        
         const fetchUporabniki = async () => {
             try {
-                const response = await api.post('/uporabnik/adminEmail', { adminEmail: user.email });
+                const response = await api.post('/uporabnik/adminEmail', { adminEmail: currentUser.email });
                 setUsers(response.data);
             } catch (er) {
                 console.log("Napaka pri pridobivanju uporabnikov", er);
@@ -39,11 +34,7 @@ function AdminProfile() {
         }
     
         fetchUporabniki();
-    }, [user]);
-
-    /*const handleRoleChange = (userId, newRole) => {
-        setUsers(users.map(user => user.id === userId ? { ...user, role: newRole } : user));
-    };*/
+    }, [currentUser]);
 
     return (
         <div className="overflow-x-auto mt-8">

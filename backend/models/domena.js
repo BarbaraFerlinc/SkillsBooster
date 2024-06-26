@@ -20,7 +20,8 @@ class Domena {
                 kljucna_znanja: kljucna_znanja,
                 lastnik: lastnik,
                 kvizi: [],
-                zaposleni: []
+                zaposleni: [],
+                rezultati: []
             };
 
             db.collection("Domene_znanja").doc(id).set(novaDomena);
@@ -117,7 +118,12 @@ class Domena {
             }
             const updatedZaposleni = domena.zaposleni ? [...domena.zaposleni, uporabnikId] : [uporabnikId];
 
-            db.collection("Domene_znanja").doc(id).update({zaposleni: updatedZaposleni});
+            if (domena.rezultati && domena.rezultati.includes(`${uporabnikId};0`)) {
+                return { message: 'Uporabnik je že vključen v to domeno', domena: domena };
+            }
+            const updatedRezultati = domena.rezultati ? [...domena.rezultati, `${uporabnikId};0`] : [`${uporabnikId};0`];
+
+            db.collection("Domene_znanja").doc(id).update({zaposleni: updatedZaposleni, rezultati: updatedRezultati});
             return { message: 'Uspešna posodobitev domene', domena: domena };
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
@@ -179,6 +185,8 @@ class Domena {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
         }
     }
+    
+    //spremeni rezultat uporabnika
 
     static async dodajGradivo(id, naziv, file) {
         try {

@@ -2,7 +2,7 @@ const db = require('../pb');
 const bcrypt = require('bcrypt');
 
 class Uporabnik {
-    static async dodaj(ime_priimek, email, geslo, vloga) {
+    static async dodaj(ime_priimek, email, geslo, vloga, admin) {
         try {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(geslo, saltRounds);
@@ -12,7 +12,8 @@ class Uporabnik {
                 ime_priimek: ime_priimek,
                 email: email,
                 geslo: hashedPassword,
-                vloga: vloga
+                vloga: vloga,
+                admin: admin
             };
 
             db.collection("Uporabniki").doc(id).set(novUporabnik);
@@ -59,8 +60,9 @@ class Uporabnik {
             const uporabniki = [];
             response.forEach(doc => {
                 const data = doc.data();
+                const admin = data.admin;
                 const email = data.email;
-                if (email && email.split('@')[1] === podjetje && email != adminEmail) {
+                if (email && admin && admin.split('@')[1] === podjetje && email != adminEmail) {
                     uporabniki.push(data);
             }
             });
@@ -71,7 +73,30 @@ class Uporabnik {
         }
     }
 
-    static async spremeni(id, ime_priimek, email, geslo, vloga) {
+    static async getByBoss(bossEmail, adminEmail) {
+        try {
+            const podjetje = adminEmail.split('@')[1];
+            console.log("Podjetje: " + podjetje);
+
+            const uporabnikiRef = db.collection("Uporabniki");
+            const response = await uporabnikiRef.get();
+            const uporabniki = [];
+            response.forEach(doc => {
+                const data = doc.data();
+                const admin = data.admin;
+                const email = data.email;
+                if (email && admin && admin.split('@')[1] === podjetje && email != adminEmail && email != bossEmail) {
+                    uporabniki.push(data);
+            }
+            });
+
+            return uporabniki;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju uporabnikov iz baze: ' + error.message);
+        }
+    }
+
+    static async spremeni(id, ime_priimek, email, geslo, vloga, admin) {
         try {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(geslo, saltRounds);
@@ -80,7 +105,8 @@ class Uporabnik {
                 ime_priimek: ime_priimek,
                 email: email,
                 geslo: hashedPassword,
-                vloga: vloga
+                vloga: vloga,
+                admin: admin
             };
 
             db.collection("Uporabniki").doc(id).update(uporabnik);

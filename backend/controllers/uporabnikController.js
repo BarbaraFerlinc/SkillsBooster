@@ -2,9 +2,9 @@ const bcrypt = require('bcrypt');
 const Uporabnik = require('../models/uporabnik');
 
 async function dodajUporabnika(req, res) {
-    const { ime_priimek, email, geslo, vloga } = req.body;
+    const { ime_priimek, email, geslo, vloga, admin } = req.body;
   
-    if (!ime_priimek || !email || !geslo || !vloga) {
+    if (!ime_priimek || !email || !geslo || !vloga || !admin) {
       return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
     }
   
@@ -12,7 +12,7 @@ async function dodajUporabnika(req, res) {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(geslo, saltRounds);
   
-      const newUser = await Uporabnik.dodaj(ime_priimek, email, hashedPassword, vloga);
+      const newUser = await Uporabnik.dodaj(ime_priimek, email, hashedPassword, vloga, admin);
       
       res.status(200).json({ message: 'Uspešna registracija', user: newUser });
     } catch (error) {
@@ -56,11 +56,24 @@ async function najdiUporabnikaAdmin(req, res) {
     }
 }
 
+async function najdiUporabnikaBoss(req, res) {
+    const { bossEmail, adminEmail } = req.body;
+    try {
+        const uporabniki = await Uporabnik.getByBoss(bossEmail, adminEmail);
+        if (!uporabniki) {
+        return res.status(404).json({ error: 'Uporabniki ne obstajajo' });
+        }
+        res.status(200).json(uporabniki);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju uporabnikov iz baze', details: error.message });
+    }
+}
+
 async function spremeniUporabnika(req, res) {
     const { id } = req.params;
-    const { ime_priimek, email, geslo, vloga } = req.body;
+    const { ime_priimek, email, geslo, vloga, admin } = req.body;
 
-    if (!ime_priimek || !email || !geslo || !vloga) {
+    if (!ime_priimek || !email || !geslo || !vloga || !admin) {
         return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
     }
 
@@ -68,7 +81,7 @@ async function spremeniUporabnika(req, res) {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(geslo, saltRounds);
 
-        const updatedUser = await Uporabnik.spremeni(id, ime_priimek, email, hashedPassword, vloga);
+        const updatedUser = await Uporabnik.spremeni(id, ime_priimek, email, hashedPassword, vloga, admin);
         
         res.status(200).json({ message: 'Uspešno posodobljen uporabnik', user: updatedUser });
     } catch (error) {
@@ -112,6 +125,7 @@ module.exports = {
     vsiUporabniki,
     najdiUporabnika,
     najdiUporabnikaAdmin,
+    najdiUporabnikaBoss,
     spremeniUporabnika,
     izbrisiUporabnika,
     profilUporabnika

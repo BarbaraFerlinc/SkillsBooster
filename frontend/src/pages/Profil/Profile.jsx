@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import Sidebar from '../../partials/Sidebar.jsx';
 import Header from '../../partials/Header.jsx';
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
@@ -12,23 +11,17 @@ import { UserAuth } from '../../context/AuthContext.jsx';
 
 function Profile() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    /*const location = useLocation();
-    const user = location.state.user;*/
-
     const [currentUser, setCurrentUser] = useState(null);
 
     const { user } = UserAuth();
-    console.log("user: " + user.email);
 
     useEffect(() => {
         if (user) {
           const uporabnikovEmail = user.email;
-          console.log("user.email: " + user.email);
     
           api.post('/uporabnik/profil', { id: uporabnikovEmail })
             .then(res => {
               const profil = res.data;
-              console.log("profil: " + profil);
               setCurrentUser(profil);
             })
             .catch(err => {
@@ -51,7 +44,7 @@ function Profile() {
 
                         {currentUser?.vloga === 'admin' && <AdminProfile />}
                         {currentUser?.vloga === 'boss' && <BossProfile />}
-                        {currentUser?.vloga === 'user' && <EmployeeProfile userId={user.email} />}
+                        {currentUser?.vloga === 'user' && <EmployeeProfile />}
                     </div>
                 </main>
             </div>

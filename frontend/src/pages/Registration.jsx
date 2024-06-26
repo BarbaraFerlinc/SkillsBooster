@@ -14,7 +14,8 @@ const initialUser = {
     ime_priimek: "Administrator",
     email: "",
     geslo: "",
-    vloga: "admin"
+    vloga: "admin",
+    admin: ""
 }
 
 function Registration() {    
@@ -125,6 +126,7 @@ function Registration() {
 
             try {
                 user.email = email;
+                user.admin = email;
                 user.geslo = password;
                 company.admin_email = email;
 
