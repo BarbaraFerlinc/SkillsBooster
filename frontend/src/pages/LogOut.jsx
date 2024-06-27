@@ -7,17 +7,21 @@ function Logout() {
 
     const navigate = useNavigate();
 
-    useEffect(async () => {
-        // Perform logout logic here, e.g., clearing authentication tokens or user data
-        console.log('User logged out');
+    useEffect(() => {
+        const performLogout = async () => {
+            try {
+                console.log('User logged out');
+                await logout();
+                setTimeout(() => {
+                    navigate('/');
+                }, 3000);
+            } catch (error) {
+                console.error('Error during logout:', error);
+            }
+        };
 
-        await logout();
-        
-        // Redirect to the initial dashboard (login page)
-        setTimeout(() => {
-            navigate('/');
-        }, 3000);
-    }, [navigate]);
+        performLogout();
+    }, [logout, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">

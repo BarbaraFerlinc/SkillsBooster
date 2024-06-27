@@ -1,43 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UserAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
-
+import api from "../services/api";
 
 function BossRouting() {
     const { user } = UserAuth();
     const navigate = useNavigate();
-    const [users, setUsers] = useState([]);
-    const [role, setRole] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {    
-        const fetchUporabniki = async () => {
-            try {
-                const response = await api.get('/uporabnik/vsi');
-                setUsers(response.data);
-            } catch (er) {
-                console.log("Napaka pri pridobivanju uporabnikov", er);
+    useEffect(() => {
+        if (user) {
+          const uporabnikovEmail = user.email;
+          console.log("user: ", uporabnikovEmail);
+    
+          api.post('/uporabnik/profil', { id: uporabnikovEmail })
+            .then(res => {
+              const profil = res.data;
+              setCurrentUser(profil);
+              setLoading(false);
+            })
+            .catch(err => {
+              console.error(err);
+              setLoading(false);
+            });
+        } else {
+            setLoading(false);
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (!loading) {
+            if (!user) {
+                navigate("/login");
+            } else if (currentUser && currentUser.vloga !== "boss") {
+                navigate("/profile");
             }
         }
-    
-        fetchPodjetja();
-        fetchUporabniki();
-    }, [])
+    }, [user, currentUser, loading, navigate]);
 
-    if (!user) {
-        navigate("/login");
-        return null;
-    } else {
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].email == user.email) {
-                setRole(users[i].vloga);
-        }
-      }
-    }
-
-    if (role != "boss") {
-        navigate("/profil");
-        return null;
+    // se pokaže okno za nalaganje
+    if (loading) {
+        return <div>Loading...</div>; // Ali kakšen drug indikator nalaganja
     }
 
     return <Outlet />;
