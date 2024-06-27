@@ -2,25 +2,22 @@ const db = require('../pb');
 const bcrypt = require('bcrypt');
 
 class Uporabnik {
-    static async dodaj(ime_priimek, email, geslo, vloga) {
+    static async dodaj(ime_priimek, email, geslo, vloga, admin) {
         try {
-            if (this.getById(email) == undefined) {
-                const saltRounds = 10;
-                const hashedPassword = await bcrypt.hash(geslo, saltRounds);
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(geslo, saltRounds);
 
-                const id = email;
-                const novUporabnik = {
-                    ime_priimek: ime_priimek,
-                    email: email,
-                    geslo: hashedPassword,
-                    vloga: vloga
-                };
+            const id = email;
+            const novUporabnik = {
+                ime_priimek: ime_priimek,
+                email: email,
+                geslo: hashedPassword,
+                vloga: vloga,
+                admin: admin
+            };
 
-                db.collection("Uporabniki").doc(id).set(novUporabnik);
-                return { message: 'Uspešna registracija', user: novUporabnik };
-            } else {
-                return { message: 'Neuspešna registracija', user: undefined };
-            }
+            db.collection("Uporabniki").doc(id).set(novUporabnik);
+            return { message: 'Uspešna registracija', user: novUporabnik };
         } catch (error) {
             throw new Error('Napaka pri vstavljanju uporabnika v bazo: ' + error.message);
         }
@@ -53,24 +50,67 @@ class Uporabnik {
         }
     }
 
-    static async spremeni(id, ime_priimek, email, geslo, vloga) {
+    static async getByAdmin(adminEmail) {
         try {
-            if (this.getById(id) != undefined) {
-                const saltRounds = 10;
-                const hashedPassword = await bcrypt.hash(geslo, saltRounds);
+            const podjetje = adminEmail.split('@')[1];
+            console.log("Admin email: " + podjetje);
 
-                const uporabnik = {
-                    ime_priimek: ime_priimek,
-                    email: email,
-                    geslo: hashedPassword,
-                    vloga: vloga
-                };
-
-                db.collection("Uporabniki").doc(id).update(uporabnik);
-                return { message: 'Uspešna posodobitev uporabnika', user: uporabnik };
-            } else {
-                return { message: 'Neuspešna posodobitev uporabnika', user: undefined };
+            const uporabnikiRef = db.collection("Uporabniki");
+            const response = await uporabnikiRef.get();
+            const uporabniki = [];
+            response.forEach(doc => {
+                const data = doc.data();
+                const admin = data.admin;
+                const email = data.email;
+                if (email && admin && admin.split('@')[1] === podjetje && email != adminEmail) {
+                    uporabniki.push(data);
             }
+            });
+
+            return uporabniki;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju uporabnikov iz baze: ' + error.message);
+        }
+    }
+
+    static async getByBoss(bossEmail, adminEmail) {
+        try {
+            const podjetje = adminEmail.split('@')[1];
+            console.log("Podjetje: " + podjetje);
+
+            const uporabnikiRef = db.collection("Uporabniki");
+            const response = await uporabnikiRef.get();
+            const uporabniki = [];
+            response.forEach(doc => {
+                const data = doc.data();
+                const admin = data.admin;
+                const email = data.email;
+                if (email && admin && admin.split('@')[1] === podjetje && email != adminEmail && email != bossEmail) {
+                    uporabniki.push(data);
+            }
+            });
+
+            return uporabniki;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju uporabnikov iz baze: ' + error.message);
+        }
+    }
+
+    static async spremeni(id, ime_priimek, email, geslo, vloga, admin) {
+        try {
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(geslo, saltRounds);
+
+            const uporabnik = {
+                ime_priimek: ime_priimek,
+                email: email,
+                geslo: hashedPassword,
+                vloga: vloga,
+                admin: admin
+            };
+
+            db.collection("Uporabniki").doc(id).update(uporabnik);
+            return { message: 'Uspešna posodobitev uporabnika', user: uporabnik };
         } catch (error) {
             throw new Error('Napaka pri posodabljanju uporabnika v bazi: ' + error.message);
         }

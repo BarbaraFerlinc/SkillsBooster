@@ -39,7 +39,7 @@ async function najdiDomenoId(req, res) {
 }
 
 async function najdiDomenoUser(req, res) {
-    const { id } = req.params;
+    const { id } = req.body;
     try {
         const domene = await Domena.getByUser(id);
         if (!domene) {
@@ -52,7 +52,7 @@ async function najdiDomenoUser(req, res) {
 }
 
 async function najdiDomenoOwner(req, res) {
-    const { id } = req.params;
+    const { id } = req.body;
     try {
         const domene = await Domena.getByOwner(id);
         if (!domene) {

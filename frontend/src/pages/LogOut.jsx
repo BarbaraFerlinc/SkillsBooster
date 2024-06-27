@@ -1,21 +1,27 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-//import { UserAuth } from '../context/AuthContext'; --KLARA
+import { UserAuth } from '../context/AuthContext';
 
 function Logout() {
-    //const { logout } = UserAuth(); --KLARA
+    const { logout } = UserAuth();
 
     const navigate = useNavigate();
 
-    useEffect(async () => {
-        // Perform logout logic here, e.g., clearing authentication tokens or user data
-        console.log('User logged out');
+    useEffect(() => {
+        const performLogout = async () => {
+            try {
+                console.log('User logged out');
+                await logout();
+                setTimeout(() => {
+                    navigate('/');
+                }, 3000);
+            } catch (error) {
+                console.error('Error during logout:', error);
+            }
+        };
 
-        //await logout(); --KLARA
-        
-        // Redirect to the initial dashboard (login page)
-        navigate('/');
-    }, [navigate]);
+        performLogout();
+    }, [logout, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">

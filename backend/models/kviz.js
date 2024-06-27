@@ -4,16 +4,15 @@ class Kviz {
     static async dodaj(naziv) {
         try {
             const id = naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            if (this.getById(id) == undefined) {
-                const novKviz = {
-                    naziv: naziv
-                };
 
-                db.collection("Kvizi").doc(id).set(novKviz);
-                return { message: 'Uspešno dodan kviz', kviz: novKviz };
-            } else {
-                return { message: 'Neuspešno dodan kviz', kviz: undefined };
-            }
+            const novKviz = {
+                naziv: naziv,
+                rezultati: [],
+                vprasanja: []
+            };
+
+            db.collection("Kvizi").doc(id).set(novKviz);
+            return { message: 'Uspešno dodan kviz', kviz: novKviz };
         } catch (error) {
             throw new Error('Napaka pri vstavljanju kviza v bazo: ' + error.message);
         }
@@ -48,16 +47,12 @@ class Kviz {
 
     static async spremeni(id, naziv) {
         try {
-            if (this.getById(id) != undefined) {
-                const kviz = {
-                    naziv: naziv
-                };
+            const kviz = {
+                naziv: naziv
+            };
 
-                db.collection("Kvizi").doc(id).update(kviz);
-                return { message: 'Uspešna posodobitev kviza', kviz: kviz };
-            } else {
-                return { message: 'Neuspešna posodobitev kviza', kviz: undefined };
-            }
+            db.collection("Kvizi").doc(id).update(kviz);
+            return { message: 'Uspešna posodobitev kviza', kviz: kviz };
         } catch (error) {
             throw new Error('Napaka pri posodabljanju kviza v bazi: ' + error.message);
         }
@@ -65,21 +60,17 @@ class Kviz {
 
     static async dodajVprasanje(id, vprasanjeId) {
         try {
-            if (this.getById(id) != undefined) {
-                const kvizRef = db.collection("Kvizi").doc(id);
-                const response = await kvizRef.get();
-                const kviz = response.data();
+            const kvizRef = db.collection("Kvizi").doc(id);
+            const response = await kvizRef.get();
+            const kviz = response.data();
 
-                if (kviz.vprasanja && kviz.vprasanja.includes(vprasanjeId)) {
-                    return { message: 'Vprašanje je že vključeno v ta kviz', kviz: kviz };
-                }
-                const updatedVprasanja = kviz.vprasanja ? [...kviz.vprasanja, vprasanjeId] : [vprasanjeId];
-
-                db.collection("Kvizi").doc(id).update({vprasanja: updatedVprasanja});
-                return { message: 'Uspešna posodobitev kviza', kviz: kviz };
-            } else {
-                return { message: 'Neuspešna posodobitev kviza', kviz: undefined };
+            if (kviz.vprasanja && kviz.vprasanja.includes(vprasanjeId)) {
+                return { message: 'Vprašanje je že vključeno v ta kviz', kviz: kviz };
             }
+            const updatedVprasanja = kviz.vprasanja ? [...kviz.vprasanja, vprasanjeId] : [vprasanjeId];
+
+            db.collection("Kvizi").doc(id).update({vprasanja: updatedVprasanja});
+            return { message: 'Uspešna posodobitev kviza', kviz: kviz };
         } catch (error) {
             throw new Error('Napaka pri pridobivanju kviza iz baze: ' + error.message);
         }
@@ -87,21 +78,17 @@ class Kviz {
 
     static async odstraniVprasanje(id, vprasanjeId) {
         try {
-            if (this.getById(id) != undefined) {
-                const kvizRef = db.collection("Kvizi").doc(id);
-                const response = await kvizRef.get();
-                const kviz = response.data();
-    
-                if (kviz.vprasanja && kviz.vprasanja.includes(vprasanjeId)) {
-                    const updatedVprasanja = kviz.vprasanja.filter(obstojeceVprasanjeId => obstojeceVprasanjeId !== vprasanjeId);
-    
-                    await db.collection("Kvizi").doc(id).update({ vprasanja: updatedVprasanja });
-                    return { message: 'Vprašanje uspešno odstranjeno iz kviza', kviz: kviz };
-                } else {
-                    return { message: 'Vprašanje ni del tega kviza', kviz: kviz };
-                }
+            const kvizRef = db.collection("Kvizi").doc(id);
+            const response = await kvizRef.get();
+            const kviz = response.data();
+
+            if (kviz.vprasanja && kviz.vprasanja.includes(vprasanjeId)) {
+                const updatedVprasanja = kviz.vprasanja.filter(obstojeceVprasanjeId => obstojeceVprasanjeId !== vprasanjeId);
+
+                await db.collection("Kvizi").doc(id).update({ vprasanja: updatedVprasanja });
+                return { message: 'Vprašanje uspešno odstranjeno iz kviza', kviz: kviz };
             } else {
-                return { message: 'Kviz ne obstaja', kviz: undefined };
+                return { message: 'Vprašanje ni del tega kviza', kviz: kviz };
             }
         } catch (error) {
             throw new Error('Napaka pri pridobivanju kviza iz baze: ' + error.message);
@@ -110,36 +97,32 @@ class Kviz {
 
     static async dodajRezultat(id, uporabnikId, vrednost) {
         try {
-            if (this.getById(id) != undefined) {
-                const kvizRef = db.collection("Kvizi").doc(id);
-                const response = await kvizRef.get();
-                const kviz = response.data();
+            const kvizRef = db.collection("Kvizi").doc(id);
+            const response = await kvizRef.get();
+            const kviz = response.data();
 
-                const rezultat = `${uporabnikId};${vrednost}`;
+            const rezultat = `${uporabnikId};${vrednost}`;
 
-                let updatedRezultati = [];
+            let updatedRezultati = [];
 
-                if (kviz.rezultati) {
-                    const index = kviz.rezultati.findIndex(r => {
-                        const [uporabnik] = r.split(';');
-                        return uporabnik === `${uporabnikId}`;
-                    });
+            if (kviz.rezultati) {
+                const index = kviz.rezultati.findIndex(r => {
+                    const [uporabnik] = r.split(';');
+                    return uporabnik === `${uporabnikId}`;
+                });
 
-                    if (index !== -1) {
-                        kviz.rezultati[index] = rezultat;
-                        updatedRezultati = [...kviz.rezultati];
-                    } else {
-                        updatedRezultati = [...kviz.rezultati, rezultat];
-                    }
+                if (index !== -1) {
+                    kviz.rezultati[index] = rezultat;
+                    updatedRezultati = [...kviz.rezultati];
                 } else {
-                    updatedRezultati = [rezultat];
+                    updatedRezultati = [...kviz.rezultati, rezultat];
                 }
-
-                db.collection("Kvizi").doc(id).update({rezultati: updatedRezultati});
-                return { message: 'Uspešna posodobitev kviza', kviz: kviz };
             } else {
-                return { message: 'Neuspešna posodobitev kviza', kviz: undefined };
+                updatedRezultati = [rezultat];
             }
+
+            db.collection("Kvizi").doc(id).update({rezultati: updatedRezultati});
+            return { message: 'Uspešna posodobitev kviza', kviz: kviz };
         } catch (error) {
             throw new Error('Napaka pri pridobivanju kviza iz baze: ' + error.message);
         }
@@ -147,27 +130,23 @@ class Kviz {
 
     static async odstraniRezultat(id, uporabnikId) {
         try {
-            if (this.getById(id) != undefined) {
-                const kvizRef = db.collection("Kvizi").doc(id);
-                const response = await kvizRef.get();
-                const kviz = response.data();
-    
-                if (kviz.rezultati && kviz.rezultati.some(r => {
+            const kvizRef = db.collection("Kvizi").doc(id);
+            const response = await kvizRef.get();
+            const kviz = response.data();
+
+            if (kviz.rezultati && kviz.rezultati.some(r => {
+                const [uporabnik] = r.split(';');
+                return uporabnik === `${uporabnikId}`;
+            })) {
+                const updatedRezultati = kviz.rezultati.filter(r => {
                     const [uporabnik] = r.split(';');
-                    return uporabnik === `${uporabnikId}`;
-                })) {
-                    const updatedRezultati = kviz.rezultati.filter(r => {
-                        const [uporabnik] = r.split(';');
-                        return uporabnik !== `${uporabnikId}`;
-                    });
-    
-                    await db.collection("Kvizi").doc(id).update({ rezultati: updatedRezultati });
-                    return { message: 'Rezultat uspešno odstranjen iz kviza', kviz: kviz };
-                } else {
-                    return { message: 'Rezultat ni del tega kviza', kviz: kviz };
-                }
+                    return uporabnik !== `${uporabnikId}`;
+                });
+
+                await db.collection("Kvizi").doc(id).update({ rezultati: updatedRezultati });
+                return { message: 'Rezultat uspešno odstranjen iz kviza', kviz: kviz };
             } else {
-                return { message: 'Kviz ne obstaja', kviz: undefined };
+                return { message: 'Rezultat ni del tega kviza', kviz: kviz };
             }
         } catch (error) {
             throw new Error('Napaka pri pridobivanju kviza iz baze: ' + error.message);
