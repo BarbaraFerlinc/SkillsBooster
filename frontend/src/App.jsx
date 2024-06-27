@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Routes,
   Route,
@@ -16,7 +16,7 @@ import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Domena from "./pages/Domene/Domena";
 import DodajDomeno from "./pages/Domene/DodajDomeno";
-import AddUser from "./pages/AddUser.jsx";
+
 import LogOut from "./pages/LogOut.jsx";
 import Kviz from "./pages/Kviz/Kviz.jsx";
 import DodajKviz from "./pages/Kviz/DodajKviz.jsx";
@@ -24,8 +24,12 @@ import OpenQuestions from "./pages/Kviz/OpenQuestions.jsx";
 import ClosedQuestions from "./pages/Kviz/ClosedQuestions.jsx";
 import SolveQuiz from "./pages/Kviz/SolveQuiz.jsx";
 
+import {Users} from "./Data.jsx";
+import AdminProfile from "./pages/Profil/AdminProfile.jsx";
 
 function App() {
+
+
 
   const location = useLocation();
 
@@ -43,9 +47,11 @@ function App() {
         <Route exact path="/login" element={<Login />} />
 
         <Route path="/profile/:id" element={<Profile />} />
+
+
         <Route exact path="/domena/:id" element={<Domena/>} />
         <Route exact path="/addDomena" element={<DodajDomeno/>} />
-        <Route exact path="/addUser" element={<AddUser/>} />
+
         <Route exact path="/logout" element={<LogOut/>} />
         <Route exact path="/quiz/:id" element={<Kviz/>} />
         <Route exact path="/addQuiz" element={<DodajKviz/>} />
