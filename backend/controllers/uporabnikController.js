@@ -12,7 +12,7 @@ async function dodajUporabnika(req, res) {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(geslo, saltRounds);
   
-      const newUser = await Uporabnik.dodaj(ime_priimek, email, hashedPassword, vloga, admin);
+      const newUser = await Uporabnik.dodaj(ime_priimek, email, hashedPassword, vloga, admin, geslo);
       
       res.status(200).json({ message: 'Uspešna registracija', user: newUser });
     } catch (error) {

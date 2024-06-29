@@ -152,10 +152,7 @@ function Registration() {
                     // pokaže se okno in piše 'Uspešno ste registrirali podjetje.'
                     console.log('Both requests successful');
                 }
-
-                console.log('Uspešno registrirano podjetje');
-                console.log(user);
-                console.log(company);
+                
                 setCompany(initialCompany);
                 setUser(initialUser);
 

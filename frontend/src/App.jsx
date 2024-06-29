@@ -17,7 +17,6 @@ import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Domena from "./pages/Domene/Domena";
 import DodajDomeno from "./pages/Domene/DodajDomeno";
-import AddUser from "./pages/AddUser.jsx";
 import LogOut from "./pages/LogOut.jsx";
 import Kviz from "./pages/Kviz/Kviz.jsx";
 import DodajKviz from "./pages/Kviz/DodajKviz.jsx";
@@ -56,10 +55,6 @@ function App() {
             <Route path='' element={<BossRouting />}>
               <Route exact path="/addDomena" element={<DodajDomeno/>} />
               <Route exact path="/addQuiz" element={<DodajKviz/>} />
-            </Route>
-
-            <Route path='' element={<AdminRouting />}>
-              <Route exact path="/addUser" element={<AddUser/>} />
             </Route>
           </Route>
           

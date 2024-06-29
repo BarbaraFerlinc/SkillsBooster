@@ -2,18 +2,21 @@ const db = require('../pb');
 const bcrypt = require('bcrypt');
 
 class Uporabnik {
-    static async dodaj(ime_priimek, email, geslo, vloga, admin) {
+    static async dodaj(ime_priimek, email, geslo, vloga, admin, original_geslo) {
         try {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(geslo, saltRounds);
+            console.log("Geslo: ", geslo, " in ", original_geslo);
 
+            // potem original geslo namesto v bazo, pošlje na mail uporabnika
             const id = email;
             const novUporabnik = {
                 ime_priimek: ime_priimek,
                 email: email,
                 geslo: hashedPassword,
                 vloga: vloga,
-                admin: admin
+                admin: admin,
+                original_geslo: original_geslo
             };
 
             db.collection("Uporabniki").doc(id).set(novUporabnik);
@@ -53,7 +56,6 @@ class Uporabnik {
     static async getByAdmin(adminEmail) {
         try {
             const podjetje = adminEmail.split('@')[1];
-            console.log("Admin email: " + podjetje);
 
             const uporabnikiRef = db.collection("Uporabniki");
             const response = await uporabnikiRef.get();
@@ -76,7 +78,6 @@ class Uporabnik {
     static async getByBoss(bossEmail, adminEmail) {
         try {
             const podjetje = adminEmail.split('@')[1];
-            console.log("Podjetje: " + podjetje);
 
             const uporabnikiRef = db.collection("Uporabniki");
             const response = await uporabnikiRef.get();

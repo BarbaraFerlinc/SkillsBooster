@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
+import { initializeApp } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword, signOut } from "firebase/auth";
 
 function AdminProfile() {
     const [currentUser, setCurrentUser] = useState(null);
     const [users, setUsers] = useState([]);
+
+    const [userAdded, setUserAdded] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [newUserName, setNewUserName] = useState('');
     const [newUserEmail, setNewUserEmail] = useState('');
-    const [newUserPassword, setNewUserPassword] = useState('');
     const [newUserRole, setNewUserRole] = useState('user');
 
     const { user } = UserAuth();
@@ -32,33 +36,60 @@ function AdminProfile() {
                 try {
                     const response = await api.post('/uporabnik/adminEmail', { adminEmail: currentUser.email });
                     setUsers(response.data);
+                    setUserAdded(false);
                 } catch (er) {
                     console.log("Napaka pri pridobivanju uporabnikov", er);
                 }
             }
             fetchUporabniki();
         }
-    }, [currentUser]);
+    }, [currentUser, userAdded]);
 
     const handleAddUser = () => {
         setShowModal(true);
     };
 
     const handleConfirmAddUser = async () => {
+        var config = {apiKey: import.meta.env.VITE_API_KEY,
+                authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+                projectId: import.meta.env.VITE_PROJECT_ID,
+                storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+                messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+                appId: import.meta.env.VITE_APP_ID};
+        var secondaryApp = initializeApp(config, "Secondary");
+        let auth = getAuth(secondaryApp);
+        
         const newUser = {
-            id: Date.now(),
+            ime_priimek: newUserName,
             email: newUserEmail,
-            password: Math.random().toString(36).slice(-8), // Generate a random password
-            vloga: newUserRole
+            geslo: Math.random().toString(36).slice(-12),
+            vloga: newUserRole,
+            admin: currentUser.email
         };
+
         try {
-            await api.post('/uporabniki/', newUser);
-            setUsers([...users, newUser]);
+            await createUserWithEmailAndPassword(auth, newUserEmail, newUser.geslo);
+
+            await signOut(auth);
+
+            const response = await api.post("/uporabnik/dodaj", newUser, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            });
+
+            setUserAdded(true);
             setShowModal(false);
+            setNewUserName('');
             setNewUserEmail('');
             setNewUserRole('user');
         } catch (error) {
             console.error("Error adding new user:", error);
+        } finally {
+            if (secondaryApp) {
+                secondaryApp.delete();
+            }
         }
     };
 
@@ -74,6 +105,18 @@ function AdminProfile() {
             {showModal && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded shadow-md">
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">
+                                Ime in priimek
+                            </label>
+                            <input
+                                type="text"
+                                value={newUserName}
+                                onChange={(e) => setNewUserName(e.target.value)}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                required
+                            />
+                        </div>
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2">
                                 Email
