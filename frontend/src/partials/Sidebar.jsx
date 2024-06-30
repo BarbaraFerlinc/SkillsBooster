@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import space from "../images/space-svgrepo-com.png";
+import { UserAuth } from '../context/AuthContext.jsx';
+import api from '../services/api.js';
 
 import {Domains} from "../Data.jsx";
 import SeznamDomen from "../pages/Domene/SeznamDomen.jsx";
@@ -9,12 +11,67 @@ import Domena from "../pages/Domene/Domena.jsx"; // Import the SeznamDomen compo
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const location = useLocation();
   const { pathname } = location;
+  const [currentUser, setCurrentUser] = useState(null);
+  const [domains, setDomains] = useState([]);
+
+  const { user } = UserAuth();
 
   const trigger = useRef(null);
   const sidebar = useRef(null);
 
   const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
   const [sidebarExpanded, setSidebarExpanded] = useState(storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true');
+
+  useEffect(() => {
+    if (user) {
+      const uporabnikovEmail = user.email;
+
+      api.post('/uporabnik/profil', { id: uporabnikovEmail })
+        .then(res => {
+          const profil = res.data;
+          setCurrentUser(profil);
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (currentUser) {
+      switch (currentUser.vloga) {
+        case "boss":
+          fetchDomeneForOwner(currentUser);
+          break;
+        case "user":
+          fetchDomeneForUser(currentUser);
+          break;
+        case "admin":
+          setDomains(null);
+          break;
+        default:
+          setDomains(null);
+      }
+    }
+}, [currentUser]);
+
+  const fetchDomeneForUser = async (uporabnik) => {
+    try {
+        const response = await api.post('/domena/uporabnik', { id: uporabnik.email });
+        setDomains(response.data);
+    } catch (er) {
+        console.log("Napaka pri pridobivanju domen", er);
+    }
+  }
+
+  const fetchDomeneForOwner = async (uporabnik) => {
+    try {
+        const response = await api.post('/domena/lastnik', { id: uporabnik.email });
+        setDomains(response.data);
+    } catch (er) {
+        console.log("Napaka pri pridobivanju domen", er);
+    }
+  }
 
   // close on click outside
   useEffect(() => {
@@ -89,7 +146,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               <div className="flex items-center">
                 <NavLink end to="/" className="block" >
                   <img src={space} alt="Icon" className="w-12 h-12 mr-2" title={"Home"}/>
-
                 </NavLink>
               </div>
             </div>
@@ -105,22 +161,32 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     aria-hidden="true">
                 •••
               </span>
-                <span className="lg:hidden lg:sidebar-expanded:block 2xl:block">Domene</span>
+                <span className="lg:hidden lg:sidebar-expanded:block 2xl:block">Domains</span>
               </h3>
               <ul className="mt-3">
                 {/* Render SeznamDomen component */}
                 <li>
-                  <SeznamDomen domains={Domains}/>
+                  <SeznamDomen domains={domains}/>
                 </li>
               </ul>
-              <div className="flex items-center justify-between">
+              {currentUser && (currentUser.vloga == "boss") && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <NavLink to="/addDomena"
+                            className="text-sm font-medium ml-3 text-white lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                      Add Domena
+                    </NavLink>
+                  </div>
+                </div>
+              )}
+              {currentUser && (currentUser.vloga == "admin") && (
+                <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <NavLink to="/addDomena"
-                           className="text-sm font-medium ml-3 text-white lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                    Add Domena
-                  </NavLink>
+                  No Domains
                 </div>
               </div>
+              )}
+              
 
 
             </div>

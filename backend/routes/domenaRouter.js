@@ -12,8 +12,10 @@ router.put('/uporabnik/:id', domenaController.dodajUporabnikaDomena);
 router.put('/odstrani-uporabnika/:id', domenaController.odstraniUporabnikaDomena);
 router.put('/kviz/:id', domenaController.dodajKvizDomena);
 router.put('/odstrani-kviz/:id', domenaController.odstraniKvizDomena);
-router.put('/gradivo/:id', domenaController.dodajGradivoDomena);
-router.put('/izbrisi-gradivo/:id', domenaController.izbrisiGradivoDomena);
+router.post('/gradivo', domenaController.dodajGradivoDomena);
+router.post('/gradiva', domenaController.najdiGradiva);
+router.post('/izbrisi-gradivo', domenaController.izbrisiGradivoDomena);
 router.delete('/:id', domenaController.izbrisiDomeno);
+router.post('/id', domenaController.najdiDomeno);
 
 module.exports = router;

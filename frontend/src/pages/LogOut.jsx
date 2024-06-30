@@ -14,7 +14,7 @@ function Logout() {
                 await logout();
                 setTimeout(() => {
                     navigate('/');
-                }, 3000);
+                }, 4000);
             } catch (error) {
                 console.error('Error during logout:', error);
             }

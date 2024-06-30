@@ -150,10 +150,9 @@ async function odstraniKvizDomena(req, res) {
 }
 
 async function dodajGradivoDomena(req, res) {
-    const { id } = req.params;
-    const { naziv, file } = req.body;
+    const { id, naziv, file } = req.body;
 
-    if (!naziv || !file ) {
+    if (!id || !naziv || !file ) {
         return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
     }
 
@@ -166,11 +165,23 @@ async function dodajGradivoDomena(req, res) {
     }
 }
 
+async function najdiGradiva(req, res) {
+    const { id } = req.body;
+    try {
+        const domena = await Domena.najdiGradiva(id);
+        if (!domena) {
+        return res.status(404).json({ error: 'Domena ne obstaja' });
+        }
+        res.status(200).json(domena);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju domene iz baze', details: error.message });
+    }
+}
+
 async function izbrisiGradivoDomena(req, res) {
-    const { id } = req.params;
-    const { naziv } = req.body;
+    const { id, naziv } = req.body;
     
-    if (!naziv ) {
+    if (!id || !naziv ) {
         return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
     }
 
@@ -196,6 +207,23 @@ async function izbrisiDomeno(req, res) {
     }
 }
 
+async function najdiDomeno(req, res) {
+    const id = req.body.id;
+    if (!id) {
+        return res.status(400).send({ error: 'Id is required' });
+    }
+
+    try {
+        const domena = await Domena.getById(id);
+        if (!domena) {
+        return res.status(404).json({ error: 'Domena ne obstaja' });
+        }
+        res.status(200).json(domena);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju domene iz baze', details: error.message });
+    }
+}
+
 module.exports = {
     dodajDomeno,
     vseDomene,
@@ -208,6 +236,8 @@ module.exports = {
     dodajKvizDomena,
     odstraniKvizDomena,
     dodajGradivoDomena,
+    najdiGradiva,
     izbrisiGradivoDomena,
-    izbrisiDomeno
+    izbrisiDomeno,
+    najdiDomeno
 };

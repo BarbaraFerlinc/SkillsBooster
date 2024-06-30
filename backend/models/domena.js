@@ -1,5 +1,5 @@
 const db = require('../pb');
-const { storage, ref, uploadBytes, deleteObject } = require('../firebase');
+const { storage, ref, uploadBytes, deleteObject, getDownloadURL } = require('../firebase');
 
 class Domena {
     static async dodaj(naziv, opis, kljucna_znanja, lastnik) {
@@ -21,7 +21,8 @@ class Domena {
                 lastnik: lastnik,
                 kvizi: [],
                 zaposleni: [],
-                rezultati: []
+                rezultati: [],
+                gradiva: []
             };
 
             db.collection("Domene_znanja").doc(id).set(novaDomena);
@@ -189,6 +190,17 @@ class Domena {
     //spremeni rezultat uporabnika
 
     static async dodajGradivo(id, naziv, file) {
+        const domenaRef = db.collection("Domene_znanja").doc(id);
+        const response = await domenaRef.get();
+        const domena = response.data();
+
+        if (domena.gradiva && domena.gradiva.includes(naziv)) {
+            return { message: 'Gradivo je že del te domene', domena: domena };
+        }
+    
+        const updatedGradiva = [...(domena.gradiva || []), naziv];
+        await domenaRef.update({ gradiva: updatedGradiva });
+
         try {
             const gradivoRef = ref(storage, `${id}/${naziv}`);
             uploadBytes(gradivoRef, file).then((snapshot) => {
@@ -202,7 +214,40 @@ class Domena {
         }
     }
 
+    static async najdiGradiva(id) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+            const gradiva = domena.gradiva;
+
+            return gradiva;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju gradiv iz baze: ' + error.message);
+        }
+    }
+
+    static async beriGradivo(id, naziv) {
+        try {
+            // to do
+            return { message: 'Uspešno dodano gradivo', gradivo: naziv };
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
+
     static async izbrisiGradivo(id, naziv) {
+        const domenaRef = db.collection("Domene_znanja").doc(id);
+        const response = await domenaRef.get();
+        const domena = response.data();
+
+        if (!domena.gradiva || !domena.gradiva.includes(naziv)) {
+            return { message: 'Gradivo ni del te domene', domena: domena };
+        }
+
+        const updatedGradiva = domena.gradiva.filter(item => item !== naziv);
+        await domenaRef.update({ gradiva: updatedGradiva });
+
         try {
             const gradivoRef = ref(storage, `${id}/${naziv}`);
             deleteObject(gradivoRef).then(() => {

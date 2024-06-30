@@ -40,7 +40,7 @@ function BossProfile() {
       }, [user]);
 
     useEffect(() => {
-        if (user) {
+        if (currentUser) {
             const fetchUporabniki = async () => {
                 try {
                     const response = await api.post('/uporabnik/bossEmail', { bossEmail: user.email, adminEmail: currentUser.admin });

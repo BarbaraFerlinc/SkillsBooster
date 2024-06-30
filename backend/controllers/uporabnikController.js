@@ -33,7 +33,6 @@ async function najdiUporabnika(req, res) {
     const { id } = req.params;
     try {
         const user = await Uporabnik.getById(id);
-        console.log(user)
         if (!user) {
         return res.status(404).json({ error: 'Uporabnik ne obstaja' });
         }
@@ -110,7 +109,6 @@ async function profilUporabnika(req, res) {
 
     try {
         const user = await Uporabnik.getById(id);
-        console.log(user)
         if (!user) {
         return res.status(404).json({ error: 'Uporabnik ne obstaja' });
         }

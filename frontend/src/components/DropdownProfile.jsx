@@ -4,14 +4,35 @@ import Transition from '../utils/Transition';
 
 import UserAvatar from '../images/user-avatar-32.png';
 
+import api from '../services/api';
+import { UserAuth } from '../context/AuthContext';
+
 function DropdownProfile({
   align
 }) {
+  const [currentUser, setCurrentUser] = useState(null)
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  const { user } = UserAuth();
+
   const trigger = useRef(null);
   const dropdown = useRef(null);
+
+  useEffect(() => {
+    if (user) {
+      const uporabnikovEmail = user.email;
+
+      api.post('/uporabnik/profil', { id: uporabnikovEmail })
+        .then(res => {
+          const profil = res.data;
+          setCurrentUser(profil);
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    }
+  }, [user]);
 
   // close on click outside
   useEffect(() => {
@@ -45,7 +66,7 @@ function DropdownProfile({
       >
         <img className="w-8 h-8 rounded-full" src={UserAvatar} width="32" height="32" alt="User" />
         <div className="flex items-center truncate">
-          <span className="truncate ml-2 text-sm font-medium dark:text-slate-300 group-hover:text-slate-800 dark:group-hover:text-slate-200">ime uporabnika</span>
+          <span className="truncate ml-2 text-sm font-medium dark:text-slate-300 group-hover:text-slate-800 dark:group-hover:text-slate-200">{currentUser?.ime_priimek}</span>
 
         </div>
       </button>
