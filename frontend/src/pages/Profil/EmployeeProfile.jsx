@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Users } from "../../Data.jsx";
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 
@@ -11,22 +10,22 @@ function EmployeeProfile() {
 
     useEffect(() => {
         if (user) {
-          const uporabnikovEmail = user.email;
-    
-          api.post('/uporabnik/profil', { id: uporabnikovEmail })
-            .then(res => {
-              const profil = res.data;
-              setCurrentUser(profil);
-            })
-            .catch(err => {
-              console.error(err);
-            });
+            const userEmail = user.email;
+
+            api.post('/uporabnik/profil', { id: userEmail })
+                .then(res => {
+                    const profile = res.data;
+                    setCurrentUser(profile);
+                })
+                .catch(err => {
+                    console.error(err);
+                });
         }
     }, [user]);
 
-      useEffect(() => {
-        if (user) {
-            const fetchDomene = async () => {
+    useEffect(() => {
+        if (currentUser) {
+            const fetchDomains = async () => {
                 try {
                     const response = await api.post('/domena/uporabnik', { id: currentUser.email });
                     setDomains(response.data);
@@ -34,7 +33,7 @@ function EmployeeProfile() {
                     console.log("Napaka pri pridobivanju domen", er);
                 }
             }
-            fetchDomene();
+            fetchDomains();
         }
     }, [currentUser]);
 
@@ -52,9 +51,9 @@ function EmployeeProfile() {
                     <div key={index} className="mb-4">
                         <h3 className="text-lg font-semibold">{domain.naziv}</h3>
                         <div className="flex items-center mb-2">
-                            <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
                                 <div
-                                    className="bg-indigo-600 h-2 rounded-full"
+                                    className="bg-indigo-600 h-1.5 rounded-full"
                                     style={{ width: `${progress}%` }}
                                 ></div>
                             </div>

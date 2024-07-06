@@ -53,7 +53,7 @@ function App() {
             <Route exact path="/quiz/:id" element={<Kviz/>} />
 
             <Route path='' element={<BossRouting />}>
-              <Route exact path="/addDomena" element={<DodajDomeno/>} />
+
               <Route exact path="/addQuiz" element={<DodajKviz/>} />
             </Route>
           </Route>
