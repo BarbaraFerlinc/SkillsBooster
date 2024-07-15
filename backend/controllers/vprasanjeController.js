@@ -39,6 +39,20 @@ async function najdiVprasanje(req, res) {
     }
 }
 
+async function najdiVprasanja(req, res) {
+    const { ids } = req.body;
+    try {
+        const vprasanja = await Vprasanje.getByIds(ids);
+        console.log(vprasanja)
+        if (!vprasanja) {
+        return res.status(404).json({ error: 'Vprašanja ne obstajajo' });
+        }
+        res.status(200).json(vprasanja);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju vprašanj iz baze', details: error.message });
+    }
+}
+
 async function spremeniVprasanje(req, res) {
     const { id } = req.params;
     const { vprasanje, tip } = req.body;
@@ -105,6 +119,7 @@ module.exports = {
     dodajVprasanje,
     vsaVprasanja,
     najdiVprasanje,
+    najdiVprasanja,
     spremeniVprasanje,
     dodajOdgovorVprasanje,
     odstraniOdgovorVprasanje,

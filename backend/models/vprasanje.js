@@ -46,6 +46,19 @@ class Vprasanje {
         }
     }
 
+    static async getByIds(ids) {
+        try {
+            const vprasanjaRef = db.collection("Vprasanja");
+            const vprasanjaPromises = ids.map(id => vprasanjaRef.doc(id).get());
+            const responses = await Promise.all(vprasanjaPromises);
+            const vprasanja = responses.map(response => response.data());
+
+            return vprasanja;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju vprašanj iz baze: ' + error.message);
+        }
+    }
+
     static async spremeni(id, vprasanje, tip) {
         try {
             const spremenjeno = {

@@ -32,6 +32,7 @@ function Domena() {
     const [files, setFiles] = useState([]);
     const [quizDeleted, setQuizDeleted] = useState(false);
     const [quizzes, setQuizzes] = useState([]);
+    const [quiz, setQuiz] = useState(null);
 
     const { id } = useParams();
     const { user } = UserAuth();
@@ -174,20 +175,29 @@ function Domena() {
             });*/
     }
 
-    const handleQuizDelete = (quizName) => {
+    const handleQuizDelete = async (quizName) => {
         const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         const kvizId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        console.log("id: ", novId);
-        console.log("kvizId: ", kvizId);
         api.post(`/domena/odstrani-kviz`, { id: novId, kvizId: kvizId })
             .then(res => {
-                console.log('Izbrisan kviz: ', quizName);
                 setQuizDeleted(true);
             })
             .catch(err => {
                 console.error(err);
             });
-        // more se še odstranit sam kviz in vsa vprašanja in odgovori
+
+        await api.post('/kviz/id', { id: kvizId })
+            .then(res => {
+                const kviz = res.data;
+                kviz.vprasanja.forEach(vprasanje => {
+                    api.delete(`/vprasanje/${vprasanje}`);
+                });
+
+                api.delete(`/kviz/${kvizId}`);
+            })
+            .catch(err => {
+                console.error(err);
+        });
     };
 
     return (

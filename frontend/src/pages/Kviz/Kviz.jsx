@@ -25,7 +25,6 @@ function Kviz() {
             api.post('/kviz/id', { id: novId })
                 .then(res => {
                     const kviz = res.data;
-                    console.log(kviz);
                     setCurrentQuiz(kviz);
                 })
                 .catch(err => {
