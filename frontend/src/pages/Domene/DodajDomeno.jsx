@@ -6,6 +6,8 @@ import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
 import SeznamDomen from "./SeznamDomen.jsx";
 //import { UserAuth } from '../../context/AuthContext.js'; --KLARA
 
+// lahko zbrišemo ??
+
 function DodajDomeno({ onSubmit, currentUser }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [domainName, setDomainName] = useState("");

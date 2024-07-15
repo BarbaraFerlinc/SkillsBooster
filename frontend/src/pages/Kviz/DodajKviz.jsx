@@ -58,9 +58,17 @@ function DodajKviz() {
 
     const handleSubmitQuiz = async () => {
         const novId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        const vprasanja = await dodajVprasanja(novId);
+        const vprasanja = dodajVprasanja(novId);
+        const vprasanjaId = [];
+
+        vprasanja.forEach(async q => {
+            vprasanjaId.push(`${novId}_${q.vprasanje.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`);
+
+            await api.post(`/vprasanje/dodaj`, q);
+        })
+        console.log(vprasanjaId);
         
-        await api.post(`/kviz/dodaj`, { naziv: quizName, vprasanja: vprasanja });
+        await api.post(`/kviz/dodaj`, { naziv: quizName, vprasanja: vprasanjaId });
         console.log('Dodan kviz: ', quizName);
         
         await api.post(`/domena/dodaj-kviz`, { id: domain, kvizId: novId });
@@ -69,14 +77,14 @@ function DodajKviz() {
         window.location.href = `/domena/${domain}`;
     };
 
-    const dodajVprasanja = async (kvizId) => {
+    const dodajVprasanja = (kvizId) => {
         let vprasanja = [];
-        questions.forEach(async question => {
+        questions.forEach(question => {
             let odgovori;
             if (question.type === "open") {
                 odgovori = [question.answer];
             } else {
-                odgovori = question.answers.map(answer => `${answer.text};${answer.isCorrect}`);
+                odgovori = question.answer.map(answer => `${answer.text};${answer.isCorrect}`);
             }
 
             const vprasanje = {
@@ -86,26 +94,10 @@ function DodajKviz() {
                 odgovori: odgovori
             }
 
-            await api.post(`/vprasanje/dodaj`, { vprasanja })
-            .then(res => {
-                console.log('Dodano vprašanje: ', vprasanje);
-            })
-            .catch(err => {
-                console.error(err);
-            });
-
-            vprasanja.push(`${kvizId}_${question.question.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`);
-            
-
-            /*api.put(`/kviz/vprasanje`, { id: kvizId, vprasanjeId: `${kvizId}_${question.question.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}` })
-            .then(res => {
-                console.log('Dodano vprašanje v kviz: ', kvizId, ' ', question.question);
-            })
-            .catch(err => {
-                console.error(err);
-            });*/
+            console.log(vprasanje);
+            vprasanja.push(vprasanje);
         });
-
+        console.log(vprasanja);
         return vprasanja;
     }
 
