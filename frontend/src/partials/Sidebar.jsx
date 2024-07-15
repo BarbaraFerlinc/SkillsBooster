@@ -12,7 +12,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [domains, setDomains] = useState([]);
   const [showAddDomainCard, setShowAddDomainCard] = useState(false);
-  const [newDomain, setNewDomain] = useState({ name: '', description: '', keywords: '' });
+  const [newDomain, setNewDomain] = useState({ naziv: '', opis: '', kljucna_znanja: '' });
 
   const { user } = UserAuth();
 
@@ -53,7 +53,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
           setDomains(null);
       }
     }
-  }, [currentUser]);
+  }, [currentUser, showAddDomainCard]);
 
   const fetchDomeneForUser = async (user) => {
     try {
@@ -79,9 +79,15 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   const handleSubmitDomain = async () => {
     try {
-      await api.post('/domena/lastnik', newDomain);
+      newDomain.lastnik = currentUser.email;
+      const response = await api.post('/domena/dodaj', newDomain, {
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+      });
       setShowAddDomainCard(false);
-      fetchDomeneForOwner(currentUser); // Refresh domains after adding new one
+      //fetchDomeneForOwner(currentUser); // Refresh domains after adding new one
     } catch (er) {
       console.log("Napaka pri dodajanju domene", er);
     }
@@ -170,7 +176,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         onClick={handleAddDomain}
                         className="text-sm font-medium ml-3 text-white lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200"
                     >
-                      Add Domena
+                      Add Domain
                     </button>
                   </div>
               )}
@@ -182,8 +188,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                       <input
                           type="text"
                           className="border rounded p-2 w-full"
-                          value={newDomain.name}
-                          onChange={(e) => setNewDomain({ ...newDomain, name: e.target.value })}
+                          value={newDomain.naziv}
+                          onChange={(e) => setNewDomain({ ...newDomain, naziv: e.target.value })}
                       />
                     </div>
                     <div className="mb-2">
@@ -191,17 +197,17 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                       <input
                           type="text"
                           className="border rounded p-2 w-full"
-                          value={newDomain.description}
-                          onChange={(e) => setNewDomain({ ...newDomain, description: e.target.value })}
+                          value={newDomain.opis}
+                          onChange={(e) => setNewDomain({ ...newDomain, opis: e.target.value })}
                       />
                     </div>
                     <div className="mb-2">
-                      <label className="block text-sm font-medium mb-1">Keywords</label>
+                      <label className="block text-sm font-medium mb-1">Key Skills</label>
                       <input
                           type="text"
                           className="border rounded p-2 w-full"
-                          value={newDomain.keywords}
-                          onChange={(e) => setNewDomain({ ...newDomain, keywords: e.target.value })}
+                          value={newDomain.kljucna_znanja}
+                          onChange={(e) => setNewDomain({ ...newDomain, kljucna_znanja: e.target.value })}
                       />
                     </div>
                     <button
