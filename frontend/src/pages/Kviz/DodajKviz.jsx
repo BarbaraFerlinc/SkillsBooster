@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import OpenQuestion from './OpenQuestions.jsx';
 import ClosedQuestion from './ClosedQuestions.jsx';
 import {useParams} from "react-router-dom";
+import api from '../../services/api.js';
 
 function DodajKviz() {
-    const { id } = useParams(); // Get the quiz id from URL parameters
+    const { domain } = useParams(); // Get the quiz id from URL parameters
     const [quizName, setQuizName] = useState('');
     const [questions, setQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState({ type: 'open', question: '', answer: '' });
+    const [questionAdded, setQuestionAdded] = useState(false);
     const [quizzes, setQuizzes] = useState([]);
 
     const handleQuizNameChange = (e) => {
@@ -45,14 +47,67 @@ function DodajKviz() {
     const handleConfirmQuestion = () => {
         setQuestions([...questions, currentQuestion]);
         setCurrentQuestion({ type: 'open', question: '', answer: '' });
+        setQuestionAdded(true);
     };
 
+    useEffect(() => {
+        console.log(questions);
+        setQuestionAdded(false);
+    }, [domain, questionAdded]);
 
- const handleSubmitQuiz = () => {
-        // Redirect to domain/id (replace 'id' with the actual id)
-     console.log(`/domena/${id}`);
-        window.location.href = `/domena/${id}`;
+
+    const handleSubmitQuiz = async () => {
+        const novId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const vprasanja = await dodajVprasanja(novId);
+        
+        await api.post(`/kviz/dodaj`, { naziv: quizName, vprasanja: vprasanja });
+        console.log('Dodan kviz: ', quizName);
+        
+        await api.post(`/domena/dodaj-kviz`, { id: domain, kvizId: novId });
+        console.log('Kviz dodan v domeno.');
+
+        window.location.href = `/domena/${domain}`;
     };
+
+    const dodajVprasanja = async (kvizId) => {
+        let vprasanja = [];
+        questions.forEach(async question => {
+            let odgovori;
+            if (question.type === "open") {
+                odgovori = [question.answer];
+            } else {
+                odgovori = question.answers.map(answer => `${answer.text};${answer.isCorrect}`);
+            }
+
+            const vprasanje = {
+                vprasanje: question.question,
+                tip: question.type,
+                kviz: kvizId,
+                odgovori: odgovori
+            }
+
+            await api.post(`/vprasanje/dodaj`, { vprasanja })
+            .then(res => {
+                console.log('Dodano vprašanje: ', vprasanje);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+
+            vprasanja.push(`${kvizId}_${question.question.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`);
+            
+
+            /*api.put(`/kviz/vprasanje`, { id: kvizId, vprasanjeId: `${kvizId}_${question.question.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}` })
+            .then(res => {
+                console.log('Dodano vprašanje v kviz: ', kvizId, ' ', question.question);
+            })
+            .catch(err => {
+                console.error(err);
+            });*/
+        });
+
+        return vprasanja;
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">

@@ -168,6 +168,19 @@ class Domena {
         }
     }
 
+    static async najdiKvize(id) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+            const kvizi = domena.kvizi;
+
+            return kvizi;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju kvizov iz baze: ' + error.message);
+        }
+    }
+
     static async odstraniKviz(id, kvizId) {
         try {
             const domenaRef = db.collection("Domene_znanja").doc(id);
@@ -201,13 +214,22 @@ class Domena {
         const updatedGradiva = [...(domena.gradiva || []), naziv];
         await domenaRef.update({ gradiva: updatedGradiva });
 
+        const gradivoRef = ref(storage, `${id}/${naziv}`);
+        /*try {
+            const url = await getDownloadURL(gradivoRef);
+        } catch (error) {
+            console.error('Error getting download URL:', error);
+        }*/
+
         try {
-            const gradivoRef = ref(storage, `${id}/${naziv}`);
             uploadBytes(gradivoRef, file).then((snapshot) => {
                 console.log('Uploaded a blob or file!');
             }).catch((error) => {
-            console.error('Error uploading file:', error);
+                console.error('Error uploading file:', error);
             });
+            /*const gradivo = `${naziv};${url}`;
+
+            return { message: 'Uspešno dodano gradivo', gradivo: gradivo };*/
             return { message: 'Uspešno dodano gradivo', gradivo: naziv };
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
@@ -220,7 +242,21 @@ class Domena {
             const response = await domenaRef.get();
             const domena = response.data();
             const gradiva = domena.gradiva;
+            /*const files = [];
 
+            for (const gradivo of gradiva) {
+                const naziv = gradivo.split(';')[0];
+                const url = gradivo.split(';')[1];
+                files.push({naziv, url});
+            }
+
+            for (const gradivo of gradiva) {
+                const gradivoRef = ref(storage, `${id}/${gradivo.naziv}`);
+                const url = await getDownloadURL(gradivoRef);
+                files.push({naziv: naziv, url: url});
+            }
+
+            return files;*/
             return gradiva;
         } catch (error) {
             throw new Error('Napaka pri pridobivanju gradiv iz baze: ' + error.message);
@@ -229,8 +265,15 @@ class Domena {
 
     static async beriGradivo(id, naziv) {
         try {
-            // to do
-            return { message: 'Uspešno dodano gradivo', gradivo: naziv };
+            const gradivoRef = ref(storage, `${id}/${naziv}`);
+            const url = await getDownloadURL(gradivoRef);
+    
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const blob = await response.blob();
+            return blob;
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
         }

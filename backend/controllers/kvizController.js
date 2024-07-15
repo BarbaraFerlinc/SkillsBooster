@@ -1,14 +1,14 @@
 const Kviz = require('../models/kviz');
 
 async function dodajKviz(req, res) {
-    const { naziv } = req.body;
+    const { naziv, vprasanja } = req.body;
   
-    if (!naziv) {
+    if (!naziv || !vprasanja) {
       return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
     }
   
     try {
-      const novKviz = await Kviz.dodaj(naziv);
+      const novKviz = await Kviz.dodaj(naziv, vprasanja);
       
       res.status(200).json({ message: 'Uspešno dodan kviz', kviz: novKviz });
     } catch (error) {
@@ -25,7 +25,7 @@ async function vsiKvizi(req, res) {
     }
 }
   
-async function najdiKviz(req, res) {
+async function najdiKvizId(req, res) {
     const { id } = req.params;
     try {
         const kviz = await Kviz.getById(id);
@@ -137,14 +137,32 @@ async function izbrisiKviz(req, res) {
     }
 }
 
+async function najdiKviz(req, res) {
+    const { id } = req.body;
+    if (!id) {
+        return res.status(400).send({ error: 'Id is required' });
+    }
+
+    try {
+        const kviz = await Kviz.getById(id);
+        if (!kviz) {
+        return res.status(404).json({ error: 'Kviz ne obstaja' });
+        }
+        res.status(200).json(kviz);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju kviza iz baze', details: error.message });
+    }
+}
+
 module.exports = {
     dodajKviz,
     vsiKvizi,
-    najdiKviz,
+    najdiKvizId,
     spremeniKviz,
     dodajVprasanjeKviz,
     odstraniVprasanjeKviz,
     dodajRezultatKviz,
     odstraniRezultatKviz,
-    izbrisiKviz
+    izbrisiKviz,
+    najdiKviz
 };

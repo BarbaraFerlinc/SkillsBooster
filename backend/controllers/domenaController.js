@@ -116,8 +116,7 @@ async function odstraniUporabnikaDomena(req, res) {
 }
 
 async function dodajKvizDomena(req, res) {
-    const { id } = req.params;
-    const { kvizId } = req.body;
+    const { id, kvizId } = req.body;
 
     if (!kvizId ) {
         return res.status(400).json({ error: 'Izbran mora biti kviz' });
@@ -132,9 +131,21 @@ async function dodajKvizDomena(req, res) {
     }
 }
 
+async function najdiKvizeDomena(req, res) {
+    const { id } = req.body;
+    try {
+        const domena = await Domena.najdiKvize(id);
+        if (!domena) {
+        return res.status(404).json({ error: 'Domena ne obstaja' });
+        }
+        res.status(200).json(domena);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju domene iz baze', details: error.message });
+    }
+}
+
 async function odstraniKvizDomena(req, res) {
-    const { id } = req.params;
-    const { kvizId } = req.body;
+    const { id, kvizId } = req.body;
 
     if (!kvizId ) {
         return res.status(400).json({ error: 'Izbran mora biti kviz' });
@@ -165,7 +176,7 @@ async function dodajGradivoDomena(req, res) {
     }
 }
 
-async function najdiGradiva(req, res) {
+async function najdiGradivadomena(req, res) {
     const { id } = req.body;
     try {
         const domena = await Domena.najdiGradiva(id);
@@ -175,6 +186,22 @@ async function najdiGradiva(req, res) {
         res.status(200).json(domena);
     } catch (error) {
         res.status(500).json({ error: 'Napaka pri pridobivanju domene iz baze', details: error.message });
+    }
+}
+
+async function beriGradivoDomena(req, res) {
+    const { id, naziv } = req.body;
+    
+    if (!id || !naziv ) {
+        return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
+    }
+
+    try {
+        const url = await Domena.beriGradivo(id, naziv);
+        
+        res.status(200).json(url);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri posodabljanju domene v bazi', details: error.message });
     }
 }
 
@@ -234,9 +261,11 @@ module.exports = {
     dodajUporabnikaDomena,
     odstraniUporabnikaDomena,
     dodajKvizDomena,
+    najdiKvizeDomena,
     odstraniKvizDomena,
     dodajGradivoDomena,
-    najdiGradiva,
+    najdiGradivadomena,
+    beriGradivoDomena,
     izbrisiGradivoDomena,
     izbrisiDomeno,
     najdiDomeno

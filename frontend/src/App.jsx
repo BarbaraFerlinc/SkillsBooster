@@ -25,6 +25,7 @@ import ClosedQuestions from "./pages/Kviz/ClosedQuestions.jsx";
 import { AuthContextProvider } from './context/AuthContext.jsx';
 import PrivateRouting from './components/PrivateRouting.jsx';
 import BossRouting from './components/BossRouting.jsx';
+import UserRouting from './components/UserRouting.jsx';
 import AdminRouting from './components/AdminRouting.jsx';
 import SolveQuiz from "./pages/Kviz/SolveQuiz.jsx";
 
@@ -50,11 +51,13 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route exact path="/domena/:id" element={<Domena/>} />
             <Route exact path="/logout" element={<LogOut/>} />
-            <Route exact path="/quiz/:id" element={<Kviz/>} />
 
             <Route path='' element={<BossRouting />}>
+              <Route exact path="/addQuiz/:domain" element={<DodajKviz/>} />
+            </Route>
 
-              <Route exact path="/addQuiz" element={<DodajKviz/>} />
+            <Route path='' element={<UserRouting />}>
+              <Route exact path="/quiz/:id" element={<Kviz/>} />
             </Route>
           </Route>
           

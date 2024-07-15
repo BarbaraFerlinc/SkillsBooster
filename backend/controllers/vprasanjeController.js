@@ -1,14 +1,14 @@
 const Vprasanje = require('../models/vprasanje');
 
 async function dodajVprasanje(req, res) {
-    const { vprasanje, tip } = req.body;
+    const { vprasanje, tip, kviz, odgovori } = req.body;
   
-    if (!vprasanje || !tip) {
+    if (!vprasanje || !tip || !kviz || !odgovori) {
       return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
     }
   
     try {
-      const novoVprasanje = await Vprasanje.dodaj(vprasanje, tip);
+      const novoVprasanje = await Vprasanje.dodaj(vprasanje, tip, kviz, odgovori);
       
       res.status(200).json({ message: 'Uspešno dodano vprašanje', vprasanje: novoVprasanje });
     } catch (error) {
@@ -57,15 +57,14 @@ async function spremeniVprasanje(req, res) {
 }
 
 async function dodajOdgovorVprasanje(req, res) {
-    const { id } = req.params;
-    const { odgovorId } = req.body;
+    const { id, odgovor } = req.body;
 
-    if (!odgovorId ) {
+    if (!odgovor ) {
         return res.status(400).json({ error: 'Izbran mora biti odgovor' });
     }
 
     try {
-        const updatedVprasanje = await Vprasanje.dodajOdgovor(id, odgovorId);
+        const updatedVprasanje = await Vprasanje.dodajOdgovor(id, odgovor);
         
         res.status(200).json({ message: 'Uspešno posodobljeno vprašanje', vprasanje: updatedVprasanje });
     } catch (error) {
@@ -74,15 +73,14 @@ async function dodajOdgovorVprasanje(req, res) {
 }
 
 async function odstraniOdgovorVprasanje(req, res) {
-    const { id } = req.params;
-    const { odgovorId } = req.body;
+    const { id, odgovor } = req.body;
 
-    if (!odgovorId ) {
+    if (!odgovor ) {
         return res.status(400).json({ error: 'Izbrano mora biti vprašanje' });
     }
 
     try {
-        const updatedVprasanje = await Vprasanje.odstraniOdgovor(id, odgovorId);
+        const updatedVprasanje = await Vprasanje.odstraniOdgovor(id, odgovor);
         
         res.status(200).json({ message: 'Uspešno posodobljeno vprašanje', vprasanje: updatedVprasanje });
     } catch (error) {

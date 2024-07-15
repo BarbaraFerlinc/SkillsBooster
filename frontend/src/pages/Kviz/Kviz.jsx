@@ -4,18 +4,41 @@ import { quizzes } from "../../Data.jsx";
 import Sidebar from "../../partials/Sidebar.jsx";
 import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
+import api from '../../services/api.js';
+
+const initialQuiz = {
+    naziv: "No Quiz",
+    rezultati: [],
+    vprasanja: []
+}
 
 function Kviz() {
     const { id } = useParams(); // Get the quiz id from the URL parameters
-    const quiz = quizzes.find(quiz => quiz.id === parseInt(id)); // Find the quiz data based on the id
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [quizResult, setQuizResult] = useState(null); // State to hold the quiz result percentage
+    //const quiz = quizzes.find(quiz => quiz.id === parseInt(id)); // Find the quiz data based on the id
+    const [currentQuiz, setCurrentQuiz] = useState(initialQuiz);
+    const [sidebarOpen, setSidebarOpen] = useState(false); // tu je blo prej initialfalsequiz al nekaj takega??
+    const [quizResult, setQuizResult] = useState(0); // State to hold the quiz result percentage
+
+    useEffect(() => {
+        if (id) {
+            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post('/kviz/id', { id: novId })
+                .then(res => {
+                    const kviz = res.data;
+                    console.log(kviz);
+                    setCurrentQuiz(kviz);
+                })
+                .catch(err => {
+                    console.error(err);
+            });
+        }
+    }, [id]);
 
     // Simulated function to fetch quiz result
     const fetchQuizResult = () => {
         // Replace with actual logic to fetch quiz result from API or localStorage
-        const result = Math.floor(Math.random() * 100); // Random result for demo
-        setQuizResult(result);
+        /*const result = Math.floor(Math.random() * 100); // Random result for demo
+        setQuizResult(result);*/
     };
 
     // useEffect to fetch quiz result on component mount
@@ -34,7 +57,7 @@ function Kviz() {
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
                         {/* Main Header */}
-                        <DynamicHeader domainName={quiz?.name}/>
+                        <DynamicHeader domainName={currentQuiz?.naziv}/>
 
                         {/* Link to SolveQuiz.jsx */}
                         <a

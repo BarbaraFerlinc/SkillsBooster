@@ -1,14 +1,14 @@
 const db = require('../pb');
 
 class Kviz {
-    static async dodaj(naziv) {
+    static async dodaj(naziv, vprasanja) {
         try {
             const id = naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
             const novKviz = {
                 naziv: naziv,
                 rezultati: [],
-                vprasanja: []
+                vprasanja: vprasanja
             };
 
             db.collection("Kvizi").doc(id).set(novKviz);

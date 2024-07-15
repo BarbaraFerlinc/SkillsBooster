@@ -24,7 +24,6 @@ function SeznamDomen({ domains }) {
 SeznamDomen.propTypes = {
     domains: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.number.isRequired,
             kljucna_znanja: PropTypes.string,
             kvizi: PropTypes.arrayOf(PropTypes.string),
             lastnik: PropTypes.string,
@@ -32,6 +31,7 @@ SeznamDomen.propTypes = {
             opis: PropTypes.string,
             rezultati: PropTypes.arrayOf(PropTypes.string),
             zaposleni: PropTypes.arrayOf(PropTypes.string),
+            gradiva: PropTypes.arrayOf(PropTypes.string),
         })
     ).isRequired,
 };
