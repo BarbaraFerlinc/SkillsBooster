@@ -1,34 +1,17 @@
-import Domena from "./pages/Domene/Domena.jsx";
-
 export const Users = [
     {
         id:0,
         email: 'admin@gmail.com',
         password: '12345678',
         role: 'admin',
-        domains:Domena[{}]
+
     },
     {
         id: 1,
         email: 'boss@gmail.com',
         password: '12341',
         role: 'boss',
-        domains: Domena[
-            {
-                id: 1,
-                name: "Domena1",
-                description:"to je domena 1",
-                avtor: "Boss Man"
 
-            },
-                {
-                    id: 2,
-                    name: "Domena2",
-                    description:"to je domena 2",
-                    avtor: "Boss Man"
-
-                }
-            ],
     },
     {
         id: 2,

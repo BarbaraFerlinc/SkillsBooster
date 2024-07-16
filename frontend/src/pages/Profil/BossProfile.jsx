@@ -8,7 +8,7 @@ function BossProfile() {
     const [allUsers, setAllUsers] = useState([]);
     const [domains, setDomains] = useState([]);
     const [userDomains, setUserDomains] = useState({});
-    const [showUserList, setShowUserList] = useState(false);
+    const [domainScores, setDomainScores] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
 
     const { user } = UserAuth();
@@ -19,8 +19,8 @@ function BossProfile() {
                 const response = await api.get('/domena/vse');
                 const names = response.data.map(domain => domain.naziv);
                 setDomains(names);
-            } catch (er) {
-                console.log("Napaka pri pridobivanju domen", er);
+            } catch (err) {
+                console.log("Error fetching domains", err);
             }
         };
 
@@ -49,8 +49,8 @@ function BossProfile() {
                     const response = await api.post('/uporabnik/bossEmail', { bossEmail: user.email, adminEmail: currentUser.admin });
                     setUsers(response.data);
                     response.data.forEach(fetchDomainsForUser);
-                } catch (er) {
-                    console.log("Napaka pri pridobivanju uporabnikov", er);
+                } catch (err) {
+                    console.log("Error fetching users", err);
                 }
             };
             fetchUsers();
@@ -62,37 +62,24 @@ function BossProfile() {
             const response = await api.post('/domena/uporabnik', { id: user.email });
             const domainNames = response.data.map(domena => domena.naziv);
             setUserDomains(prev => ({ ...prev, [user.id]: domainNames }));
-        } catch (er) {
-            console.log("Napaka pri pridobivanju domen", er);
+            calculateDomainScores(); // Recalculate scores when domains for a user are fetched
+        } catch (err) {
+            console.log("Error fetching domains for user", err);
         }
     };
 
-    const handleAddUser = async (user) => {
-        if (!users.find(u => u.id === user.id)) {
-            setUsers(prev => [...prev, user]);
-            fetchDomainsForUser(user);
-        }
-        setShowUserList(false);
-    };
-
-    const handleDomainChange = (userId, domain) => {
-        setUserDomains(prev => {
-            const userDomainsCopy = { ...prev };
-            if (userDomainsCopy[userId]) {
-                if (userDomainsCopy[userId].includes(domain)) {
-                    userDomainsCopy[userId] = userDomainsCopy[userId].filter(d => d !== domain);
+    const calculateDomainScores = () => {
+        const newDomainScores = {};
+        Object.values(userDomains).forEach(domains => {
+            domains.forEach(domain => {
+                if (newDomainScores[domain]) {
+                    newDomainScores[domain]++;
                 } else {
-                    userDomainsCopy[userId].push(domain);
+                    newDomainScores[domain] = 1;
                 }
-            } else {
-                userDomainsCopy[userId] = [domain];
-            }
-            return userDomainsCopy;
+            });
         });
-    };
-
-    const handleSubmitChanges = () => {
-        // handle submit changes logic here
+        setDomainScores(newDomainScores);
     };
 
     useEffect(() => {
@@ -100,8 +87,8 @@ function BossProfile() {
             try {
                 const response = await api.get('/uporabnik/vsi');
                 setAllUsers(response.data);
-            } catch (er) {
-                console.log("Napaka pri pridobivanju vseh uporabnikov", er);
+            } catch (err) {
+                console.log("Error fetching all users", err);
             }
         };
 
@@ -115,77 +102,43 @@ function BossProfile() {
 
     return (
         <div className="overflow-x-auto mt-8">
-            <button
-                className="bg-blue-500 text-white py-2 px-4 rounded"
-                onClick={() => setShowUserList(!showUserList)}
-            >
-                Add User
-            </button>
-            {showUserList && (
-                <div className="mt-4">
-                    <input
-                        type="text"
-                        placeholder="Search users..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="border rounded p-2 mb-2"
-                    />
-                    <ul className="border rounded max-h-40 overflow-y-auto">
-                        {filteredUsers.map(user => (
-                            <li
-                                key={user.id}
-                                className="p-2 cursor-pointer hover:bg-gray-200"
-                                onClick={() => handleAddUser(user)}
-                            >
-                                {user.ime_priimek} ({user.email})
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-
-            <table className="min-w-full bg-white border mt-4">
-                <thead>
-                <tr>
-                    <th className="py-2 px-4 border-b">Name</th>
-                    <th className="py-2 px-4 border-b">Email</th>
-                    <th className="py-2 px-4 border-b">Domains</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                {users.map(user => (
-                    <tr key={user.id}>
-                        <td className="py-2 px-4 border-b">{user.ime_priimek}</td>
-                        <td className="py-2 px-4 border-b">{user.email}</td>
-                        <td className="py-2 px-4 border-b">
-                            {domains.map(domain => (
-                                <label key={domain} className="block">
-                                    <input
-                                        type="checkbox"
-                                        checked={userDomains[user.id]?.includes(domain) || false}
-                                        onChange={() => handleDomainChange(user.id, domain)}
-                                    />
-                                    {domain}
-                                </label>
+            <div className="flex">
+                <div className="w-full">
+                    <h2 className="text-xl font-semibold mb-4">Users table</h2>
+                    <div className="min-w-full bg-white border mt-4 overflow-x-auto">
+                        <table className="min-w-full">
+                            <thead>
+                            <tr>
+                                <th className="py-2 px-4 border-b">Name</th>
+                                <th className="py-2 px-4 border-b">Email</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {filteredUsers.map(user => (
+                                <tr key={user.id}>
+                                    <td className="py-2 px-4 border-b">{user.ime_priimek}</td>
+                                    <td className="py-2 px-4 border-b">{user.email}</td>
+                                </tr>
                             ))}
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-
-            {Object.keys(userDomains).length > 0 && (
-                <div className="mt-4 text-right">
-                    <button
-                        className="bg-green-500 text-white py-2 px-4 rounded"
-                        onClick={handleSubmitChanges}
-                    >
-                        Submit Changes
-                    </button>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            )}
+            </div>
+            <div className="mt-8">
+                <h2 className="text-xl font-semibold mb-4">Knowledge Matrix</h2>
+                <div className="grid grid-cols-2 gap-4">
+                    {domains.map((domain, index) => (
+                        <div key={index} className="bg-white border p-4 rounded-md shadow-md">
+                            <h3 className="text-lg font-semibold mb-2">{domain}</h3>
+                            <p>Average Score: {domainScores[domain] || 0}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
         </div>
+
     );
 }
 

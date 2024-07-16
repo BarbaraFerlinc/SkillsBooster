@@ -175,13 +175,7 @@ function AdminProfile() {
                         <td className="py-2 px-4 border-b">{user.email}</td>
                         <td className="py-2 px-4 border-b">{user.vloga}</td>
                         <td className="py-2 px-4 border-b">
-                            {/*<select
-                                value={user.vloga}
-                                className="bg-gray-200 border rounded p-1"
-                            >
-                                <option value="employee">Employee</option>
-                                <option value="boss">Boss</option>
-                            </select>*/}
+
                         </td>
                     </tr>
                 ))}
