@@ -29,7 +29,6 @@ async function najdiVprasanje(req, res) {
     const { id } = req.params;
     try {
         const vprasanje = await Vprasanje.getById(id);
-        console.log(vprasanje)
         if (!vprasanje) {
         return res.status(404).json({ error: 'Vprašanje ne obstaja' });
         }
@@ -43,7 +42,6 @@ async function najdiVprasanja(req, res) {
     const { ids } = req.body;
     try {
         const vprasanja = await Vprasanje.getByIds(ids);
-        console.log(vprasanja)
         if (!vprasanja) {
         return res.status(404).json({ error: 'Vprašanja ne obstajajo' });
         }

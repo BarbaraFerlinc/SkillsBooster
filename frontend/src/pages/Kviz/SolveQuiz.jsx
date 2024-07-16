@@ -5,6 +5,7 @@ import Header from '../../partials/Header.jsx';
 import DynamicHeader from '../../partials/dashboard/DynamicHeader.jsx';
 import { quizzes } from '../../Data.jsx';
 import api from '../../services/api.js';
+import { UserAuth } from '../../context/AuthContext.jsx';
 
 const initialQuiz = {
     naziv: "No Quiz",
@@ -13,13 +14,13 @@ const initialQuiz = {
 }
 
 function SolveQuiz() {
-    const { id } = useParams(); // Get the quiz id from URL parameters
-    //const [quiz] = useState(quizzes.find(q => q.id === parseInt(id))); // Find the quiz data based on id
+    const { id } = useParams();
     const [currentQuiz, setCurrentQuiz] = useState(initialQuiz);
     const [questions, setQuestions] = useState([]);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // State to track current question index
-    //const [answers, setAnswers] = useState(Array(currentQuiz.vprasanja.length).fill('')); // State to store user answers
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState([]);
+
+    const { user } = UserAuth();
 
     useEffect(() => {
         if (id) {
@@ -41,7 +42,7 @@ function SolveQuiz() {
             .then(res => {
               const vprasanja = res.data;
               setQuestions(vprasanja);
-              setAnswers(Array(vprasanja.length).fill(''));
+              setAnswers(Array(vprasanja.length).fill([]));
             })
             .catch(err => {
               console.error(err);
@@ -56,7 +57,17 @@ function SolveQuiz() {
     // Function to handle selecting an answer for closed questions
     const handleSelectAnswer = (optionIndex) => {
         const updatedAnswers = [...answers];
-        updatedAnswers[currentQuestionIndex] = questions[currentQuestionIndex].odgovori[optionIndex].split(';')[0];
+        //updatedAnswers[currentQuestionIndex] = questions[currentQuestionIndex].odgovori[optionIndex].split(';')[0];
+        const selectedOption = questions[currentQuestionIndex].odgovori[optionIndex].split(';')[0];
+        if (updatedAnswers[currentQuestionIndex].includes(selectedOption)) {
+            // If the option is already selected, deselect it
+            updatedAnswers[currentQuestionIndex] = updatedAnswers[currentQuestionIndex].filter(
+                answer => answer !== selectedOption
+            );
+        } else {
+            // Otherwise, select the option
+            updatedAnswers[currentQuestionIndex] = [...updatedAnswers[currentQuestionIndex], selectedOption];
+        }
         setAnswers(updatedAnswers);
     };
 
@@ -82,14 +93,12 @@ function SolveQuiz() {
     };
 
     // Function to end the quiz
-    const handleEndQuiz = () => {
-        // Calculate score (for demo, just count correct answers)
+    const handleEndQuiz = async () => {
         const score = calculateScore();
-        // Redirect or navigate to the quiz results page or another component with the score
-        // Example: You can use <Link> or any navigation method you prefer
-        // Replace `/quiz/${id}` with your desired endpoint
-        console.log(`/quiz/${id}`);
-        // Navigate to the result page or any desired endpoint
+
+        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        await api.post(`/kviz/dodaj-rezultat`, { id: novId, uporabnikId: user.email, vrednost: score });
+        
         window.location.href = `/quiz/${id}?score=${score}`;
     };
 
@@ -97,13 +106,24 @@ function SolveQuiz() {
     const calculateScore = () => {
         let correctAnswers = 0;
         for (let i = 0; i < questions.length; i++) {
-            // dobi dejanska vprašanja, ne samo nazive vprašanj
-            /*const question = currentQuiz.vprasanja[i];
+            const question = questions[i];
             const userAnswer = answers[i];
-            if (question.type === 'closed' && userAnswer === question.correctAnswer) {
-                correctAnswers++;
-            }*/
-            // You can add more logic here for scoring open questions if needed
+            if (question.tip === 'closed') {
+                const correctAnswersArray = question.odgovori
+                    .filter(odgovor => odgovor.split(';')[1] === "true")
+                    .map(odgovor => odgovor.split(';')[0]);
+                const isCorrect = correctAnswersArray.every(answer => userAnswer.includes(answer)) &&
+                                  userAnswer.every(answer => correctAnswersArray.includes(answer));
+
+                if (isCorrect) {
+                    correctAnswers++;
+                }
+            } else if (question.tip === 'open') {
+                // tu se more dodat AI
+                if (userAnswer === question.odgovori[0]) {
+                    correctAnswers++;
+                }
+            }
         }
         const score = Math.round((correctAnswers / questions.length) * 100);
         return score;
@@ -139,7 +159,7 @@ function SolveQuiz() {
                                                 (option, index) => (
                                                     <li
                                                         key={index}
-                                                        className={`mb-2 cursor-pointer ${answers[currentQuestionIndex] === option.split(';')[0] ? 'bg-indigo-200' : ''}`}
+                                                        className={`mb-2 cursor-pointer ${answers[currentQuestionIndex].includes(option.split(';')[0]) ? 'bg-indigo-200' : ''}`}
                                                         onClick={() => handleSelectAnswer(index)}
                                                     >
                                                         {option.split(';')[0]}

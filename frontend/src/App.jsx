@@ -57,7 +57,7 @@ function App() {
             </Route>
 
             <Route path='' element={<UserRouting />}>
-              <Route exact path="/quiz/:id" element={<Kviz/>} />
+              <Route exact path="/quiz/:id/:domain" element={<Kviz/>} />
               <Route exact path="/solveQuiz/:id" element={<SolveQuiz/>} />
             </Route>
           </Route>
