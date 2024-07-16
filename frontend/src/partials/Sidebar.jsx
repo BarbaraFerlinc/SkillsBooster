@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import space from "../images/space-svgrepo-com.png";
 import { UserAuth } from '../context/AuthContext.jsx';
@@ -18,6 +18,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   const trigger = useRef(null);
   const sidebar = useRef(null);
+  const addDomainCardRef = useRef(null);
 
   const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
   const [sidebarExpanded, setSidebarExpanded] = useState(storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true');
@@ -82,8 +83,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
       newDomain.lastnik = currentUser.email;
       const response = await api.post('/domena/dodaj', newDomain, {
         headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
       });
       setShowAddDomainCard(false);
@@ -92,6 +93,24 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
       console.log("Napaka pri dodajanju domene", er);
     }
   };
+
+  const handleClickOutside = useCallback(
+      (event) => {
+        if (showAddDomainCard && addDomainCardRef.current && !addDomainCardRef.current.contains(event.target)) {
+          setShowAddDomainCard(true);
+        }
+      },
+      [showAddDomainCard]
+  );
+
+  useEffect(() => {
+    if (showAddDomainCard) {
+      document.addEventListener('click', handleClickOutside);
+    } else {
+      document.removeEventListener('click', handleClickOutside);
+    }
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showAddDomainCard, handleClickOutside]);
 
   useEffect(() => {
     const clickHandler = ({ target }) => {
@@ -159,7 +178,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
           <div className="space-y-8">
             <div>
-              <h3 className="text-xs uppercase text-slate-500 font-semibold pl-3">
+              <h3 className="text-sm uppercase text-slate-500 font-semibold pl-3">
               <span className="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">
                 •••
               </span>
@@ -181,7 +200,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                   </div>
               )}
               {showAddDomainCard && (
-                  <div className="bg-white p-4 rounded shadow-md mt-4">
+                  <div ref={addDomainCardRef} className="bg-white p-4 rounded shadow-md mt-4 relative">
                     <h4 className="text-lg font-semibold mb-2">Add New Domain</h4>
                     <div className="mb-2">
                       <label className="block text-sm font-medium mb-1">Name</label>
@@ -210,12 +229,20 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                           onChange={(e) => setNewDomain({ ...newDomain, kljucna_znanja: e.target.value })}
                       />
                     </div>
-                    <button
-                        onClick={handleSubmitDomain}
-                        className="bg-blue-500 text-white py-2 px-4 rounded mt-2 float-right"
-                    >
-                      Submit
-                    </button>
+                    <div className="flex justify-end">
+                      <button
+                          onClick={() => setShowAddDomainCard(false)}
+                          className="bg-red-500 text-white py-2 px-4 rounded mr-2"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                          onClick={handleSubmitDomain}
+                          className="bg-blue-500 text-white py-2 px-4 rounded"
+                      >
+                        Submit
+                      </button>
+                    </div>
                   </div>
               )}
             </div>

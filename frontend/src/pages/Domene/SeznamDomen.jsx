@@ -10,7 +10,7 @@ function SeznamDomen({ domains }) {
                     <div className="flex items-center">
                         <NavLink
                             to={`/domena/${domain.naziv}`}
-                            className="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 text-slate-200 hover:text-white truncate"
+                            className="text-md font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 text-slate-200 hover:text-white truncate"
                         >
                             {domain.naziv}
                         </NavLink>

@@ -95,9 +95,13 @@ function BossProfile() {
         fetchAllUsers();
     }, []);
 
+    const emailPostfix = currentUser ? currentUser.email.split('@')[1] : '';
+
     const filteredUsers = allUsers.filter(user =>
-        user.ime_priimek.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+            user.email.split('@')[1] === emailPostfix && (
+                user.ime_priimek.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.email.toLowerCase().includes(searchTerm.toLowerCase())
+            )
     );
 
     return (
@@ -136,9 +140,7 @@ function BossProfile() {
                     ))}
                 </div>
             </div>
-
         </div>
-
     );
 }
 

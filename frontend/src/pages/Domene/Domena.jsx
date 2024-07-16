@@ -238,7 +238,7 @@ function Domena() {
                                         
                                         <a href="#" onClick={() => handleFileDownload(fileName)}>{fileName}</a>
                                         {/*<a href={URL.createObjectURL(file.url)} download={file.naziv}>{file.naziv}</a>*/}
-                                        {currentUser && (currentUser.vloga == "boss") && (
+                                        {currentUser && (currentUser.vloga === "boss") && (
                                             <button onClick={() => handleFileDelete(fileName)} className="btn bg-red-500 hover:bg-red-600 text-white ml-4">Delete</button>
                                         )}
                                     </div>
@@ -246,7 +246,7 @@ function Domena() {
                             )}
                         </div>
 
-                        {currentUser && (currentUser.vloga == "boss") && (
+                        {currentUser && (currentUser.vloga === "boss") && (
                             <label htmlFor="fileInput" className="btn bg-indigo-500 hover:bg-indigo-600 text-white cursor-pointer mt-8">
                                 <span className="hidden xs:block ml-2">Add file</span>
                             </label>
@@ -269,7 +269,7 @@ function Domena() {
                                 <div className="flex items-center">
                                     <NavLink
                                         to={`/quiz/${quiz}`}
-                                        className="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 text-black hover:text-black truncate"
+                                        className="text-md font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 text-black hover:text-black truncate"
                                     >
                                         {quiz}
                                     </NavLink>
