@@ -5,7 +5,7 @@ import {useParams} from "react-router-dom";
 import api from '../../services/api.js';
 
 function DodajKviz() {
-    const { domain } = useParams(); // Get the quiz id from URL parameters
+    const { domain } = useParams();
     const [quizName, setQuizName] = useState('');
     const [questions, setQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState({ type: 'open', question: '', answer: '' });
@@ -66,13 +66,10 @@ function DodajKviz() {
 
             await api.post(`/vprasanje/dodaj`, q);
         })
-        console.log(vprasanjaId);
         
         await api.post(`/kviz/dodaj`, { naziv: quizName, vprasanja: vprasanjaId });
-        console.log('Dodan kviz: ', quizName);
         
         await api.post(`/domena/dodaj-kviz`, { id: domain, kvizId: novId });
-        console.log('Kviz dodan v domeno.');
 
         window.location.href = `/domena/${domain}`;
     };

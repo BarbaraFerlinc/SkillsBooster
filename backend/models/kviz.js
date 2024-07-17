@@ -45,6 +45,19 @@ class Kviz {
         }
     }
 
+    static async getByIds(ids) {
+        try {
+            const kviziRef = db.collection("Kvizi");
+            const kviziPromises = ids.map(id => kviziRef.doc(id).get());
+            const responses = await Promise.all(kviziPromises);
+            const kvizi = responses.map(response => response.data());
+
+            return kvizi;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju kvizov iz baze: ' + error.message);
+        }
+    }
+
     static async spremeni(id, naziv) {
         try {
             const kviz = {
@@ -123,6 +136,31 @@ class Kviz {
 
             db.collection("Kvizi").doc(id).update({rezultati: updatedRezultati});
             return { message: 'Uspešna posodobitev kviza', kviz: kviz };
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju kviza iz baze: ' + error.message);
+        }
+    }
+
+    static async najdiRezultat(id, uporabnikId) {
+        try {
+            const kvizRef = db.collection("Kvizi").doc(id);
+            const response = await kvizRef.get();
+            const kviz = response.data();
+
+            if (kviz.rezultati && kviz.rezultati.some(r => {
+                const [uporabnik] = r.split(';');
+                return uporabnik === `${uporabnikId}`;
+            })) {
+                const rezultat = kviz.rezultati.find(r => {
+                    const [uporabnik] = r.split(';');
+                    return uporabnik === `${uporabnikId}`;
+                });
+                const rezultatValue = rezultat.split(';')[1];
+
+                return rezultatValue;
+            } else {
+                return null;
+            }
         } catch (error) {
             throw new Error('Napaka pri pridobivanju kviza iz baze: ' + error.message);
         }

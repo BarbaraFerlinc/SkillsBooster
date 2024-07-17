@@ -90,14 +90,16 @@ function Domena() {
     const fetchQuizzes = () => {
         const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         api.post('/domena/kvizi', { id: novId })
-            .then(res => {
+            .then(async res => {
                 const kvizi = res.data;
-                setQuizzes(kvizi);
+                const response = await api.post('/kviz/ids', { ids: kvizi });
+                setQuizzes(response.data);
                 setQuizDeleted(false);
             })
             .catch(err => {
                 console.error(err);
             });
+        
     };
 
     const handleFileChange = (e) => {
@@ -267,10 +269,10 @@ function Domena() {
                             {quizzes.map((quiz, index) => (
                                 <li key={index} className="flex items-center justify-between">
                                     <NavLink
-                                        to={`/quiz/${quiz}`}
+                                        to={`/quiz/${quiz.naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}
                                         className="text-md font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 text-black hover:text-black truncate"
                                     >
-                                        {quiz}
+                                        {quiz.naziv}
                                     </NavLink>
                                     {currentUser && (currentUser.vloga === "boss") && (
                                         <button
