@@ -4,17 +4,13 @@ import { UserAuth } from '../context/AuthContext';
 
 function Logout() {
     const { logout } = UserAuth();
-
     const navigate = useNavigate();
 
     useEffect(() => {
         const performLogout = async () => {
             try {
-                console.log('User logged out');
                 await logout();
-                setTimeout(() => {
-                    navigate('/');
-                }, 2000);
+                navigate('/');
             } catch (error) {
                 console.error('Error during logout:', error);
             }

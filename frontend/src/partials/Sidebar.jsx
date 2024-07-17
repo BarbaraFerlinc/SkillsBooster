@@ -193,7 +193,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                   <div className="flex items-center justify-between mt-4">
                     <button
                         onClick={handleAddDomain}
-                        className="text-sm font-medium ml-3 text-white lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200"
+                        className="text-md font-medium ml-3 text-white lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200"
                     >
                       Add Domain
                     </button>

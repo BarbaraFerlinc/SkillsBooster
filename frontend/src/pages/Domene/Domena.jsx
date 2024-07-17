@@ -203,22 +203,22 @@ function Domena() {
     return (
         <div className="flex h-screen overflow-hidden">
             {/* Sidebar */}
-            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
 
             {/* Content area */}
             <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                 {/* Site header */}
-                <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+                <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
 
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
                         {/* Main Header */}
-                        <DynamicHeader domainName={currentDomain.naziv} />
+                        <DynamicHeader domainName={currentDomain.naziv}/>
 
                         {/* Gradivo Section */}
                         <div className="flex items-center justify-between mt-8">
                             <div className="flex items-center">
-                                <img src={reading} alt="Icon" className="w-16 h-16 mr-4" />
+                                <img src={reading} alt="Icon" className="w-16 h-16 mr-4"/>
                                 <h3 className="text-xl font-bold text-gray-800">Files</h3>
                             </div>
                         </div>
@@ -230,16 +230,15 @@ function Domena() {
                         />
 
                         <div className="gap-6 mt-4">
-                        {files.length === 0 ? (
+                            {files.length === 0 ? (
                                 <p>No files</p>
                             ) : (
                                 files.map((fileName, index) => (
-                                    <div key={index}>
-                                        
+                                    <div key={index} className="flex items-center justify-between">
                                         <a href="#" onClick={() => handleFileDownload(fileName)}>{fileName}</a>
-                                        {/*<a href={URL.createObjectURL(file.url)} download={file.naziv}>{file.naziv}</a>*/}
                                         {currentUser && (currentUser.vloga === "boss") && (
-                                            <button onClick={() => handleFileDelete(fileName)} className="btn bg-red-500 hover:bg-red-600 text-white ml-4">Delete</button>
+                                            <button onClick={() => handleFileDelete(fileName)}
+                                                    className="btn bg-red-500 hover:bg-red-600 text-white ml-4">Delete</button>
                                         )}
                                     </div>
                                 ))
@@ -247,16 +246,16 @@ function Domena() {
                         </div>
 
                         {currentUser && (currentUser.vloga === "boss") && (
-                            <label htmlFor="fileInput" className="btn bg-indigo-500 hover:bg-indigo-600 text-white cursor-pointer mt-8">
+                            <label htmlFor="fileInput"
+                                   className="btn bg-indigo-500 hover:bg-indigo-600 text-white cursor-pointer mt-8">
                                 <span className="hidden xs:block ml-2">Add file</span>
                             </label>
                         )}
-                        
 
                         {/* Kvizi Section */}
                         <div className="flex items-center justify-between mt-8">
                             <div className="flex items-center">
-                                <img src={writing} alt="Icon" className="w-16 h-16 mr-4" />
+                                <img src={writing} alt="Icon" className="w-16 h-16 mr-4"/>
                                 <h3 className="text-xl font-bold text-gray-800">Quizes</h3>
                             </div>
                         </div>
@@ -264,9 +263,9 @@ function Domena() {
                         {/* SeznamKvizov Component */}
                         {/*<SeznamKviz quizzes={quizzes} domain={id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()} />*/}
 
-                        {quizzes.map((quiz, index) => (
-                            <li key={index} className="flex items-center justify-between">
-                                <div className="flex items-center">
+                        <ul className="gap-6 mt-4">
+                            {quizzes.map((quiz, index) => (
+                                <li key={index} className="flex items-center justify-between">
                                     <NavLink
                                         to={`/quiz/${quiz}`}
                                         className="text-md font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 text-black hover:text-black truncate"
@@ -274,19 +273,20 @@ function Domena() {
                                         {quiz}
                                     </NavLink>
                                     {currentUser && (currentUser.vloga === "boss") && (
-                                        <button 
-                                            onClick={() => handleQuizDelete(quiz)} 
+                                        <button
+                                            onClick={() => handleQuizDelete(quiz)}
                                             className="btn bg-red-500 hover:bg-red-600 text-white ml-4"
                                         >
                                             Delete
                                         </button>
                                     )}
-                                </div>
-                            </li>
-                        ))}
+                                </li>
+                            ))}
+                        </ul>
 
-                        {currentUser && (currentUser.vloga == "boss") && (
-                            <NavLink to={`/addQuiz/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
+                        {currentUser && (currentUser.vloga === "boss") && (
+                            <NavLink
+                                to={`/addQuiz/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
                                 <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-8">
                                     <span className="hidden xs:block ml-2">Add quiz</span>
                                 </button>
@@ -294,9 +294,10 @@ function Domena() {
                         )}
                     </div>
                 </main>
-                <AIAssistant />
+                <AIAssistant/>
             </div>
         </div>
+
     );
 }
 
