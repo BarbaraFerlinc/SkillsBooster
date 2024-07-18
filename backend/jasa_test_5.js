@@ -1,0 +1,1 @@
+// dostop do modela

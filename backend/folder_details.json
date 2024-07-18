@@ -1,0 +1,26 @@
+[
+  {
+    "name": "brandnew",
+    "url": "gs://[object Object]/brandnew",
+    "model": "",
+    "modelCreationTime": ""
+  },
+  {
+    "name": "daj_bog_da_dela",
+    "url": "gs://[object Object]/daj_bog_da_dela",
+    "model": "12e6d694-5e58-47c6-8881-6b7e40451bec_model_adapter",
+    "modelCreationTime": "2024-07-18T17:15:07.509Z"
+  },
+  {
+    "name": "novadomena",
+    "url": "gs://[object Object]/novadomena",
+    "model": "",
+    "modelCreationTime": ""
+  },
+  {
+    "name": "seenadomena",
+    "url": "gs://[object Object]/seenadomena",
+    "model": "",
+    "modelCreationTime": ""
+  }
+]
