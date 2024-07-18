@@ -1,39 +1,40 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import space from "../images/space-svgrepo-com.png";
 import { UserAuth } from '../context/AuthContext.jsx';
 import api from '../services/api.js';
 
-import {Domains} from "../Data.jsx";
 import SeznamDomen from "../pages/Domene/SeznamDomen.jsx";
-import Domena from "../pages/Domene/Domena.jsx"; // Import the SeznamDomen component
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const location = useLocation();
   const { pathname } = location;
   const [currentUser, setCurrentUser] = useState(null);
   const [domains, setDomains] = useState([]);
+  const [showAddDomainCard, setShowAddDomainCard] = useState(false);
+  const [newDomain, setNewDomain] = useState({ naziv: '', opis: '', kljucna_znanja: '' });
 
   const { user } = UserAuth();
 
   const trigger = useRef(null);
   const sidebar = useRef(null);
+  const addDomainCardRef = useRef(null);
 
   const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
   const [sidebarExpanded, setSidebarExpanded] = useState(storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true');
 
   useEffect(() => {
     if (user) {
-      const uporabnikovEmail = user.email;
+      const userEmail = user.email;
 
-      api.post('/uporabnik/profil', { id: uporabnikovEmail })
-        .then(res => {
-          const profil = res.data;
-          setCurrentUser(profil);
-        })
-        .catch(err => {
-          console.error(err);
-        });
+      api.post('/uporabnik/profil', { id: userEmail })
+          .then(res => {
+            const profile = res.data;
+            setCurrentUser(profile);
+          })
+          .catch(err => {
+            console.error(err);
+          });
     }
   }, [user]);
 
@@ -53,27 +54,64 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
           setDomains(null);
       }
     }
-}, [currentUser]);
+  }, [currentUser, showAddDomainCard]);
 
-  const fetchDomeneForUser = async (uporabnik) => {
+  const fetchDomeneForUser = async (user) => {
     try {
-        const response = await api.post('/domena/uporabnik', { id: uporabnik.email });
-        setDomains(response.data);
+      const response = await api.post('/domena/uporabnik', { id: user.email });
+      setDomains(response.data);
     } catch (er) {
-        console.log("Napaka pri pridobivanju domen", er);
+      console.log("Napaka pri pridobivanju domen", er);
     }
-  }
+  };
 
-  const fetchDomeneForOwner = async (uporabnik) => {
+  const fetchDomeneForOwner = async (user) => {
     try {
-        const response = await api.post('/domena/lastnik', { id: uporabnik.email });
-        setDomains(response.data);
+      const response = await api.post('/domena/lastnik', { id: user.email });
+      setDomains(response.data);
     } catch (er) {
-        console.log("Napaka pri pridobivanju domen", er);
+      console.log("Napaka pri pridobivanju domen", er);
     }
-  }
+  };
 
-  // close on click outside
+  const handleAddDomain = () => {
+    setShowAddDomainCard(true);
+  };
+
+  const handleSubmitDomain = async () => {
+    try {
+      newDomain.lastnik = currentUser.email;
+      const response = await api.post('/domena/dodaj', newDomain, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      setShowAddDomainCard(false);
+      //fetchDomeneForOwner(currentUser); // Refresh domains after adding new one
+    } catch (er) {
+      console.log("Napaka pri dodajanju domene", er);
+    }
+  };
+
+  const handleClickOutside = useCallback(
+      (event) => {
+        if (showAddDomainCard && addDomainCardRef.current && !addDomainCardRef.current.contains(event.target)) {
+          setShowAddDomainCard(true);
+        }
+      },
+      [showAddDomainCard]
+  );
+
+  useEffect(() => {
+    if (showAddDomainCard) {
+      document.addEventListener('click', handleClickOutside);
+    } else {
+      document.removeEventListener('click', handleClickOutside);
+    }
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showAddDomainCard, handleClickOutside]);
+
   useEffect(() => {
     const clickHandler = ({ target }) => {
       if (!sidebar.current || !trigger.current) return;
@@ -84,7 +122,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     return () => document.removeEventListener('click', clickHandler);
   });
 
-  // close if the esc key is pressed
   useEffect(() => {
     const keyHandler = ({ keyCode }) => {
       if (!sidebarOpen || keyCode !== 27) return;
@@ -103,14 +140,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     }
   }, [sidebarExpanded]);
 
-  // Function to handle navigation to specific domain
-  const navigateToDomain = (domainId) => {
-    // Perform navigation to the specific domain using React Router
-  };
-
   return (
       <div>
-        {/* Sidebar backdrop (mobile only) */}
         <div
             className={`fixed inset-0 bg-slate-900 bg-opacity-30 z-40 lg:hidden lg:z-auto transition-opacity duration-200 ${
                 sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -118,7 +149,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             aria-hidden="true"
         ></div>
 
-        {/* Sidebar */}
         <div
             id="sidebar"
             ref={sidebar}
@@ -126,9 +156,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 sidebarOpen ? 'translate-x-0' : '-translate-x-64'
             }`}
         >
-          {/* Sidebar header */}
           <div className="flex justify-between mb-10 pr-3 sm:px-2">
-            {/* Close button */}
             <button
                 ref={trigger}
                 className="lg:hidden text-slate-500 hover:text-slate-400"
@@ -138,68 +166,95 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             >
               <span className="sr-only">Close sidebar</span>
               <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10.7 18.7l1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3-1.4-1.4L4 12z"/>
+                <path d="M10.7 18.7l1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3-1.4-1.4L4 12z" />
               </svg>
             </button>
-            {/* Logo */}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <NavLink end to="/" className="block" >
-                  <img src={space} alt="Icon" className="w-12 h-12 mr-2" title={"Home"}/>
-                </NavLink>
+                <img src={space} alt="Icon" className="w-12 h-12 mr-2" />
               </div>
             </div>
-
           </div>
 
-          {/* Links */}
           <div className="space-y-8">
-            {/* More group */}
             <div>
-              <h3 className="text-xs uppercase text-slate-500 font-semibold pl-3">
-              <span className="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6"
-                    aria-hidden="true">
+              <h3 className="text-sm uppercase text-slate-500 font-semibold pl-3">
+              <span className="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">
                 •••
               </span>
                 <span className="lg:hidden lg:sidebar-expanded:block 2xl:block">Domains</span>
               </h3>
               <ul className="mt-3">
-                {/* Render SeznamDomen component */}
                 <li>
-                  <SeznamDomen domains={domains}/>
+                  <SeznamDomen domains={domains} />
                 </li>
               </ul>
-              {currentUser && (currentUser.vloga == "boss") && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <NavLink to="/addDomena"
-                            className="text-sm font-medium ml-3 text-white lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                      Add Domena
-                    </NavLink>
+              {currentUser && currentUser.vloga === "boss" && (
+                  <div className="flex items-center justify-between mt-4">
+                    <button
+                        onClick={handleAddDomain}
+                        className="text-md font-medium ml-3 text-white lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200"
+                    >
+                      Add Domain
+                    </button>
                   </div>
-                </div>
               )}
-              {currentUser && (currentUser.vloga == "admin") && (
-                <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  No Domains
-                </div>
-              </div>
+              {showAddDomainCard && (
+                  <div ref={addDomainCardRef} className="bg-white p-4 rounded shadow-md mt-4 relative">
+                    <h4 className="text-lg font-semibold mb-2">Add New Domain</h4>
+                    <div className="mb-2">
+                      <label className="block text-sm font-medium mb-1">Name</label>
+                      <input
+                          type="text"
+                          className="border rounded p-2 w-full"
+                          value={newDomain.naziv}
+                          onChange={(e) => setNewDomain({ ...newDomain, naziv: e.target.value })}
+                      />
+                    </div>
+                    <div className="mb-2">
+                      <label className="block text-sm font-medium mb-1">Description</label>
+                      <input
+                          type="text"
+                          className="border rounded p-2 w-full"
+                          value={newDomain.opis}
+                          onChange={(e) => setNewDomain({ ...newDomain, opis: e.target.value })}
+                      />
+                    </div>
+                    <div className="mb-2">
+                      <label className="block text-sm font-medium mb-1">Key Skills</label>
+                      <input
+                          type="text"
+                          className="border rounded p-2 w-full"
+                          value={newDomain.kljucna_znanja}
+                          onChange={(e) => setNewDomain({ ...newDomain, kljucna_znanja: e.target.value })}
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                          onClick={() => setShowAddDomainCard(false)}
+                          className="bg-red-500 text-white py-2 px-4 rounded mr-2"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                          onClick={handleSubmitDomain}
+                          className="bg-blue-500 text-white py-2 px-4 rounded"
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </div>
               )}
-              
-
-
             </div>
           </div>
 
-          {/* Expand / collapse button */}
           <div className="pt-3 hidden lg:inline-flex 2xl:hidden justify-end mt-auto">
             <div className="px-3 py-2">
               <button onClick={() => setSidebarExpanded(!sidebarExpanded)}>
                 <span className="sr-only">Expand / collapse sidebar</span>
                 <svg className="w-6 h-6 fill-current sidebar-expanded:rotate-180" viewBox="0 0 24 24">
-                  <path className="text-slate-400" d="M19.586 11l-5-5L16 4.586 23.414 12 16 19.414 14.586 18l5-5H7v-2z"/>
-                  <path className="text-slate-600" d="M3 23H1V1h2z"/>
+                  <path className="text-slate-400" d="M19.586 11l-5-5L16 4.586 23.414 12 16 19.414 14.586 18l5-5H7v-2z" />
+                  <path className="text-slate-600" d="M3 23H1V1h2z" />
                 </svg>
               </button>
             </div>

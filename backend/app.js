@@ -10,7 +10,6 @@ require('dotenv').config();
 // Routers
 var domenaRouter = require('./routes/domenaRouter');
 var kvizRouter = require('./routes/kvizRouter');
-var odgovorRouter = require('./routes/odgovorRouter');
 var podjetjeRouter = require('./routes/podjetjeRouter');
 var uporabnikRouter = require('./routes/uporabnikRouter');
 var vprasanjeRouter = require('./routes/vprasanjeRouter');
@@ -38,7 +37,6 @@ app.use((req, res, next) => {
 // Routers' use
 app.use('/domena/', domenaRouter);
 app.use('/kviz/', kvizRouter);
-app.use('/odgovor/', odgovorRouter);
 app.use('/podjetje/', podjetjeRouter);
 app.use('/uporabnik/', uporabnikRouter);
 app.use('/vprasanje/', vprasanjeRouter);

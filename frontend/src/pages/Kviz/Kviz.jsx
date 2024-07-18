@@ -4,24 +4,57 @@ import { quizzes } from "../../Data.jsx";
 import Sidebar from "../../partials/Sidebar.jsx";
 import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
+import api from '../../services/api.js';
+import { UserAuth } from '../../context/AuthContext.jsx';
+
+const initialQuiz = {
+    naziv: "No Quiz",
+    rezultati: [],
+    vprasanja: []
+}
 
 function Kviz() {
-    const { id } = useParams(); // Get the quiz id from the URL parameters
-    const quiz = quizzes.find(quiz => quiz.id === parseInt(id)); // Find the quiz data based on the id
+    const { id, domain } = useParams();
+    const [currentQuiz, setCurrentQuiz] = useState(initialQuiz);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [quizResult, setQuizResult] = useState(null); // State to hold the quiz result percentage
+    const [quizResult, setQuizResult] = useState(0);
+
+    const { user } = UserAuth();
+
+    useEffect(() => {
+        if (id) {
+            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post('/kviz/id', { id: novId })
+                .then(res => {
+                    const kviz = res.data;
+                    setCurrentQuiz(kviz);
+                })
+                .catch(err => {
+                    console.error(err);
+            });
+        }
+    }, [id]);
 
     // Simulated function to fetch quiz result
-    const fetchQuizResult = () => {
-        // Replace with actual logic to fetch quiz result from API or localStorage
-        const result = Math.floor(Math.random() * 100); // Random result for demo
-        setQuizResult(result);
+    const fetchQuizResult = async () => {
+        if (id && user) {
+            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            try {
+                const result = await api.post('/kviz/najdi-rezultat', { id: novId, uporabnikId: user.email });
+                setQuizResult(result.data);
+            } catch (err) {
+                console.error(err);
+                setQuizResult(null);
+            }
+        }
     };
 
     // useEffect to fetch quiz result on component mount
     useEffect(() => {
-        fetchQuizResult();
-    }, []);
+        if (user) {
+            fetchQuizResult();
+        }
+    }, [id, user]);
 
     return (
         <div className="flex h-screen overflow-hidden">
@@ -34,16 +67,18 @@ function Kviz() {
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
                         {/* Main Header */}
-                        <DynamicHeader domainName={quiz?.name}/>
+                        <DynamicHeader domainName={currentQuiz?.naziv}/>
 
-                        {/* Link to SolveQuiz.jsx */}
-                        <a
-                            href={`/solveQuiz/${id}`} // Assuming solveQuiz route with quiz id parameter
-                            className="block py-2 px-4 text-lg text-blue-700 hover:text-gray-900 mb-4" // Added mb-4 for margin-bottom
-                            style={{textDecoration: 'none'}}
-                        >
-                            Solve Quiz
-                        </a>
+                        {/* Conditionally render Solve Quiz link only if quizResult is null */}
+                        {quizResult === null && (
+                            <a
+                                href={`/solveQuiz/${id}`}
+                                className="block py-2 px-4 text-lg text-blue-700 hover:text-gray-900 mb-4"
+                                style={{ textDecoration: 'none' }}
+                            >
+                                Solve Quiz
+                            </a>
+                        )}
 
                         {/* Display quiz result percentage */}
                         {quizResult !== null && (
@@ -54,7 +89,7 @@ function Kviz() {
 
                         <div className="result">
                             <Link
-                                to="/domena/:id"
+                                to={`/domena/${domain}`}
                                 className="btn bg-blue-300 hover:bg-blue-400 text-white"
                             >
                                 Back

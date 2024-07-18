@@ -13,7 +13,6 @@ function AdminRouting() {
     useEffect(() => {
         if (user) {
           const uporabnikovEmail = user.email;
-          console.log("user: ", uporabnikovEmail);
     
           api.post('/uporabnik/profil', { id: uporabnikovEmail })
             .then(res => {

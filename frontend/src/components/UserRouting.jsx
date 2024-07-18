@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import api from "../services/api";
 
-function BossRouting() {
+function UserRouting() {
     const { user } = UserAuth();
     const navigate = useNavigate();
     const [currentUser, setCurrentUser] = useState(null);
@@ -33,7 +33,7 @@ function BossRouting() {
         if (!loading) {
             if (!user) {
                 navigate("/login");
-            } else if (currentUser && currentUser.vloga !== "boss") {
+            } else if (currentUser && currentUser.vloga !== "user") {
                 navigate("/profile");
             }
         }
@@ -46,4 +46,4 @@ function BossRouting() {
 
     return <Outlet />;
 }
-export default BossRouting;
+export default UserRouting;

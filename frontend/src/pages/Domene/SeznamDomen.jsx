@@ -10,7 +10,7 @@ function SeznamDomen({ domains }) {
                     <div className="flex items-center">
                         <NavLink
                             to={`/domena/${domain.naziv}`}
-                            className="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 text-slate-200 hover:text-white truncate"
+                            className="text-md font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 text-slate-200 hover:text-white truncate"
                         >
                             {domain.naziv}
                         </NavLink>
@@ -24,7 +24,6 @@ function SeznamDomen({ domains }) {
 SeznamDomen.propTypes = {
     domains: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.number.isRequired,
             kljucna_znanja: PropTypes.string,
             kvizi: PropTypes.arrayOf(PropTypes.string),
             lastnik: PropTypes.string,
@@ -32,6 +31,7 @@ SeznamDomen.propTypes = {
             opis: PropTypes.string,
             rezultati: PropTypes.arrayOf(PropTypes.string),
             zaposleni: PropTypes.arrayOf(PropTypes.string),
+            gradiva: PropTypes.arrayOf(PropTypes.string),
         })
     ).isRequired,
 };

@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { Users } from "../Data.jsx";
 import { UserAuth } from '../context/AuthContext.jsx';
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    //const [error, setError] = useState('');
-    
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const { signIn } = UserAuth();
-
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -20,36 +17,38 @@ function Login() {
         setEmailError('');
         setPasswordError('');
         const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-        
+
         if (email === '') {
             setEmailError('Email is required.');
         } else if (!emailRegex.test(email)) {
             setEmailError('Please provide a valid email address.');
         }
-      
+
         if (password === '') {
             setPasswordError('Password is required.');
         }
-    
+
         if (emailError || passwordError) {
             return;
         }
 
+        setLoading(true);
+
         try {
             await signIn(email, password);
-            // pokaže se okno in piše 'Uspešno ste se prijavili.'
-      
             setTimeout(() => {
+                setLoading(false);
                 navigate('/profile');
             }, 3000);
         } catch (er) {
+            setLoading(false);
             if (er.message === "Firebase: Error (auth/user-not-found).") {
                 setPasswordError("User with this email does not exist.");
             } else if (er.message === "Firebase: Error (auth/wrong-password).") {
                 setPasswordError("Email or password is incorrect.");
             } else if (er.message === "Firebase: Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later. (auth/too-many-requests).") {
                 setPasswordError("Too many failed login attempts. Please try again later.");
-            }      
+            }
         };
     };
 
@@ -82,9 +81,10 @@ function Login() {
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                        className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={loading}
                     >
-                        Login
+                        {loading ? 'Loading...' : 'Login'}
                     </button>
                 </form>
                 <div className="mt-4 text-center">

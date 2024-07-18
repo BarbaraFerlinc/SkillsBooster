@@ -1,14 +1,15 @@
 const db = require('../pb');
 
 class Vprasanje {
-    static async dodaj(vprasanje, tip) {
+    static async dodaj(vprasanje, tip, kviz, odgovori) {
         try {
-            const id = vprasanje.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const id = `${kviz}_${vprasanje.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`;
             
             const novoVprasanje = {
                 vprasanje: vprasanje,
                 tip: tip,
-                odgovori: []
+                kviz: kviz,
+                odgovori: odgovori
             };
 
             db.collection("Vprasanja").doc(id).set(novoVprasanje);
@@ -45,6 +46,19 @@ class Vprasanje {
         }
     }
 
+    static async getByIds(ids) {
+        try {
+            const vprasanjaRef = db.collection("Vprasanja");
+            const vprasanjaPromises = ids.map(id => vprasanjaRef.doc(id).get());
+            const responses = await Promise.all(vprasanjaPromises);
+            const vprasanja = responses.map(response => response.data());
+
+            return vprasanja;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju vprašanj iz baze: ' + error.message);
+        }
+    }
+
     static async spremeni(id, vprasanje, tip) {
         try {
             const spremenjeno = {
@@ -59,16 +73,16 @@ class Vprasanje {
         }
     }
 
-    static async dodajOdgovor(id, odgovorId) {
+    static async dodajOdgovor(id, odgovor) {
         try {
             const vprasanjaRef = db.collection("Vprasanja").doc(id);
             const response = await vprasanjaRef.get();
             const vprasanje = response.data();
 
-            if (vprasanje.odgovori && vprasanje.odgovori.includes(odgovorId)) {
+            if (vprasanje.odgovori && vprasanje.odgovori.includes(odgovor)) {
                 return { message: 'Odgovor je že vključen v to vprašanje', vprasanje: vprasanje };
             }
-            const updatedOdgovori = vprasanje.odgovori ? [...vprasanje.odgovori, odgovorId] : [odgovorId];
+            const updatedOdgovori = vprasanje.odgovori ? [...vprasanje.odgovori, odgovor] : [odgovor];
 
             db.collection("Vprasanja").doc(id).update({odgovori: updatedOdgovori});
             return { message: 'Uspešna posodobitev vprašanja', vprasanje: vprasanje };
@@ -77,14 +91,14 @@ class Vprasanje {
         }
     }
 
-    static async odstraniOdgovor(id, odgovorId) {
+    static async odstraniOdgovor(id, odgovor) {
         try {
             const vprasanjaRef = db.collection("Vprasanja").doc(id);
             const response = await vprasanjaRef.get();
             const vprasanje = response.data();
 
-            if (vprasanje.odgovori && vprasanje.odgovori.includes(odgovorId)) {
-                const updatedOdgovori = vprasanje.odgovori.filter(obstojeciOdgovorId => obstojeciOdgovorId !== odgovorId);
+            if (vprasanje.odgovori && vprasanje.odgovori.includes(odgovor)) {
+                const updatedOdgovori = vprasanje.odgovori.filter(obstojeciOdgovor => obstojeciOdgovor !== odgovor);
 
                 await db.collection("Vprasanja").doc(id).update({ odgovori: updatedOdgovori });
                 return { message: 'Odgovor uspešno odstranjen iz vprašanja', vprasanje: vprasanje };

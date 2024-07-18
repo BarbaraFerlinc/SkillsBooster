@@ -209,7 +209,8 @@ function Registration() {
                         <small className="text-red-500">{errors.naslov}</small>
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="postna_stevilka" className="block text-sm font-medium text-gray-700">Poštna številka</label>
+                        <label htmlFor="postna_stevilka" className="block text-sm font-medium text-gray-700">Poštna
+                            številka</label>
                         <input
                             type="text"
                             id="postna_stevilka"
@@ -247,7 +248,8 @@ function Registration() {
                         <small className="text-red-500">{errors.geslo}</small>
                     </div>
                     <div className="mb-6">
-                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm
+                            Password</label>
                         <input
                             type="password"
                             id="confirmPassword"
@@ -267,16 +269,18 @@ function Registration() {
                                 disabled={isSubmitting}
                                 className="form-checkbox"
                             />
-                            <span className="ml-2">I agree to the <NavLink to="/terms" className="text-blue-500 hover:underline">terms and conditions</NavLink></span>
+                            <span className="ml-2">I agree to the <NavLink to="/terms"
+                                                                           className="text-blue-500 hover:underline">terms and conditions</NavLink></span>
                         </label>
-                        <br />
+                        <br/>
                         <small className="text-red-500">{errors.agreed}</small>
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                        className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={loading}
                     >
-                        Registracija
+                        {loading ? 'Loading...' : 'Registracija'}
                     </button>
                 </form>
             </div>
