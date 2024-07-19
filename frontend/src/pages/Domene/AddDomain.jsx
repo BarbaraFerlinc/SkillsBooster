@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import Sidebar from "../../partials/Sidebar.jsx";
 import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
-import SeznamDomen from "./SeznamDomen.jsx";
+import DomainList from "./DomainList.jsx";
 import api from "../../services/api.js";
 //import { UserAuth } from '../../context/AuthContext.js'; --KLARA
 
 // lahko zbrišemo ??
 
-function DodajDomeno({ onSubmit, currentUser }) {
+function AddDomain({ onSubmit, currentUser }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [domainName, setDomainName] = useState("");
     const [description, setDescription] = useState("");
@@ -152,7 +152,7 @@ function DodajDomeno({ onSubmit, currentUser }) {
                             </div>
                         )}
 
-                        <SeznamDomen domains={domains} />
+                        <DomainList domains={domains} />
 
                         <div className="grid grid-cols-12 gap-6">
                             {/* Your cards content here */}
@@ -164,7 +164,7 @@ function DodajDomeno({ onSubmit, currentUser }) {
     );
 }
 
-DodajDomeno.propTypes = {
+AddDomain.propTypes = {
     onSubmit: PropTypes.func.isRequired,
     currentUser: PropTypes.shape({
         id: PropTypes.number.isRequired,
@@ -172,4 +172,4 @@ DodajDomeno.propTypes = {
     }).isRequired
 };
 
-export default DodajDomeno;
+export default AddDomain;

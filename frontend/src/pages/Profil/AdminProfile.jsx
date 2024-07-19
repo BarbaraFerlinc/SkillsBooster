@@ -3,6 +3,7 @@ import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signOut } from "firebase/auth";
+import {useThemeProvider} from "../../utils/ThemeContext.jsx";
 
 function AdminProfile() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -15,6 +16,7 @@ function AdminProfile() {
     const [newUserRole, setNewUserRole] = useState('user');
 
     const { user } = UserAuth();
+    const { currentTheme } = useThemeProvider();
 
     useEffect(() => {
         if (user) {
@@ -93,6 +95,7 @@ function AdminProfile() {
         }
     };
 
+    const textClass = currentTheme === 'dark' ? 'text-black' : 'text-gray-800';
     return (
         <div className="overflow-x-auto mt-8">
             <button
@@ -104,7 +107,7 @@ function AdminProfile() {
 
             {showModal && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded shadow-md">
+                    <div className="bg-gray-200 p-6 rounded shadow-md">
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2">
                                 Ime in priimek
@@ -136,7 +139,7 @@ function AdminProfile() {
                             <select
                                 value={newUserRole}
                                 onChange={(e) => setNewUserRole(e.target.value)}
-                                className="bg-gray-200 border rounded p-2 w-full"
+                                className="bg-white  rounded p-2 w-full"
                             >
                                 <option value="user">User</option>
                                 <option value="boss">Boss</option>
@@ -163,18 +166,20 @@ function AdminProfile() {
             <table className="min-w-full bg-white border">
                 <thead>
                 <tr>
-                    <th className="py-2 px-4 border-b">Name</th>
-                    <th className="py-2 px-4 border-b">Email</th>
-                    <th className="py-2 px-4 border-b">Role</th>
+
+                    <th className={`py-2 px-5 border-b ${textClass}`}>Name</th>
+                    <th className={`py-2 px-5 border-b ${textClass}`}>Email</th>
+                    <th className={`py-2 px-5 border-b ${textClass}`}>Role</th>
                 </tr>
                 </thead>
                 <tbody>
                 {users.map(user => (
                     <tr key={user.id}>
-                        <td className="py-2 px-4 border-b">{user.ime_priimek}</td>
-                        <td className="py-2 px-4 border-b">{user.email}</td>
-                        <td className="py-2 px-4 border-b">{user.vloga}</td>
-                        <td className="py-2 px-4 border-b">
+
+                        <td className={`py-2 px-15 border-b  ${textClass}`}>{user.ime_priimek}</td>
+                        <td className={`py-2 px-15  border-b ${textClass}`}>{user.email}</td>
+                        <td className={`py-2 px-15  border-b ${textClass}`}>{user.vloga}</td>
+                        <td className={`py-2 px-15  border-b ${textClass}`}>
 
                         </td>
                     </tr>

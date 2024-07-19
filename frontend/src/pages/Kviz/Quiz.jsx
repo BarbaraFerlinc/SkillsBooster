@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { quizzes } from "../../Data.jsx";
+
 import Sidebar from "../../partials/Sidebar.jsx";
 import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
@@ -13,7 +13,7 @@ const initialQuiz = {
     vprasanja: []
 }
 
-function Kviz() {
+function Quiz() {
     const { id, domain } = useParams();
     const [currentQuiz, setCurrentQuiz] = useState(initialQuiz);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -102,4 +102,4 @@ function Kviz() {
     );
 }
 
-export default Kviz;
+export default Quiz;

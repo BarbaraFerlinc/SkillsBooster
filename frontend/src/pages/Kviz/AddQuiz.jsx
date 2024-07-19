@@ -4,7 +4,7 @@ import ClosedQuestion from './ClosedQuestions.jsx';
 import {useParams} from "react-router-dom";
 import api from '../../services/api.js';
 
-function DodajKviz() {
+function AddQuiz() {
     const { domain } = useParams();
     const [quizName, setQuizName] = useState('');
     const [questions, setQuestions] = useState([]);
@@ -173,4 +173,4 @@ function DodajKviz() {
     );
 }
 
-export default DodajKviz;
+export default AddQuiz;

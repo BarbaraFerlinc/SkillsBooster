@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
+import {useThemeProvider} from "../../utils/ThemeContext.jsx";
 
 function BossProfile() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -11,10 +12,12 @@ function BossProfile() {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(''); // Change to single selected user
+    const [selectedUser, setSelectedUser] = useState('');
     const [selectedDomain, setSelectedDomain] = useState('');
 
+
     const { user } = UserAuth();
+    const { currentTheme } = useThemeProvider();
 
     useEffect(() => {
         const fetchDomains = async () => {
@@ -123,9 +126,11 @@ function BossProfile() {
                 user.email.toLowerCase().includes(searchTerm.toLowerCase())
             )
     );
+    const textClass = currentTheme === 'dark' ? 'text-white' : 'text-gray-800';
+
 
     return (
-        <div className="overflow-x-auto mt-8">
+        <div className={`overflow-x-auto mt-4 ${textClass}`}>
             <div className="mt-4">
                 <button
                     onClick={() => setIsModalOpen(true)}
@@ -137,7 +142,7 @@ function BossProfile() {
 
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-                    <div className="bg-white p-8 rounded-md shadow-md w-1/2">
+                    <div className={`bg-white ${textClass} p-8 rounded-md shadow-md w-1/2`}>
                         <h2 className="text-xl font-semibold mb-4">Add User to Domain</h2>
                         <div className="mb-4">
                             <label className="block mb-2">Select Domain:</label>
@@ -185,14 +190,14 @@ function BossProfile() {
                 </div>
             )}
             <div className="flex">
-                <div className="w-full">
-                    <h2 className="text-xl font-semibold mb-4">Domains</h2>
+                <div className="w-full mt-4">
+                    <h2 className={`text-xl font-semibold mb-4 ${textClass}`}>Domains</h2>
                     <div className="flex mb-4">
                         {domains.map((domain, index) => (
                             <button
                                 key={index}
                                 onClick={() => handleTabClick(domain)}
-                                className={`mr-2 p-2 border rounded ${activeTab === domain ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}
+                                className={`mr-2 p-2 border rounded ${activeTab === domain ? 'bg-blue-400 text-white' : '${textClass} '}`}
                             >
                                 {domain}
                             </button>
@@ -200,8 +205,7 @@ function BossProfile() {
                     </div>
                     {domains.map((domain, index) => (
                         activeTab === domain && (
-                            <div key={index} className="min-w-full bg-white border mt-4 overflow-x-auto">
-                                <h3 className="text-lg font-semibold mb-2">{domain}</h3>
+                            <div key={index} className={`min-w-full ${textClass}  border mt-4 overflow-x-auto`}>
                                 <table className="min-w-full">
                                     <thead>
                                     <tr>
@@ -224,10 +228,10 @@ function BossProfile() {
                 </div>
             </div>
             <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-4">Knowledge Matrix</h2>
+                <h2 className={`text-xl font-semibold mb-4 ${textClass}`}>Knowledge Matrix</h2>
                 <div className="grid grid-cols-2 gap-4">
                     {domains.map((domain, index) => (
-                        <div key={index} className="bg-white border p-4 rounded-md shadow-md">
+                        <div key={index} className={`p-4 rounded-md shadow-md ${textClass}  border`}>
                             <h3 className="text-lg font-semibold mb-2">{domain}</h3>
                             <p>Average Score: {domainScores[domain] || 0}</p>
                         </div>

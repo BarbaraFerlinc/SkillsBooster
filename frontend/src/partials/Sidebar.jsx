@@ -4,7 +4,7 @@ import space from "../images/space-svgrepo-com.png";
 import { UserAuth } from '../context/AuthContext.jsx';
 import api from '../services/api.js';
 
-import SeznamDomen from "../pages/Domene/SeznamDomen.jsx";
+import DomainList from "../pages/Domene/DomainList.jsx";
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const location = useLocation();
@@ -186,7 +186,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </h3>
               <ul className="mt-3">
                 <li>
-                  <SeznamDomen domains={domains} />
+                  <DomainList domains={domains} />
                 </li>
               </ul>
               {currentUser && currentUser.vloga === "boss" && (

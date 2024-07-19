@@ -6,7 +6,7 @@ import { UserAuth } from '../../context/AuthContext.jsx';
 
 // lahko zbrišemo ??
 
-function SeznamKviz({ quizzes, domain }) {
+function QuizList({ quizzes, domain }) {
     const [currentUser, setCurrentUser] = useState(null);
 
     const { user } = UserAuth();
@@ -67,9 +67,9 @@ function SeznamKviz({ quizzes, domain }) {
     );
 }
 
-SeznamKviz.propTypes = {
+QuizList.propTypes = {
     quizzes: PropTypes.arrayOf(PropTypes.string).isRequired,
     domain: PropTypes.string.isRequired,
 };
 
-export default SeznamKviz;
+export default QuizList;
