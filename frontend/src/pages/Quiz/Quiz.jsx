@@ -88,7 +88,7 @@ function Quiz() {
                         <div className="result">
                             <Link
                                 to={`/domain/${domain}`}
-                                className="btn bg-blue-300 hover:bg-blue-400 text-white"
+                                className="btn bg-indigo-500 text-white py-2 px-5 rounded mr-1"
                             >
                                 Back
                             </Link>

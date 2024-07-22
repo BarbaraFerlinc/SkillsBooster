@@ -80,7 +80,6 @@ function AddQuiz() {
         setQuestionAdded(false);
     }, [domain, questionAdded]);
 
-
     const handleSubmitQuiz = async () => {
         const novId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         const vprasanja = dodajVprasanja(novId);
@@ -192,7 +191,7 @@ function AddQuiz() {
                     </button>
                     <button
                         onClick={handleSubmitQuiz}
-                        className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
+                        className="bg-green-500 text-white py-2 px-5 rounded"
                     >
                         Submit Quiz
                     </button>

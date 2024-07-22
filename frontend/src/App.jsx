@@ -15,15 +15,15 @@ import Dashboard from './pages/Dashboard';
 import Profile from "./pages/Profil/Profile.jsx";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
-import Domain from "./pages/Domene/Domain.jsx";
+import Domain from "./pages/Domain/Domain.jsx";
 import LogOut from "./pages/LogOut.jsx";
-import Quiz from "./pages/Kviz/Quiz.jsx";
-import AddQuiz from "./pages/Kviz/AddQuiz.jsx";
+import Quiz from "./pages/Quiz/Quiz.jsx";
+import AddQuiz from "./pages/Quiz/AddQuiz.jsx";
 import { AuthContextProvider } from './context/AuthContext.jsx';
 import PrivateRouting from './components/PrivateRouting.jsx';
 import BossRouting from './components/BossRouting.jsx';
 import UserRouting from './components/UserRouting.jsx';
-import SolveQuiz from "./pages/Kviz/SolveQuiz.jsx";
+import SolveQuiz from "./pages/Quiz/SolveQuiz.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 
 function App() {

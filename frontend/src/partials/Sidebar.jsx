@@ -4,7 +4,7 @@ import space from "../images/space-svgrepo-com.png";
 import { UserAuth } from '../context/AuthContext.jsx';
 import api from '../services/api.js';
 
-import DomainList from "../pages/Domene/DomainList.jsx";
+import DomainList from "../pages/Domain/DomainList.jsx";
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const location = useLocation();
@@ -171,7 +171,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </button>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <img src={space} alt="Icon" className="w-12 h-12 mr-2" />
+                <img src={space} alt="Icon" className="w-14 h-14 mr-2" />
               </div>
             </div>
           </div>
@@ -232,13 +232,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     <div className="flex justify-end">
                       <button
                           onClick={() => setShowAddDomainCard(false)}
-                          className="bg-red-500 text-white py-2 px-4 rounded mr-2"
+                          className="btn bg-red-500 text-white py-2 px-5 rounded mr-2"
                       >
                         Cancel
                       </button>
                       <button
                           onClick={handleSubmitDomain}
-                          className="bg-blue-500 text-white py-2 px-4 rounded"
+                          className="btn bg-green-500 text-white py-2 px-5 rounded mr-1"
                       >
                         Submit
                       </button>

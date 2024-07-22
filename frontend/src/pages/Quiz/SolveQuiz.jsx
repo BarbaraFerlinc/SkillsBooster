@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import Sidebar from '../../partials/Sidebar.jsx';
 import Header from '../../partials/Header.jsx';
 import DynamicHeader from '../../partials/dashboard/DynamicHeader.jsx';
-
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 
