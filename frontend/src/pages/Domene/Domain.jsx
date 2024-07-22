@@ -172,8 +172,8 @@ function Domain() {
                             <p className={`mt-4 ${subTextClass}`}>{currentDomain.opis || "No description available."}</p>
                         </div>
                         <div className="mt-8">
-                            <h2 className={`text-2xl font-bold ${textClass}`}>Key Words</h2>
-                            <p className={`mt-4 ${subTextClass}`}>{currentDomain.kljucna_znanja || "No key words available."}</p>
+                            <h2 className={`text-2xl font-bold ${textClass}`}>Key Skills</h2>
+                            <p className={`mt-4 ${subTextClass}`}>{currentDomain.kljucna_znanja || "No key skills available."}</p>
                         </div>
 
                         {/* Gradivo Section */}

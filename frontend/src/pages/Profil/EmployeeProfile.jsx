@@ -6,6 +6,7 @@ import {useThemeProvider} from "../../utils/ThemeContext.jsx";
 function EmployeeProfile() {
     const [currentUser, setCurrentUser] = useState(null);
     const [domains, setDomains] = useState([]);
+    const [progressMap, setProgressMap] = useState({});
 
     const { user } = UserAuth();
     const { currentTheme } = useThemeProvider();
@@ -39,9 +40,69 @@ function EmployeeProfile() {
         }
     }, [currentUser]);
 
-    const getUserResult = (domain, userId) => {
-        const resultEntry = domain.rezultati.find(entry => entry.startsWith(`${userId};`));
-        return resultEntry ? parseFloat(resultEntry.split(';')[1]) : 0;
+    useEffect(() => {
+        const updateDomainScores = async () => {
+            domains.forEach(async domain => {
+                const novId = domain.naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+                const score = await calculateDomainScore(domain);
+                const newScore = Math.round(score * 100) / 100;
+                await api.post(`/domena/spremeni-rezultat`, { id: novId, uporabnikId: user.email, novaVrednost: newScore });
+            });
+        };
+
+        const fetchResults = async () => {
+            if (domains.length > 0) {
+                const newProgressMap = {};
+
+                for (const domain of domains) {
+                    const progress = await fetchUserResult(domain);
+                    newProgressMap[domain.naziv] = progress;
+                }
+
+                setProgressMap(newProgressMap);
+            }
+        };
+
+        updateDomainScores();
+        fetchResults();
+    }, [domains]);
+
+    const calculateDomainScore = async (currentDomain) => {
+        let result = 0;
+        for (const quiz of currentDomain.kvizi) {
+            const quizResult = await fetchQuizResult(quiz);
+            if (quizResult !== null) {
+                result += Number(quizResult);
+            }
+        }
+        const average = result / currentDomain.kvizi.length;
+        return average;
+    }
+
+    const fetchQuizResult = async (quizId) => {
+        if (quizId && user) {
+            try {
+                const result = await api.post('/kviz/najdi-rezultat', { id: quizId, uporabnikId: user.email });
+                return result.data;
+            } catch (err) {
+                console.error(err);
+                return null;
+            }
+        }
+        return null;
+    };
+
+    const fetchUserResult = async (domain) => {
+        if (domain && user) {
+            const novId = domain.naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            try {
+                const result = await api.post('/domena/najdi-rezultat', { id: novId, uporabnikId: user.email });
+                return result.data;
+            } catch (err) {
+                console.error(err);
+                return 0;
+            }
+        }
     };
 
     const getProgressBarColor = (progress) => {
@@ -61,7 +122,7 @@ function EmployeeProfile() {
         <div className="mt-8">
             <h2 className={`text-xl font-semibold mb-4 ${textClass}`}>My Domains</h2>
             {domains.map((domain, index) => {
-                const progress = currentUser ? getUserResult(domain, currentUser.email) : 0;
+                const progress = progressMap[domain.naziv] || 0;
                 const progressBarColor = getProgressBarColor(progress);
 
                 return (

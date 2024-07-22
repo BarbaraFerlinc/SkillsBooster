@@ -3,6 +3,17 @@ import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 import {useThemeProvider} from "../../utils/ThemeContext.jsx";
 
+const initialDomain = {
+    kljucna_znanja: "",
+    kvizi: [],
+    lastnik: "",
+    naziv: "No Domain",
+    opis: "",
+    rezultati: [],
+    zaposleni: [],
+    gradiva: []
+}
+
 function BossProfile() {
     const [currentUser, setCurrentUser] = useState(null);
     const [allUsers, setAllUsers] = useState([]);
@@ -12,9 +23,9 @@ function BossProfile() {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState('');
-    const [selectedDomain, setSelectedDomain] = useState('');
-
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [selectedDomain, setSelectedDomain] = useState(initialDomain);
+    const [filteredUsers, setFilteredUsers] = useState([]);
 
     const { user } = UserAuth();
     const { currentTheme } = useThemeProvider();
@@ -69,7 +80,25 @@ function BossProfile() {
             const response = await api.post('/domena/uporabnik', { id: user.email });
             const domainNames = response.data.map(domena => domena.naziv);
             setUserDomains(prev => ({ ...prev, [user.id]: domainNames }));
-            calculateDomainScores(); // Recalculate scores when domains for a user are fetched
+
+            if (selectedDomain.naziv && domainNames.includes(selectedDomain.naziv)) {
+                setFilteredUsers(prevFilteredUsers => 
+                    [...prevFilteredUsers, user]
+                );
+            }
+            //calculateDomainScores(); // Recalculate scores when domains for a user are fetched
+        } catch (err) {
+            console.log("Error fetching domains for user", err);
+        }
+    };
+
+    const fetchUsersForDomain = async (domain) => {
+        const novId = domain.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        try {
+            const response = await api.post('/domena/uporabniki', { id: novId });
+            const domainUsers = response.data;
+            setFilteredUsers(domainUsers);
+            //calculateDomainScores();
         } catch (err) {
             console.log("Error fetching domains for user", err);
         }
@@ -89,45 +118,68 @@ function BossProfile() {
         setDomainScores(newDomainScores);
     };
 
-    const handleTabClick = (domain) => {
-        setActiveTab(domain);
+    const handleTabClick = (domainValue) => {
+        setActiveTab(domainValue);
+        const novId = domainValue.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post('/domena/id', { id: novId })
+            .then(res => {
+                const domain = res.data;
+                setSelectedDomain(domain);
+                if (domain) {
+                    fetchUsersForDomain(domain.naziv);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
     };
 
     const handleUserSelection = (userId) => {
-        setSelectedUser(userId); // Single user selection
+        setSelectedUsers(prevSelectedUsers => {
+            if (prevSelectedUsers.includes(userId)) {
+                return prevSelectedUsers.filter(id => id !== userId);
+            } else {
+                return [...prevSelectedUsers, userId];
+            }
+        });
     };
 
-    const handleDomainSelection = (e) => {
-        setSelectedDomain(e.target.value);
+    const handleDomainSelection = async (e) => {
+        const domainValue = e.target.value;
+        const novId = domainValue.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post('/domena/id', { id: novId })
+            .then(res => {
+                const domain = res.data;
+                setSelectedDomain(domain);
+                if (domain) {
+                    fetchUsersForDomain(domain.naziv);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
     };
 
     const handleSubmit = async () => {
         try {
-            if (selectedUser) {
-                await api.post(`/domena/uporabnik/${selectedUser}`, {
-                    domain: selectedDomain
-                });
+            const novId = selectedDomain.naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            for (const userId of selectedUsers) {
+                await api.put(`/domena/uporabnik/${novId}`, { uporabnikId: userId });
+                for (const quiz of selectedDomain.kvizi) {
+                    await api.post(`/kviz/dodaj-rezultat`, { id: quiz, uporabnikId: userId, vrednost: '0' });
+                }
             }
+            console.log(selectedUsers);
             setIsModalOpen(false);
-            setSelectedUser('');
-            setSelectedDomain('');
-            // Refresh the user domains
+            setSelectedUsers([]);
+            setSelectedDomain(initialDomain);
             allUsers.forEach(fetchDomainsForUser);
         } catch (err) {
             console.log("Error adding user to domain", err);
         }
     };
 
-    const emailPostfix = currentUser ? currentUser.email.split('@')[1] : '';
-
-    const filteredUsers = allUsers.filter(user =>
-            user.email.split('@')[1] === emailPostfix && (
-                user.ime_priimek.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.email.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-    );
     const textClass = currentTheme === 'dark' ? 'text-white' : 'text-gray-800';
-
 
     return (
         <div className={`overflow-x-auto mt-4 ${textClass}`}>
@@ -147,7 +199,7 @@ function BossProfile() {
                         <div className="mb-4">
                             <label className="block mb-2">Select Domain:</label>
                             <select
-                                value={selectedDomain}
+                                value={selectedDomain.naziv}
                                 onChange={handleDomainSelection}
                                 className="w-full p-2 border rounded-md"
                             >
@@ -159,13 +211,12 @@ function BossProfile() {
                         </div>
                         <div className="mb-4">
                             <label className="block mb-2">Select User:</label>
-                            {filteredUsers.map(user => (
-                                <div key={user.id} className="flex items-center mb-2">
+                            {allUsers.filter(user => !filteredUsers.includes(user.email)).map(user => (
+                                <div key={user.email} className="flex items-center mb-2">
                                     <input
-                                        type="radio"
-                                        name="selectedUser"
-                                        checked={selectedUser === user.id}
-                                        onChange={() => handleUserSelection(user.id)}
+                                        type="checkbox"
+                                        checked={selectedUsers.includes(user.email)}
+                                        onChange={() => handleUserSelection(user.email)}
                                         className="mr-2"
                                     />
                                     <span>{user.ime_priimek} ({user.email})</span>
@@ -214,12 +265,18 @@ function BossProfile() {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {filteredUsers.filter(user => userDomains[user.id]?.includes(domain)).map(user => (
-                                        <tr key={user.id}>
-                                            <td className="py-2 px-4 border-b">{user.ime_priimek}</td>
-                                            <td className="py-2 px-4 border-b">{user.email}</td>
+                                    {filteredUsers.length > 0 ? (
+                                        allUsers.filter(user => filteredUsers.includes(user.email)).map(user => (
+                                            <tr key={user.email}>
+                                                <td className="py-2 px-4 border-b">{user.ime_priimek}</td>
+                                                <td className="py-2 px-4 border-b">{user.email}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="2" className="py-2 px-4 text-center">This domain has no users yet</td>
                                         </tr>
-                                    ))}
+                                    )}
                                     </tbody>
                                 </table>
                             </div>

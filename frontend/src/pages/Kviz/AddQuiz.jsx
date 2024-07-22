@@ -4,13 +4,38 @@ import ClosedQuestion from './ClosedQuestions.jsx';
 import {useParams} from "react-router-dom";
 import api from '../../services/api.js';
 
+const initialDomain = {
+    kljucna_znanja: "",
+    kvizi: [],
+    lastnik: "",
+    naziv: "No Domain",
+    opis: "",
+    rezultati: [],
+    zaposleni: [],
+    gradiva: []
+}
+
 function AddQuiz() {
     const { domain } = useParams();
     const [quizName, setQuizName] = useState('');
     const [questions, setQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState({ type: 'open', question: '', answer: '' });
     const [questionAdded, setQuestionAdded] = useState(false);
-    const [quizzes, setQuizzes] = useState([]);
+    const [currentDomain, setCurrentDomain] = useState(initialDomain);
+
+    useEffect(() => {
+        if (domain) {
+            const novId = domain.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post('/domena/id', { id: novId })
+                .then(res => {
+                    const domena = res.data;
+                    setCurrentDomain(domena);
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        }
+    }, [domain]);
 
     const handleQuizNameChange = (e) => {
         setQuizName(e.target.value);
@@ -71,7 +96,11 @@ function AddQuiz() {
         
         await api.post(`/domena/dodaj-kviz`, { id: domain, kvizId: novId });
 
-        window.location.href = `/domena/${domain}`;
+        for (const userId of currentDomain.zaposleni) {
+            await api.post(`/kviz/dodaj-rezultat`, { id: novId, uporabnikId: userId, vrednost: '0' });
+        }
+        
+        window.location.href = `/domain/${domain}`;
     };
 
     const dodajVprasanja = (kvizId) => {
