@@ -168,11 +168,11 @@ function Domain() {
 
                         {/* Domain Description and Keywords */}
                         <div className="mt-8">
-                            <h2 className={`text-2xl font-bold ${textClass}`}>Description</h2>
+                            <h2 className={`text-xl font-bold ${textClass}`}>Description</h2>
                             <p className={`mt-4 ${subTextClass}`}>{currentDomain.opis || "No description available."}</p>
                         </div>
                         <div className="mt-8">
-                            <h2 className={`text-2xl font-bold ${textClass}`}>Key Words</h2>
+                            <h2 className={`text-xl font-bold ${textClass}`}>Key Words</h2>
                             <p className={`mt-4 ${subTextClass}`}>{currentDomain.kljucna_znanja || "No key words available."}</p>
                         </div>
 
@@ -210,7 +210,7 @@ function Domain() {
 
                             {currentUser && (currentUser.vloga === "boss") && (
                                 <label htmlFor="fileInput"
-                                       className="btn bg-indigo-500 hover:bg-indigo-600 text-white cursor-pointer mt-8">
+                                       className="btn bg-indigo-500 text-white py-2 px-5 rounded">
                                     <span className="ml-2">Add file</span>
                                 </label>
                             )}
@@ -246,7 +246,7 @@ function Domain() {
 
                             {currentUser && (currentUser.vloga === "boss") && (
                                 <NavLink to={`/addQuiz/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
-                                    <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white cursor-pointer mt-8">
+                                    <button className=" btn bg-indigo-500 text-white py-2 px-5 rounded">
                                         <span className="ml-2">Add Quiz</span>
                                     </button>
                                 </NavLink>
