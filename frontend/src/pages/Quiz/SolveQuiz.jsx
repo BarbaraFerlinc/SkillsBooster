@@ -136,18 +136,15 @@ function SolveQuiz() {
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
                         {/* Main Header */}
-                        <DynamicHeader domainName={`Solve Quiz: ${currentQuiz?.naziv}`} />
+                        <DynamicHeader domainName={` ${currentQuiz?.naziv}`} />
 
                         {/* Quiz Content */}
                         <div className="mt-8">
-                            {/* Quiz Title */}
-                            <h2 className="text-2xl font-bold mb-4">{currentQuiz?.naziv}</h2>
-
                             {/* Quiz Question */}
                             {questions.length > 0 && (
                                 <div className="mb-8">
-                                    <h3 className="text-xl font-semibold mb-2">
-                                        {questions[currentQuestionIndex].vprasanje}
+                                    <h3 className="text-xl font-semibold mb-2 dark:text-slate-100">
+                                        Q: {questions[currentQuestionIndex].vprasanje}
                                     </h3>
                                     {questions[currentQuestionIndex].tip === 'closed' ? (
                                         <ul className="list-disc pl-6">
