@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import Sidebar from '../../partials/Sidebar.jsx';
 import Header from '../../partials/Header.jsx';
 import DynamicHeader from '../../partials/dashboard/DynamicHeader.jsx';
-
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 
@@ -14,7 +13,7 @@ const initialQuiz = {
 }
 
 function SolveQuiz() {
-    const { id } = useParams();
+    const { id, domain } = useParams();
     const [currentQuiz, setCurrentQuiz] = useState(initialQuiz);
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -57,7 +56,6 @@ function SolveQuiz() {
     // Function to handle selecting an answer for closed questions
     const handleSelectAnswer = (optionIndex) => {
         const updatedAnswers = [...answers];
-        //updatedAnswers[currentQuestionIndex] = questions[currentQuestionIndex].odgovori[optionIndex].split(';')[0];
         const selectedOption = questions[currentQuestionIndex].odgovori[optionIndex].split(';')[0];
         if (updatedAnswers[currentQuestionIndex].includes(selectedOption)) {
             // If the option is already selected, deselect it
@@ -95,14 +93,12 @@ function SolveQuiz() {
     // Function to end the quiz
     const handleEndQuiz = async () => {
         const score = calculateScore();
-
         const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        await api.post(`/kviz/dodaj-rezultat`, { id: novId, uporabnikId: user.email, vrednost: score });
+        await api.post(`/kviz/spremeni-rezultat`, { id: novId, uporabnikId: user.email, novaVrednost: score });
         
-        window.location.href = `/quiz/${id}?score=${score}`;
+        window.location.href = `/quiz/${id}/${domain}?score=${score}`;
     };
 
-    // Function to calculate the score
     const calculateScore = () => {
         let correctAnswers = 0;
         for (let i = 0; i < questions.length; i++) {

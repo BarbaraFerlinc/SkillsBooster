@@ -129,11 +129,27 @@ async function najdiRezultatKviz(req, res) {
     try {
         const rezultat = await Kviz.najdiRezultat(id, uporabnikId);
         if (!rezultat) {
-            return res.status(404).json({ error: 'Rezultat ne obstaja' });
+            return res.json(null);
         }
         res.status(200).json(rezultat);
     } catch (error) {
         res.status(500).json({ error: 'Napaka pri pridobivanju rezultata iz baze', details: error.message });
+    }
+}
+
+async function spremeniRezultatKviz(req, res) {
+    const { id, uporabnikId, novaVrednost } = req.body;
+
+    if (!uporabnikId || !novaVrednost ) {
+        return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
+    }
+
+    try {
+        const updatedKviz = await Kviz.spremeniRezultat(id, uporabnikId, novaVrednost);
+        
+        res.status(200).json({ message: 'Uspešno posodobljen kviz', kviz: updatedKviz });
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri posodabljanju kviza v bazi', details: error.message });
     }
 }
 
@@ -193,6 +209,7 @@ module.exports = {
     odstraniVprasanjeKviz,
     dodajRezultatKviz,
     najdiRezultatKviz,
+    spremeniRezultatKviz,
     odstraniRezultatKviz,
     izbrisiKviz,
     najdiKviz

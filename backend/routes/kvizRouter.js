@@ -11,6 +11,7 @@ router.put('/vprasanje/:id', kvizController.dodajVprasanjeKviz);
 router.put('/odstrani-vprasanje/:id', kvizController.odstraniVprasanjeKviz);
 router.post('/dodaj-rezultat', kvizController.dodajRezultatKviz);
 router.post('/najdi-rezultat', kvizController.najdiRezultatKviz);
+router.post('/spremeni-rezultat', kvizController.spremeniRezultatKviz);
 router.put('/odstrani-rezultat/:id', kvizController.odstraniRezultatKviz);
 router.delete('/:id', kvizController.izbrisiKviz);
 router.post('/id', kvizController.najdiKviz);

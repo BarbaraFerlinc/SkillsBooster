@@ -166,6 +166,33 @@ class Kviz {
         }
     }
 
+    static async spremeniRezultat(id, uporabnikId, novaVrednost) {
+        try {
+            const kvizRef = db.collection("Kvizi").doc(id);
+            const response = await kvizRef.get();
+            const kviz = response.data();
+
+            if (!kviz.rezultati) {
+                return { message: 'Rezultati niso na voljo za ta kviz', kviz: kviz };
+            }
+
+            const index = kviz.rezultati.findIndex(r => {
+                const [uporabnik] = r.split(';');
+                return uporabnik === `${uporabnikId}`;
+            });
+
+            if (index !== -1) {
+                kviz.rezultati[index] = `${uporabnikId};${novaVrednost}`;
+                await db.collection("Kvizi").doc(id).update({ rezultati: kviz.rezultati });
+                return { message: 'Rezultat uspešno posodobljen', kviz: kviz };
+            } else {
+                return { message: 'Rezultat za tega uporabnika ne obstaja', kviz: kviz };
+            }
+        } catch (error) {
+            throw new Error('Napaka pri posodabljanju rezultata: ' + error.message);
+        }
+    }
+
     static async odstraniRezultat(id, uporabnikId) {
         try {
             const kvizRef = db.collection("Kvizi").doc(id);

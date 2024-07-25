@@ -70,15 +70,13 @@ function Quiz() {
                         <DynamicHeader domainName={currentQuiz?.naziv}/>
 
                         {/* Conditionally render Solve Quiz link only if quizResult is null */}
-                        {quizResult === null && (
-                            <a
-                                href={`/solveQuiz/${id}`}
-                                className="block py-2 px-4 text-lg text-blue-700 hover:text-gray-900 mb-4"
-                                style={{ textDecoration: 'none' }}
-                            >
-                                Solve Quiz
-                            </a>
-                        )}
+                        {<a
+                            href={`/solveQuiz/${id}/${domain}`}
+                            className="block py-2 px-4 text-lg text-blue-700 hover:text-gray-900 mb-4"
+                            style={{ textDecoration: 'none' }}
+                        >
+                            Solve Quiz
+                        </a>}
 
                         {/* Display quiz result percentage */}
                         {quizResult !== null && (

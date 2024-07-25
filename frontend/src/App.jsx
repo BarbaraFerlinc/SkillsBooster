@@ -56,7 +56,7 @@ function App() {
 
             <Route path='' element={<UserRouting />}>
               <Route exact path="/quiz/:id/:domain" element={<Quiz/>} />
-              <Route exact path="/solveQuiz/:id" element={<SolveQuiz/>} />
+              <Route exact path="/solveQuiz/:id/:domain" element={<SolveQuiz/>} />
             </Route>
           </Route>
 

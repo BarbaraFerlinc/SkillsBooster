@@ -172,8 +172,8 @@ function Domain() {
                             <p className={`mt-4 ${subTextClass}`}>{currentDomain.opis || "No description available."}</p>
                         </div>
                         <div className="mt-8">
-                            <h2 className={`text-xl font-bold ${textClass}`}>Key Words</h2>
-                            <p className={`mt-4 ${subTextClass}`}>{currentDomain.kljucna_znanja || "No key words available."}</p>
+                            <h2 className={`text-xl font-bold ${textClass}`}>Key Skills</h2>
+                            <p className={`mt-4 ${subTextClass}`}>{currentDomain.kljucna_znanja || "No key skills available."}</p>
                         </div>
 
                         {/* Gradivo Section */}
@@ -224,24 +224,28 @@ function Domain() {
                             </div>
 
                             <ul className="gap-6 mt-4">
-                                {quizzes.map((quiz, index) => (
-                                    <li key={index} className="flex items-center justify-between mb-2">
-                                        <NavLink
-                                            to={`/quiz/${quiz.naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}
-                                        className={`flex items-center justify-between mb-2 ${subTextClass}`}
-                                        >
-                                            {quiz.naziv}
-                                        </NavLink>
-                                        {currentUser && (currentUser.vloga === "boss") && (
-                                            <button
-                                                onClick={() => handleQuizDelete(quiz.naziv)}
-                                                className="btn bg-red-500 hover:bg-red-600 text-white ml-4"
+                                {quizzes.length === 0 ? (
+                                    <p>No quizzes</p>
+                                ) : (
+                                    quizzes.map((quiz, index) => (
+                                        <li key={index} className="flex items-center justify-between mb-2">
+                                            <NavLink
+                                                to={`/quiz/${quiz.naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}
+                                                className={`flex items-center justify-between mb-2 ${subTextClass}`}
                                             >
-                                                Delete
-                                            </button>
-                                        )}
-                                    </li>
-                                ))}
+                                                {quiz.naziv}
+                                            </NavLink>
+                                            {currentUser && (currentUser.vloga === "boss") && (
+                                                <button
+                                                    onClick={() => handleQuizDelete(quiz.naziv)}
+                                                    className="btn bg-red-500 hover:bg-red-600 text-white ml-4"
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
+                                        </li>
+                                    ))
+                                )}
                             </ul>
 
                             {currentUser && (currentUser.vloga === "boss") && (
