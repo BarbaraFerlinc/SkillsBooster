@@ -197,11 +197,11 @@ class Kviz {
             const response = await kvizRef.get();
             const kviz = response.data();
             if (kviz == undefined) {
-                throw new Error('Kviz ne obstaja');
+                throw new Error('Quiz ne obstaja');
             }
             await db.collection("Kvizi").doc(id).delete();
 
-            return { message: 'Kviz izbrisan', kviz: kviz };
+            return { message: 'Quiz izbrisan', kviz: kviz };
         } catch (error) {
             throw new Error('Napaka pri brisanju kviza iz baze: ' + error.message);
         }

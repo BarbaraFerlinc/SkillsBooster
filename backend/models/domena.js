@@ -157,7 +157,7 @@ class Domena {
             const domena = response.data();
 
             if (domena.kvizi && domena.kvizi.includes(kvizId)) {
-                return { message: 'Kviz je že vključen v to domeno', domena: domena };
+                return { message: 'Quiz je že vključen v to domeno', domena: domena };
             }
             const updatedKvizi = domena.kvizi ? [...domena.kvizi, kvizId] : [kvizId];
 
@@ -191,9 +191,9 @@ class Domena {
                 const updatedKvizi = domena.kvizi.filter(obstojeciKvizId => obstojeciKvizId !== kvizId);
 
                 await db.collection("Domene_znanja").doc(id).update({ kvizi: updatedKvizi });
-                return { message: 'Kviz uspešno odstranjen iz domene', domena: domena };
+                return { message: 'Quiz uspešno odstranjen iz domene', domena: domena };
             } else {
-                return { message: 'Kviz ni del te domene', domena: domena };
+                return { message: 'Quiz ni del te domene', domena: domena };
             }
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
@@ -310,11 +310,11 @@ class Domena {
             const response = await domenaRef.get();
             const domena = response.data();
             if (domena == undefined) {
-                throw new Error('Domena ne obstaja');
+                throw new Error('Domain ne obstaja');
             }
             await db.collection("Domene_znanja").doc(id).delete();
 
-            return { message: 'Domena izbrisana', domena: domena };
+            return { message: 'Domain izbrisana', domena: domena };
         } catch (error) {
             throw new Error('Napaka pri brisanju domene iz baze: ' + error.message);
         }

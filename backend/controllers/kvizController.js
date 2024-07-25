@@ -31,7 +31,7 @@ async function najdiKviz(req, res) {
         const kviz = await Kviz.getById(id);
         console.log(kviz)
         if (!kviz) {
-        return res.status(404).json({ error: 'Kviz ne obstaja' });
+        return res.status(404).json({ error: 'Quiz ne obstaja' });
         }
         res.status(200).json(kviz);
     } catch (error) {
@@ -158,9 +158,9 @@ async function izbrisiKviz(req, res) {
     try {
         const kviz = await Kviz.izbrisi(id);
         if (!kviz) {
-            return res.status(404).json({ error: 'Kviz ne obstaja' });
+            return res.status(404).json({ error: 'Quiz ne obstaja' });
         }
-        res.status(200).json({ message: 'Kviz izbrisan', kviz: kviz });
+        res.status(200).json({ message: 'Quiz izbrisan', kviz: kviz });
     } catch (error) {
         res.status(500).json({ error: 'Napaka pri brisanju kviza iz baze', details: error.message });
     }
@@ -175,7 +175,7 @@ async function najdiKviz(req, res) {
     try {
         const kviz = await Kviz.getById(id);
         if (!kviz) {
-            return res.status(404).json({ error: 'Kviz ne obstaja' });
+            return res.status(404).json({ error: 'Quiz ne obstaja' });
         }
         res.status(200).json(kviz);
     } catch (error) {

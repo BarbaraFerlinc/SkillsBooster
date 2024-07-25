@@ -30,7 +30,7 @@ async function najdiDomenoId(req, res) {
     try {
         const domena = await Domena.getById(id);
         if (!domena) {
-        return res.status(404).json({ error: 'Domena ne obstaja' });
+        return res.status(404).json({ error: 'Domain ne obstaja' });
         }
         res.status(200).json(domena);
     } catch (error) {
@@ -43,7 +43,7 @@ async function najdiDomenoUser(req, res) {
     try {
         const domene = await Domena.getByUser(id);
         if (!domene) {
-        return res.status(404).json({ error: 'Domene ne obstajajo' });
+        return res.status(404).json({ error: 'Domain ne obstajajo' });
         }
         res.status(200).json(domene);
     } catch (error) {
@@ -56,7 +56,7 @@ async function najdiDomenoOwner(req, res) {
     try {
         const domene = await Domena.getByOwner(id);
         if (!domene) {
-        return res.status(404).json({ error: 'Domene ne obstajajo' });
+        return res.status(404).json({ error: 'Domain ne obstajajo' });
         }
         res.status(200).json(domene);
     } catch (error) {
@@ -136,7 +136,7 @@ async function najdiKvizeDomena(req, res) {
     try {
         const domena = await Domena.najdiKvize(id);
         if (!domena) {
-        return res.status(404).json({ error: 'Domena ne obstaja' });
+        return res.status(404).json({ error: 'Domain ne obstaja' });
         }
         res.status(200).json(domena);
     } catch (error) {
@@ -181,7 +181,7 @@ async function najdiGradivadomena(req, res) {
     try {
         const domena = await Domena.najdiGradiva(id);
         if (!domena) {
-        return res.status(404).json({ error: 'Domena ne obstaja' });
+        return res.status(404).json({ error: 'Domain ne obstaja' });
         }
         res.status(200).json(domena);
     } catch (error) {
@@ -226,9 +226,9 @@ async function izbrisiDomeno(req, res) {
     try {
         const domena = await Domena.izbrisi(id);
         if (!domena) {
-        return res.status(404).json({ error: 'Domena ne obstaja' });
+        return res.status(404).json({ error: 'Domain ne obstaja' });
         }
-        res.status(200).json({ message: 'Domena izbrisana', domena: domena });
+        res.status(200).json({ message: 'Domain izbrisana', domena: domena });
     } catch (error) {
         res.status(500).json({ error: 'Napaka pri brisanju domene iz baze', details: error.message });
     }
@@ -243,7 +243,7 @@ async function najdiDomeno(req, res) {
     try {
         const domena = await Domena.getById(id);
         if (!domena) {
-        return res.status(404).json({ error: 'Domena ne obstaja' });
+        return res.status(404).json({ error: 'Domain ne obstaja' });
         }
         res.status(200).json(domena);
     } catch (error) {
