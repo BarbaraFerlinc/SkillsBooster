@@ -110,7 +110,7 @@ function AdminProfile() {
                     <div className="bg-gray-200 p-6 rounded shadow-md">
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2">
-                                Ime in priimek
+                                Name and Surname
                             </label>
                             <input
                                 type="text"
@@ -142,22 +142,23 @@ function AdminProfile() {
                                 className="bg-white  rounded p-2 w-full"
                             >
                                 <option value="user">User</option>
-                                <option value="boss">Boss</option>
+                                <option value="boss">Manager</option>
                             </select>
                         </div>
                         <div className="flex items-center justify-between">
-                            <button
-                                onClick={handleConfirmAddUser}
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                            >
-                                Confirm
-                            </button>
                             <button
                                 onClick={() => setShowModal(false)}
                                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             >
                                 Cancel
                             </button>
+                            <button
+                                onClick={handleConfirmAddUser}
+                                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            >
+                                Confirm
+                            </button>
+
                         </div>
                     </div>
                 </div>

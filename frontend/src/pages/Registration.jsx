@@ -83,7 +83,7 @@ function Registration() {
     
         if (!email) {
             formIsValid = false;
-            formErrors["email"] = "Please add ypur email";
+            formErrors["email"] = "Please add your email";
         }
     
         for (let i = 0; i < users.length; i++) {
@@ -182,7 +182,7 @@ function Registration() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6">COmpany registration</h1>
+                <h1 className="text-2xl font-bold mb-6">Company registration</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label htmlFor="naziv" className="block text-sm font-medium text-gray-700">Company name</label>
@@ -279,7 +279,7 @@ function Registration() {
                         className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={loading}
                     >
-                        {loading ? 'Loading...' : 'Registracija'}
+                        {loading ? 'Loading...' : 'Register'}
                     </button>
                 </form>
             </div>
