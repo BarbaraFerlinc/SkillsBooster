@@ -257,6 +257,7 @@ function Domain() {
                             )}
                         </div>
                     </div>
+                    <AIAssistant/>
                 </main>
             </div>
         </div>
