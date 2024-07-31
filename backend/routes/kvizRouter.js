@@ -14,5 +14,10 @@ router.post('/najdi-rezultat', kvizController.najdiRezultatKviz);
 router.put('/odstrani-rezultat/:id', kvizController.odstraniRezultatKviz);
 router.delete('/:id', kvizController.izbrisiKviz);
 router.post('/id', kvizController.najdiKviz);
+router.post('/avtPreverjanje', kvizController.dostopDoModelaKviz);
 
 module.exports = router;
+
+
+
+

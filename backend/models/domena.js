@@ -221,6 +221,44 @@ class Domena {
             console.error('Error getting download URL:', error);
         }*/
 
+
+
+            /*
+
+
+            async function uploadFile(filePath, targetFolder) {
+    try {
+        const fileName = path.basename(filePath);
+        const storageRef = ref(storage, `${targetFolder}/${fileName}`);
+        
+        const fileBuffer = fs.readFileSync(filePath);
+        const metadata = {
+            contentType: 'application/octet-stream'
+        };
+        
+        const uploadTask = uploadBytesResumable(storageRef, fileBuffer, metadata);
+        
+        uploadTask.on('state_changed', 
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+            }, 
+            (error) => {
+                console.error('Upload failed:', error);
+            }, 
+            () => {
+                console.log('Upload successful!');
+            }
+        );
+    } catch (error) {
+        console.error('Error uploading file:', error);
+    }
+}
+
+
+
+
+            */
         try {
             uploadBytes(gradivoRef, file).then((snapshot) => {
                 console.log('Uploaded a blob or file!');

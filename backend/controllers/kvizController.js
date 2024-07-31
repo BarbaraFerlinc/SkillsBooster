@@ -1,4 +1,5 @@
 const Kviz = require('../models/kviz');
+const axios = require('axios');
 
 async function dodajKviz(req, res) {
     const { naziv, vprasanja } = req.body;
@@ -15,7 +16,22 @@ async function dodajKviz(req, res) {
       res.status(500).json({ error: 'Napaka pri vstavljanju kviza v bazo', details: error.message });
     }
 }
-  
+
+async function avtPreverjanje(req, res) {
+    const { query } = req.body;
+
+    if (!query) {
+        return res.status(400).json({ error: 'Query je zahtevan' });
+    }
+
+    try {
+        const response = await Kviz.dostopDoModela(query);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri dostopanju do modela', details: error.message });
+    }
+}
+
 async function vsiKvizi(req, res) {
     try {
         const kvizi = await Kviz.vsi();
@@ -195,5 +211,6 @@ module.exports = {
     najdiRezultatKviz,
     odstraniRezultatKviz,
     izbrisiKviz,
-    najdiKviz
+    najdiKviz,
+    avtPreverjanje
 };
