@@ -93,7 +93,7 @@ function DropdownProfile({ align }) {
             <ul>
               <li>
                 <NavLink
-                    className="font-medium text-sm text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center py-1 px-3"
+                    className="font-medium text-md text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-200 flex items-center py-1 px-3"
                     to="/profile"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
@@ -102,7 +102,7 @@ function DropdownProfile({ align }) {
               </li>
               <li>
                 <NavLink
-                    className="font-medium text-sm text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center py-1 px-3"
+                    className="font-medium text-md text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-200 flex items-center py-1 px-3"
                     to="/reset"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
@@ -111,7 +111,7 @@ function DropdownProfile({ align }) {
               </li>
               <li>
                 <NavLink
-                    className="font-medium text-sm text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center py-1 px-3"
+                    className="font-medium text-md text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-200 flex items-center py-1 px-3"
                     to="/logout"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                 >

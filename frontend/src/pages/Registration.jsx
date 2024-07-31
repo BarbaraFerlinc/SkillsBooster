@@ -68,49 +68,49 @@ function Registration() {
     
         if (!company.naziv) {
             formIsValid = false;
-            formErrors["naziv"] = "Prosimo, vnesite naziv.";
+            formErrors["naziv"] = "Please add your company name";
         }
 
         if (!company.naslov) {
             formIsValid = false;
-            formErrors["naslov"] = "Prosimo, vnesite naslov.";
+            formErrors["naslov"] = "Please add your address";
         }
         
         if (!company.postna_stevilka) {
             formIsValid = false;
-            formErrors["postna_stevilka"] = "Prosimo, vnesite poštno številko.";
+            formErrors["postna_stevilka"] = "Please add your post code";
         }
     
         if (!email) {
             formIsValid = false;
-            formErrors["email"] = "Prosimo, vnesite email.";
+            formErrors["email"] = "Please add your email";
         }
     
         for (let i = 0; i < users.length; i++) {
           if (users[i].email == email) {
             formIsValid = false;
-            formErrors["email"] = "Ta email je ze v uporabi.";
+            formErrors["email"] = "This email is already in use.";
           }
         }
     
         if (!password) {
             formIsValid = false;
-            formErrors["geslo"] = "Prosimo, vnesite geslo.";
+            formErrors["geslo"] = "Please add your password";
         }
     
         if (password && password.length < 6) {
             formIsValid = false;
-            formErrors["geslo"] = "Prosimo, vnesite geslo z vsaj 6 znaki.";
+            formErrors["geslo"] = "The password should have at least 6 characters";
         }
 
         if (password !== confirmPassword) {
             formIsValid = false;
-            formErrors["geslo_enako"] = "Prosimo, vnesite ujemajoče geslo.";
+            formErrors["geslo_enako"] = "Please, add your password";
         }
 
         if (!agreed) {
             formIsValid = false;
-            formErrors["agreed"] = "Prosimo. potrdite da se strinjate s pogoji uporabe.";
+            formErrors["agreed"] = "Please confirm, to agree with terms and conditions";
         }
 
         setErrors(formErrors);
@@ -182,10 +182,10 @@ function Registration() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6">Registracija podjetja</h1>
+                <h1 className="text-2xl font-bold mb-6">Company registration</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label htmlFor="naziv" className="block text-sm font-medium text-gray-700">Naziv</label>
+                        <label htmlFor="naziv" className="block text-sm font-medium text-gray-700">Company name</label>
                         <input
                             type="text"
                             id="naziv"
@@ -197,7 +197,7 @@ function Registration() {
                         <small className="text-red-500">{errors.naziv}</small>
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="naslov" className="block text-sm font-medium text-gray-700">Naslov</label>
+                        <label htmlFor="naslov" className="block text-sm font-medium text-gray-700">Address</label>
                         <input
                             type="text"
                             id="naslov"
@@ -209,8 +209,7 @@ function Registration() {
                         <small className="text-red-500">{errors.naslov}</small>
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="postna_stevilka" className="block text-sm font-medium text-gray-700">Poštna
-                            številka</label>
+                        <label htmlFor="postna_stevilka" className="block text-sm font-medium text-gray-700"> Post code</label>
                         <input
                             type="text"
                             id="postna_stevilka"
@@ -222,7 +221,7 @@ function Registration() {
                         <small className="text-red-500">{errors.postna_stevilka}</small>
                     </div>
 
-                    <h1 className="text-2xl font-bold mb-6">Admin registracija</h1>
+                    <h1 className="text-2xl font-bold mb-6">Admin registration</h1>
                     <div className="mb-4">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
                         <input
@@ -280,7 +279,7 @@ function Registration() {
                         className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={loading}
                     >
-                        {loading ? 'Loading...' : 'Registracija'}
+                        {loading ? 'Loading...' : 'Register'}
                     </button>
                 </form>
             </div>

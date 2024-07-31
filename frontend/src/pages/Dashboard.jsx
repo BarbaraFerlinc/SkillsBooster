@@ -36,7 +36,7 @@ function Dashboard() {
                             {/* Card 1 */}
                             <div
                                 className="col-span-12 sm:col-span-6 xl:col-span-4 bg-white shadow-lg rounded-sm border border-slate-200 p-4">
-                                <h2 className="text-lg font-semibold text-slate-800 mb-2">Registriraj podjetje</h2>
+                                <h2 className="text-lg font-semibold text-slate-800 mb-2">Register your comany</h2>
                                 <p className="text-sm text-slate-600 mb-4">Create a new account to get started with our
                                     services.</p>
                                 <NavLink to="/register"
@@ -48,7 +48,7 @@ function Dashboard() {
                             {/* Card 2 */}
                             <div
                                 className="col-span-12 sm:col-span-6 xl:col-span-4 bg-white shadow-lg rounded-sm border border-slate-200 p-4">
-                                <h2 className="text-lg font-semibold text-slate-800 mb-2">Prijava</h2>
+                                <h2 className="text-lg font-semibold text-slate-800 mb-2">Login</h2>
                                 <p className="text-sm text-slate-600 mb-4">Already have an account? Log in here.</p>
                                 <NavLink to="/login"
                                          className="btn bg-blue-300 hover:bg-blue-400 text-white"> {/* Change bg-green-500 to bg-blue-300 */}

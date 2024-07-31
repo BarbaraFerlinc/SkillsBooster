@@ -4,13 +4,38 @@ import ClosedQuestion from './ClosedQuestions.jsx';
 import {useParams} from "react-router-dom";
 import api from '../../services/api.js';
 
-function DodajKviz() {
+const initialDomain = {
+    kljucna_znanja: "",
+    kvizi: [],
+    lastnik: "",
+    naziv: "No Domain",
+    opis: "",
+    rezultati: [],
+    zaposleni: [],
+    gradiva: []
+}
+
+function AddQuiz() {
     const { domain } = useParams();
     const [quizName, setQuizName] = useState('');
     const [questions, setQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState({ type: 'open', question: '', answer: '' });
     const [questionAdded, setQuestionAdded] = useState(false);
-    const [quizzes, setQuizzes] = useState([]);
+    const [currentDomain, setCurrentDomain] = useState(initialDomain);
+
+    useEffect(() => {
+        if (domain) {
+            const novId = domain.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post('/domena/id', { id: novId })
+                .then(res => {
+                    const domena = res.data;
+                    setCurrentDomain(domena);
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        }
+    }, [domain]);
 
     const handleQuizNameChange = (e) => {
         setQuizName(e.target.value);
@@ -55,7 +80,6 @@ function DodajKviz() {
         setQuestionAdded(false);
     }, [domain, questionAdded]);
 
-
     const handleSubmitQuiz = async () => {
         const novId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         const vprasanja = dodajVprasanja(novId);
@@ -71,7 +95,11 @@ function DodajKviz() {
         
         await api.post(`/domena/dodaj-kviz`, { id: domain, kvizId: novId });
 
-        window.location.href = `/domena/${domain}`;
+        for (const userId of currentDomain.zaposleni) {
+            await api.post(`/kviz/dodaj-rezultat`, { id: novId, uporabnikId: userId, vrednost: '0' });
+        }
+        
+        window.location.href = `/domain/${domain}`;
     };
 
     const dodajVprasanja = (kvizId) => {
@@ -163,7 +191,7 @@ function DodajKviz() {
                     </button>
                     <button
                         onClick={handleSubmitQuiz}
-                        className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
+                        className="bg-green-500 text-white py-2 px-5 rounded"
                     >
                         Submit Quiz
                     </button>
@@ -173,4 +201,4 @@ function DodajKviz() {
     );
 }
 
-export default DodajKviz;
+export default AddQuiz;

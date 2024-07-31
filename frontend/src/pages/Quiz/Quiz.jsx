@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { quizzes } from "../../Data.jsx";
+
 import Sidebar from "../../partials/Sidebar.jsx";
 import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
@@ -13,7 +13,7 @@ const initialQuiz = {
     vprasanja: []
 }
 
-function Kviz() {
+function Quiz() {
     const { id, domain } = useParams();
     const [currentQuiz, setCurrentQuiz] = useState(initialQuiz);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -70,15 +70,13 @@ function Kviz() {
                         <DynamicHeader domainName={currentQuiz?.naziv}/>
 
                         {/* Conditionally render Solve Quiz link only if quizResult is null */}
-                        {quizResult === null && (
-                            <a
-                                href={`/solveQuiz/${id}`}
-                                className="block py-2 px-4 text-lg text-blue-700 hover:text-gray-900 mb-4"
-                                style={{ textDecoration: 'none' }}
-                            >
-                                Solve Quiz
-                            </a>
-                        )}
+                        {<a
+                            href={`/solveQuiz/${id}/${domain}`}
+                            className="block py-2 px-4 text-lg text-blue-700 hover:text-gray-900 mb-4"
+                            style={{ textDecoration: 'none' }}
+                        >
+                            Solve Quiz
+                        </a>}
 
                         {/* Display quiz result percentage */}
                         {quizResult !== null && (
@@ -89,8 +87,8 @@ function Kviz() {
 
                         <div className="result">
                             <Link
-                                to={`/domena/${domain}`}
-                                className="btn bg-blue-300 hover:bg-blue-400 text-white"
+                                to={`/domain/${domain}`}
+                                className="btn bg-indigo-500 text-white py-2 px-5 rounded mr-1"
                             >
                                 Back
                             </Link>
@@ -102,4 +100,4 @@ function Kviz() {
     );
 }
 
-export default Kviz;
+export default Quiz;

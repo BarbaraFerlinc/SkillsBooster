@@ -30,7 +30,7 @@ async function najdiDomenoId(req, res) {
     try {
         const domena = await Domena.getById(id);
         if (!domena) {
-        return res.status(404).json({ error: 'Domena ne obstaja' });
+        return res.status(404).json({ error: 'Domain ne obstaja' });
         }
         res.status(200).json(domena);
     } catch (error) {
@@ -43,7 +43,7 @@ async function najdiDomenoUser(req, res) {
     try {
         const domene = await Domena.getByUser(id);
         if (!domene) {
-        return res.status(404).json({ error: 'Domene ne obstajajo' });
+        return res.status(404).json({ error: 'Domain ne obstajajo' });
         }
         res.status(200).json(domene);
     } catch (error) {
@@ -56,7 +56,7 @@ async function najdiDomenoOwner(req, res) {
     try {
         const domene = await Domena.getByOwner(id);
         if (!domene) {
-        return res.status(404).json({ error: 'Domene ne obstajajo' });
+        return res.status(404).json({ error: 'Domain ne obstajajo' });
         }
         res.status(200).json(domene);
     } catch (error) {
@@ -98,6 +98,19 @@ async function dodajUporabnikaDomena(req, res) {
     }
 }
 
+async function najdiUporabnikeDomena(req, res) {
+    const { id } = req.body;
+    try {
+        const domena = await Domena.najdiUporabnike(id);
+        if (!domena) {
+        return res.status(404).json({ error: 'Domena ne obstaja' });
+        }
+        res.status(200).json(domena);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju domene iz baze', details: error.message });
+    }
+}
+
 async function odstraniUporabnikaDomena(req, res) {
     const { id } = req.params;
     const { uporabnikId } = req.body;
@@ -136,7 +149,7 @@ async function najdiKvizeDomena(req, res) {
     try {
         const domena = await Domena.najdiKvize(id);
         if (!domena) {
-        return res.status(404).json({ error: 'Domena ne obstaja' });
+        return res.status(404).json({ error: 'Domain ne obstaja' });
         }
         res.status(200).json(domena);
     } catch (error) {
@@ -154,6 +167,72 @@ async function odstraniKvizDomena(req, res) {
     try {
         const updatedDomena = await Domena.odstraniKviz(id, kvizId);
         
+        res.status(200).json({ message: 'Uspešno posodobljena domena', domena: updatedDomena });
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri posodabljanju domene v bazi', details: error.message });
+    }
+}
+
+async function dodajRezultatDomena(req, res) {
+    const { id, uporabnikId, vrednost } = req.body;
+
+    if (!uporabnikId || !vrednost ) {
+        return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
+    }
+
+    try {
+        const updatedDomena = await Domena.dodajRezultat(id, uporabnikId, vrednost);
+        
+        res.status(200).json({ message: 'Uspešno posodobljena domena', domena: updatedDomena });
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri posodabljanju domene v bazi', details: error.message });
+    }
+}
+
+async function najdiRezultatDomena(req, res) {
+    const { id, uporabnikId } = req.body;
+
+    if (!uporabnikId ) {
+        return res.status(400).json({ error: 'Izbran mora biti uporabnik' });
+    }
+
+    try {
+        const rezultat = await Domena.najdiRezultat(id, uporabnikId);
+        if (!rezultat) {
+            return res.json(null);
+        }
+        res.status(200).json(rezultat);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju rezultata iz baze', details: error.message });
+    }
+}
+
+async function spremeniRezultatDomena(req, res) {
+    const { id, uporabnikId, novaVrednost } = req.body;
+
+    if (!uporabnikId || !novaVrednost ) {
+        return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
+    }
+
+    try {
+        const updatedDomena = await Domena.spremeniRezultat(id, uporabnikId, novaVrednost);
+        
+        res.status(200).json({ message: 'Uspešno posodobljena domena', domena: updatedDomena });
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri posodabljanju domene v bazi', details: error.message });
+    }
+}
+
+async function odstraniRezultatDomena(req, res) {
+    const { id } = req.params;
+    const { uporabnikId } = req.body;
+
+    if (!uporabnikId ) {
+        return res.status(400).json({ error: 'Izbran mora biti uporabnik' });
+    }
+
+    try {
+        const updatedDomena = await Domena.odstraniRezultat(id, uporabnikId);
         res.status(200).json({ message: 'Uspešno posodobljena domena', domena: updatedDomena });
     } catch (error) {
         res.status(500).json({ error: 'Napaka pri posodabljanju domene v bazi', details: error.message });
@@ -181,7 +260,7 @@ async function najdiGradivadomena(req, res) {
     try {
         const domena = await Domena.najdiGradiva(id);
         if (!domena) {
-        return res.status(404).json({ error: 'Domena ne obstaja' });
+        return res.status(404).json({ error: 'Domain ne obstaja' });
         }
         res.status(200).json(domena);
     } catch (error) {
@@ -226,9 +305,9 @@ async function izbrisiDomeno(req, res) {
     try {
         const domena = await Domena.izbrisi(id);
         if (!domena) {
-        return res.status(404).json({ error: 'Domena ne obstaja' });
+        return res.status(404).json({ error: 'Domain ne obstaja' });
         }
-        res.status(200).json({ message: 'Domena izbrisana', domena: domena });
+        res.status(200).json({ message: 'Domain izbrisana', domena: domena });
     } catch (error) {
         res.status(500).json({ error: 'Napaka pri brisanju domene iz baze', details: error.message });
     }
@@ -243,7 +322,7 @@ async function najdiDomeno(req, res) {
     try {
         const domena = await Domena.getById(id);
         if (!domena) {
-        return res.status(404).json({ error: 'Domena ne obstaja' });
+        return res.status(404).json({ error: 'Domain ne obstaja' });
         }
         res.status(200).json(domena);
     } catch (error) {
@@ -259,10 +338,15 @@ module.exports = {
     najdiDomenoOwner,
     spremeniDomeno,
     dodajUporabnikaDomena,
+    najdiUporabnikeDomena,
     odstraniUporabnikaDomena,
     dodajKvizDomena,
     najdiKvizeDomena,
     odstraniKvizDomena,
+    dodajRezultatDomena,
+    najdiRezultatDomena,
+    spremeniRezultatDomena,
+    odstraniRezultatDomena,
     dodajGradivoDomena,
     najdiGradivadomena,
     beriGradivoDomena,

@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import Sidebar from '../../partials/Sidebar.jsx';
 import Header from '../../partials/Header.jsx';
 import DynamicHeader from '../../partials/dashboard/DynamicHeader.jsx';
-import { quizzes } from '../../Data.jsx';
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 
@@ -14,7 +13,7 @@ const initialQuiz = {
 }
 
 function SolveQuiz() {
-    const { id } = useParams();
+    const { id, domain } = useParams();
     const [currentQuiz, setCurrentQuiz] = useState(initialQuiz);
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -57,7 +56,6 @@ function SolveQuiz() {
     // Function to handle selecting an answer for closed questions
     const handleSelectAnswer = (optionIndex) => {
         const updatedAnswers = [...answers];
-        //updatedAnswers[currentQuestionIndex] = questions[currentQuestionIndex].odgovori[optionIndex].split(';')[0];
         const selectedOption = questions[currentQuestionIndex].odgovori[optionIndex].split(';')[0];
         if (updatedAnswers[currentQuestionIndex].includes(selectedOption)) {
             // If the option is already selected, deselect it
@@ -95,14 +93,12 @@ function SolveQuiz() {
     // Function to end the quiz
     const handleEndQuiz = async () => {
         const score = calculateScore();
-
         const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        await api.post(`/kviz/dodaj-rezultat`, { id: novId, uporabnikId: user.email, vrednost: score });
+        await api.post(`/kviz/spremeni-rezultat`, { id: novId, uporabnikId: user.email, novaVrednost: score });
         
-        window.location.href = `/quiz/${id}?score=${score}`;
+        window.location.href = `/quiz/${id}/${domain}?score=${score}`;
     };
 
-    // Function to calculate the score
     const calculateScore = () => {
         let correctAnswers = 0;
         for (let i = 0; i < questions.length; i++) {
@@ -140,18 +136,15 @@ function SolveQuiz() {
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
                         {/* Main Header */}
-                        <DynamicHeader domainName={`Solve Quiz: ${currentQuiz?.naziv}`} />
+                        <DynamicHeader domainName={` ${currentQuiz?.naziv}`} />
 
                         {/* Quiz Content */}
                         <div className="mt-8">
-                            {/* Quiz Title */}
-                            <h2 className="text-2xl font-bold mb-4">{currentQuiz?.naziv}</h2>
-
                             {/* Quiz Question */}
                             {questions.length > 0 && (
                                 <div className="mb-8">
-                                    <h3 className="text-xl font-semibold mb-2">
-                                        {questions[currentQuestionIndex].vprasanje}
+                                    <h3 className="text-xl font-semibold mb-2 dark:text-slate-100">
+                                        Q: {questions[currentQuestionIndex].vprasanje}
                                     </h3>
                                     {questions[currentQuestionIndex].tip === 'closed' ? (
                                         <ul className="list-disc pl-6">
