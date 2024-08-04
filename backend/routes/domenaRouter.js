@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 const domenaController = require('../controllers/domenaController');
 
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 router.post('/dodaj', domenaController.dodajDomeno);
 router.get('/vse', domenaController.vseDomene);
 router.get('/:id', domenaController.najdiDomenoId);
@@ -18,7 +22,7 @@ router.post('/dodaj-rezultat', domenaController.dodajRezultatDomena);
 router.post('/najdi-rezultat', domenaController.najdiRezultatDomena);
 router.post('/spremeni-rezultat', domenaController.spremeniRezultatDomena);
 router.put('/odstrani-rezultat/:id', domenaController.odstraniRezultatDomena);
-router.post('/dodaj-gradivo', domenaController.dodajGradivoDomena);
+router.post('/dodaj-gradivo', upload.single('file'), domenaController.dodajGradivoDomena);
 router.post('/gradiva', domenaController.najdiGradivadomena);
 router.post('/beri-gradivo', domenaController.beriGradivoDomena);
 router.post('/izbrisi-gradivo', domenaController.izbrisiGradivoDomena);

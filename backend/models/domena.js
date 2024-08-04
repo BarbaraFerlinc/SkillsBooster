@@ -1,5 +1,5 @@
 const db = require('../pb');
-const { storage, ref, uploadBytes, deleteObject, getDownloadURL } = require('../firebase');
+const { storage, ref, uploadBytes, deleteObject, uploadBytesResumable, listAll, getDownloadURL } = require('../firebase');
 
 class Domena {
     static async dodaj(naziv, opis, kljucna_znanja, lastnik) {
@@ -323,75 +323,41 @@ class Domena {
         }
     }
 
-    static async dodajGradivo(id, naziv, file) {
-        const domenaRef = db.collection("Domene_znanja").doc(id);
-        const response = await domenaRef.get();
-        const domena = response.data();
-
-        if (domena.gradiva && domena.gradiva.includes(naziv)) {
-            return { message: 'Gradivo je že del te domene', domena: domena };
-        }
-    
-        const updatedGradiva = [...(domena.gradiva || []), naziv];
-        await domenaRef.update({ gradiva: updatedGradiva });
-
-        const gradivoRef = ref(storage, `${id}/${naziv}`);
-        /*try {
-            const url = await getDownloadURL(gradivoRef);
-        } catch (error) {
-            console.error('Error getting download URL:', error);
-        }*/
-
-
-
-            /*
-
-
-            async function uploadFile(filePath, targetFolder) {
-    try {
-        const fileName = path.basename(filePath);
-        const storageRef = ref(storage, `${targetFolder}/${fileName}`);
-        
-        const fileBuffer = fs.readFileSync(filePath);
-        const metadata = {
-            contentType: 'application/octet-stream'
-        };
-        
-        const uploadTask = uploadBytesResumable(storageRef, fileBuffer, metadata);
-        
-        uploadTask.on('state_changed', 
-            (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('Upload is ' + progress + '% done');
-            }, 
-            (error) => {
-                console.error('Upload failed:', error);
-            }, 
-            () => {
-                console.log('Upload successful!');
-            }
-        );
-    } catch (error) {
-        console.error('Error uploading file:', error);
-    }
-}
-
-
-
-
-            */
+    static async dodajGradivo(id, naziv, fileBuffer) {
         try {
-            uploadBytes(gradivoRef, file).then((snapshot) => {
-                console.log('Uploaded a blob or file!');
-            }).catch((error) => {
-                console.error('Error uploading file:', error);
-            });
-            /*const gradivo = `${naziv};${url}`;
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
 
-            return { message: 'Uspešno dodano gradivo', gradivo: gradivo };*/
-            return { message: 'Uspešno dodano gradivo', gradivo: naziv };
+            if (domena.gradiva && domena.gradiva.includes(naziv)) {
+                return { message: 'Gradivo je že del te domene', domena: domena };
+            }
+        
+            const updatedGradiva = [...(domena.gradiva || []), naziv];
+            await domenaRef.update({ gradiva: updatedGradiva });
+            
+            const storageRef = ref(storage, `${id}/${naziv}`);
+            
+            const metadata = {
+                contentType: 'application/octet-stream'
+            };
+            
+            const uploadTask = uploadBytesResumable(storageRef, fileBuffer, metadata);
+            
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                }, 
+                (error) => {
+                    throw new Error('Upload failed: ' + error.message);
+                }, 
+                () => {
+                    return { message: 'Upload successful!', gradivo: naziv };
+                }
+            );
         } catch (error) {
-            throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+            console.error('Error uploading file:', error);
         }
     }
 
@@ -401,21 +367,7 @@ class Domena {
             const response = await domenaRef.get();
             const domena = response.data();
             const gradiva = domena.gradiva;
-            /*const files = [];
 
-            for (const gradivo of gradiva) {
-                const naziv = gradivo.split(';')[0];
-                const url = gradivo.split(';')[1];
-                files.push({naziv, url});
-            }
-
-            for (const gradivo of gradiva) {
-                const gradivoRef = ref(storage, `${id}/${gradivo.naziv}`);
-                const url = await getDownloadURL(gradivoRef);
-                files.push({naziv: naziv, url: url});
-            }
-
-            return files;*/
             return gradiva;
         } catch (error) {
             throw new Error('Napaka pri pridobivanju gradiv iz baze: ' + error.message);

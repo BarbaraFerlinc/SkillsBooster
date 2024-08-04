@@ -16,9 +16,14 @@ def download_file(url, output_path):
 
 def main(temp_file_path):
     print("python laufa")
-    # skrij
-    os.environ['GRADIENT_ACCESS_TOKEN'] = "zHkm0nTvAVXsUobrgw4UelOfRQsKRCl2"
-    os.environ['GRADIENT_WORKSPACE_ID'] = "86abdbb7-ca5f-4f71-9882-01970e111de7_workspace"
+
+    gradient_access_token = os.getenv('GRADIENT_ACCESS_TOKEN')
+    gradient_workspace_id = os.getenv('GRADIENT_WORKSPACE_ID')
+    gradient_model_url = os.getenv('GRADIENT_MODEL_URL')
+
+    if not gradient_access_token or not gradient_workspace_id:
+        print("Manjkajo okoljske spremenljivke.")
+        return
 
     print("Nalaganje podatkov...")
     with open(temp_file_path, 'r', encoding='utf-8') as file:
@@ -62,13 +67,12 @@ def main(temp_file_path):
     celotna_vsebina = "\n".join(vsebina_datotek)
     deli_vsebine = [celotna_vsebina[i:i+1000] for i in range(0, len(celotna_vsebina), 1000)]
 
-    url = "https://api.gradient.ai/api/models/399e5ea8-21ba-4558-89b3-d962f7efd0db_model_adapter/complete"
-    # skrij
+    url = gradient_model_url
     headers = {
         "accept": "application/json",
-        "x-gradient-workspace-id": "86abdbb7-ca5f-4f71-9882-01970e111de7_workspace",
+        "x-gradient-workspace-id": gradient_workspace_id,
         "content-type": "application/json",
-        "authorization": "Bearer zHkm0nTvAVXsUobrgw4UelOfRQsKRCl2"
+        "authorization": f"Bearer {gradient_access_token}"
     }
 
     samples = []

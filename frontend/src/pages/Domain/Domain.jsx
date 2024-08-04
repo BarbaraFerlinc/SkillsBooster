@@ -99,17 +99,27 @@ function Domain() {
             });
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-
-        api.post(`/domena/dodaj-gradivo`, { id: novId, naziv: selectedFile.name, file: selectedFile })
-            .then(res => {
-                setFileAdded(true);
+        if (selectedFile) {
+            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const formData = new FormData();
+            console.log(selectedFile);
+            formData.append('id', novId);
+            formData.append('naziv', selectedFile.name);
+            formData.append('file', selectedFile);
+    
+            api.post('/domena/dodaj-gradivo', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             })
-            .catch(err => {
+            .then(() => {
+                setFileAdded(true);
+            }).catch(err => {
                 console.error(err);
             });
+        }
     };
 
     const handleFileDelete = (fileName) => {

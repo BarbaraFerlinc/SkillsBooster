@@ -1,4 +1,6 @@
 const Domena = require('../models/domena');
+const multer = require('multer');
+const { PassThrough } = require('stream');
 
 async function dodajDomeno(req, res) {
     const { naziv, opis, kljucna_znanja, lastnik } = req.body;
@@ -240,14 +242,19 @@ async function odstraniRezultatDomena(req, res) {
 }
 
 async function dodajGradivoDomena(req, res) {
-    const { id, naziv, file } = req.body;
+    const { id, naziv } = req.body;
+    const file = req.file;
+    console.log(file);
 
     if (!id || !naziv || !file ) {
         return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
     }
 
+    const fileStream = new PassThrough();
+    fileStream.end(file.buffer);
+
     try {
-        const updatedDomena = await Domena.dodajGradivo(id, naziv, file);
+        const updatedDomena = await Domena.dodajGradivo(id, naziv, file.buffer);
         
         res.status(200).json({ message: 'Uspešno posodobljena domena', domena: updatedDomena });
     } catch (error) {

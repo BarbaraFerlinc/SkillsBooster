@@ -19,12 +19,12 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
 
-async function uploadFile(filePath, targetFolder) {
+async function uploadFile(fileBuffer, targetFolder) {
     try {
         const fileName = path.basename(filePath);
         const storageRef = ref(storage, `${targetFolder}/${fileName}`);
         
-        const fileBuffer = fs.readFileSync(filePath);
+        //const fileBuffer = fs.readFileSync(filePath);
         const metadata = {
             contentType: 'application/octet-stream'
         };
@@ -49,25 +49,39 @@ async function uploadFile(filePath, targetFolder) {
 }
 
 
-async function readFiles(targetFolder) {
+async function readFiles(targetFolder, fileName) {
     try {
         const folderRef = ref(storage, targetFolder);
         const res = await listAll(folderRef);
 
+        let downloadURL = null;
         for (let itemRef of res.items) {
-            const downloadURL = await getDownloadURL(itemRef);
-            console.log(`File: ${itemRef.name} - URL: ${downloadURL}`);
+            //console.log(itemRef);
+            if (itemRef.name == fileName) {
+                downloadURL = await getDownloadURL(itemRef);
+                console.log(`File: ${itemRef.name} - URL: ${downloadURL}`);
+                break;
+            }
         }
+
+        if (downloadURL === null) {
+            console.log('File not found');
+        }
+
+        return downloadURL;
     } catch (error) {
         console.error('Error reading files:', error);
     }
 }
 
 
-const filePath = 'C:/Users/jasar/Downloads/martin_martin_martin.txt'; 
+//const filePath = 'C:/Users/UPORABNIK/Documents/Faks/Projekt/SkillsBooster/dokumentacija/Specifikacije_SkillsBooster.docx'; 
+//const filePath = path.join('C:', 'Users', 'UPORABNIK', 'Pictures', 'oogway.jpg');
+const filePath = 'C:/Users/UPORABNIK/Pictures/oogway.jpg'; 
+const file = fs.readFileSync(filePath);
 const targetFolder = 'daj_bog_da_dela';
 
 
-uploadFile(filePath, targetFolder).then(() => {
-    readFiles(targetFolder);
+uploadFile(file, targetFolder).then(() => {
+    readFiles(targetFolder, 'oogway.jpg');
 });
