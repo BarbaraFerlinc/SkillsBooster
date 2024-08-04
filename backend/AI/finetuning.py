@@ -16,6 +16,7 @@ def download_file(url, output_path):
 
 def main(temp_file_path):
     print("python laufa")
+    # skrij
     os.environ['GRADIENT_ACCESS_TOKEN'] = "zHkm0nTvAVXsUobrgw4UelOfRQsKRCl2"
     os.environ['GRADIENT_WORKSPACE_ID'] = "86abdbb7-ca5f-4f71-9882-01970e111de7_workspace"
 
@@ -62,6 +63,7 @@ def main(temp_file_path):
     deli_vsebine = [celotna_vsebina[i:i+1000] for i in range(0, len(celotna_vsebina), 1000)]
 
     url = "https://api.gradient.ai/api/models/399e5ea8-21ba-4558-89b3-d962f7efd0db_model_adapter/complete"
+    # skrij
     headers = {
         "accept": "application/json",
         "x-gradient-workspace-id": "86abdbb7-ca5f-4f71-9882-01970e111de7_workspace",

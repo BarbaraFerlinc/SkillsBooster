@@ -20,14 +20,12 @@ function BossProfile() {
     const [currentUser, setCurrentUser] = useState(null);
     const [allUsers, setAllUsers] = useState([]);
     const [domains, setDomains] = useState([]);
-    const [userDomains, setUserDomains] = useState({});
-    const [domainScores, setDomainScores] = useState({});
-    const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [selectedDomain, setSelectedDomain] = useState(initialDomain);
     const [filteredUsers, setFilteredUsers] = useState([]);
+    const [userResults, setUserResults] = useState({});
 
     const { user } = UserAuth();
     const { currentTheme } = useThemeProvider();
@@ -35,7 +33,7 @@ function BossProfile() {
     useEffect(() => {
         const fetchDomains = async () => {
             try {
-                const response = await api.get('/domena/vse');
+                const response = await api.post('/domena/lastnik', { id: user.email });
                 const names = response.data.map(domain => domain.naziv);
                 setDomains(names);
                 setActiveTab(names[0] || '');
@@ -77,18 +75,35 @@ function BossProfile() {
         }
     }, [currentUser]);
 
+    useEffect(() => {
+        const fetchResults = async () => {
+            if (domains.length > 0) {
+                const results = {};
+                for (const user of allUsers) {
+                    results[user.email] = {};
+                    for (const domain of domains) {
+                        const result = await fetchUserResult(user.email, domain);
+                        results[user.email][domain] = result;
+                    }
+                }
+                setUserResults(results);
+            }
+        };
+
+        fetchResults();
+    }, [domains, allUsers]);
+
     const fetchDomainsForUser = async (user) => {
         try {
             const response = await api.post('/domena/uporabnik', { id: user.email });
             const domainNames = response.data.map(domena => domena.naziv);
-            setUserDomains(prev => ({ ...prev, [user.id]: domainNames }));
 
             if (selectedDomain.naziv && domainNames.includes(selectedDomain.naziv)) {
                 setFilteredUsers(prevFilteredUsers => 
                     [...prevFilteredUsers, user]
                 );
             }
-            //calculateDomainScores(); // Recalculate scores when domains for a user are fetched
+            fetchResultsForUser(user.email, domainNames);
         } catch (err) {
             console.log("Error fetching domains for user", err);
         }
@@ -100,24 +115,35 @@ function BossProfile() {
             const response = await api.post('/domena/uporabniki', { id: novId });
             const domainUsers = response.data;
             setFilteredUsers(domainUsers);
-            //calculateDomainScores();
         } catch (err) {
             console.log("Error fetching domains for user", err);
         }
     };
 
-    const calculateDomainScores = () => {
-        const newDomainScores = {};
-        Object.values(userDomains).forEach(domains => {
-            domains.forEach(domain => {
-                if (newDomainScores[domain]) {
-                    newDomainScores[domain]++;
-                } else {
-                    newDomainScores[domain] = 1;
+    const fetchResultsForUser = async (userEmail, domains) => {
+        for (const domain of domains) {
+            const result = await fetchUserResult(userEmail, domain);
+            setUserResults(prev => ({ 
+                ...prev, 
+                [userEmail]: {
+                    ...(prev[userEmail] || {}),
+                    [domain]: result 
                 }
-            });
-        });
-        setDomainScores(newDomainScores);
+            }));
+        }
+    };
+
+    const fetchUserResult = async (email, domain) => {
+        if (domain && email && domain != undefined) {
+            const novId = domain.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            try {
+                const result = await api.post('/domena/najdi-rezultat', { id: novId, uporabnikId: email });
+                return result.data || '/';
+            } catch (err) {
+                console.error(err);
+                return '/';
+            }
+        }
     };
 
     const handleTabClick = (domainValue) => {
@@ -183,13 +209,17 @@ function BossProfile() {
 
     const textClass = currentTheme === 'dark' ? 'text-white' : 'text-gray-800';
     const bgClass = currentTheme === 'dark' ? 'bg-gray-700' : 'bg-white';
+    const buttonClass = domains.length === 0 
+        ? 'btn bg-gray-300 text-gray-500 cursor-not-allowed' 
+        : 'btn bg-indigo-500 hover:bg-indigo-600 text-white';
 
     return (
         <div className={`overflow-x-auto mt-4 ${textClass}`}>
             <div className="mt-4">
                 <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="btn bg-indigo-500 hover:bg-indigo-600 text-white"
+                    onClick={() => domains.length > 0 && setIsModalOpen(true)}
+                    className={buttonClass}
+                    disabled={domains.length === 0}
                 >
                     Add User to Domain
                 </button>
@@ -249,45 +279,51 @@ function BossProfile() {
                         <img src={domene} alt="Icon" className="w-16 h-16 mr-4"/>
                         <h2 className={`text-xl font-bold ${textClass}`}>Domains</h2>
                     </div>
-                    <div className="flex mb-4">
-                        {domains.map((domain, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleTabClick(domain)}
-                                className={`mr-2 p-2 border rounded ${activeTab === domain ? 'bg-blue-400 text-white' : textClass}`}
-                            >
-                                {domain}
-                            </button>
-                        ))}
-                    </div>
-                    {domains.map((domain, index) => (
-                        activeTab === domain && (
-                            <div key={index} className={`min-w-full ${textClass} border mt-4 overflow-x-auto`}>
-                                <table className="min-w-full">
-                                    <thead>
-                                    <tr>
-                                        <th className="py-2 px-4 border-b">Name</th>
-                                        <th className="py-2 px-4 border-b">Email</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {filteredUsers.length > 0 ? (
-                                        allUsers.filter(user => filteredUsers.includes(user.email)).map(user => (
-                                            <tr key={user.email}>
-                                                <td className="py-2 px-4 border-b">{user.ime_priimek}</td>
-                                                <td className="py-2 px-4 border-b">{user.email}</td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="2" className="py-2 px-4 text-center">This domain has no users yet</td>
-                                        </tr>
-                                    )}
-                                    </tbody>
-                                </table>
+                    {domains.length === 0 ? (
+                        <p>No domains</p>
+                    ) : (
+                        <>
+                            <div className="flex mb-4">
+                                {domains.map((domain, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handleTabClick(domain)}
+                                        className={`mr-2 p-2 border rounded ${activeTab === domain ? 'bg-blue-400 text-white' : textClass}`}
+                                    >
+                                        {domain}
+                                    </button>
+                                    ))}
                             </div>
-                        )
-                    ))}
+                            {domains.map((domain, index) => (
+                                activeTab === domain && (
+                                    <div key={index} className={`min-w-full ${textClass} border mt-4 overflow-x-auto`}>
+                                        <table className="min-w-full">
+                                            <thead>
+                                            <tr>
+                                                <th className="py-2 px-4 border-b">Name</th>
+                                                <th className="py-2 px-4 border-b">Email</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {filteredUsers.length > 0 ? (
+                                                allUsers.filter(user => filteredUsers.includes(user.email)).map(user => (
+                                                    <tr key={user.email}>
+                                                        <td className="py-2 px-4 border-b">{user.ime_priimek}</td>
+                                                        <td className="py-2 px-4 border-b">{user.email}</td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="2" className="py-2 px-4 text-center">This domain has no users yet</td>
+                                                </tr>
+                                            )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )
+                            ))}
+                        </>
+                    )}
                 </div>
             </div>
             <div className="mt-8">
@@ -295,30 +331,34 @@ function BossProfile() {
                     <img src={stat} alt="Icon" className="w-16 h-16 mr-4"/>
                     <h2 className={`text-xl font-bold ${textClass}`}>Kowledge Matrix</h2>
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full border-collapse border">
-                        <thead>
-                        <tr>
-                            <th className="border px-4 py-2">User</th>
-                            {domains.map((domain, index) => (
-                                <th key={index} className="border px-4 py-2">{domain}</th>
-                            ))}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {allUsers.map((user, userIndex) => (
-                            <tr key={userIndex}>
-                                <td className="border px-4 py-2">{user.ime_priimek}</td>
-                                {domains.map((domain, domainIndex) => (
-                                    <td key={domainIndex} className="border px-4 py-2">
-                                       {/*tu more bit rezultat*/}
-                                    </td>
+                {domains.length === 0 ? (
+                    <p>Add domains to see results</p>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full border-collapse border">
+                            <thead>
+                            <tr>
+                                <th className="border px-4 py-2">User</th>
+                                {domains.map((domain, index) => (
+                                    <th key={index} className="border px-4 py-2">{domain}</th>
                                 ))}
                             </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                            {allUsers.map((user, userIndex) => (
+                                <tr key={userIndex}>
+                                    <td className="border px-4 py-2">{user.ime_priimek}</td>
+                                    {domains.map((domain, domainIndex) => (
+                                        <td key={domainIndex} className="border px-4 py-2 text-center">
+                                        {userResults[user.email] && userResults[user.email][domain] !== undefined ? userResults[user.email][domain] : '/'}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );

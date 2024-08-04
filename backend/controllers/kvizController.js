@@ -1,5 +1,5 @@
 const Kviz = require('../models/kviz');
-const axios = require('axios');
+//const axios = require('axios');
 
 async function dodajKviz(req, res) {
     const { naziv, vprasanja } = req.body;
