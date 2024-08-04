@@ -122,6 +122,17 @@ function Domain() {
         }
     };
 
+    const handleFileDownload = (fileName) => {
+        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post(`/domena/beri-gradivo`, { id: novId, naziv: fileName })
+            .then(res => {
+                window.open(res.data, '_blank');
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    } 
+
     const handleFileDelete = (fileName) => {
         const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         api.post(`/domena/izbrisi-gradivo`, { id: novId, naziv: fileName })

@@ -376,17 +376,25 @@ class Domena {
 
     static async beriGradivo(id, naziv) {
         try {
-            const gradivoRef = ref(storage, `${id}/${naziv}`);
-            const url = await getDownloadURL(gradivoRef);
+            const folderRef = ref(storage, id);
+            const res = await listAll(folderRef);
     
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            let downloadURL = null;
+            for (let itemRef of res.items) {
+                if (itemRef.name == naziv) {
+                    downloadURL = await getDownloadURL(itemRef);
+                    console.log(`File: ${itemRef.name} - URL: ${downloadURL}`);
+                    break;
+                }
             }
-            const blob = await response.blob();
-            return blob;
+    
+            if (downloadURL === null) {
+                console.log('File not found');
+            }
+    
+            return downloadURL;
         } catch (error) {
-            throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+            throw new Error('Error reading files: ' + error.message);
         }
     }
 
