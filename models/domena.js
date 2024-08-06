@@ -131,6 +131,19 @@ class Domena {
         }
     }
 
+    static async najdiUporabnike(id) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+            const users = domena.zaposleni;
+
+            return users;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju uporabnikov iz baze: ' + error.message);
+        }
+    }
+
     static async odstraniUporabnika(id, uporabnikId) {
         try {
             const domenaRef = db.collection("Domene_znanja").doc(id);
@@ -157,7 +170,7 @@ class Domena {
             const domena = response.data();
 
             if (domena.kvizi && domena.kvizi.includes(kvizId)) {
-                return { message: 'Kviz je že vključen v to domeno', domena: domena };
+                return { message: 'Quiz je že vključen v to domeno', domena: domena };
             }
             const updatedKvizi = domena.kvizi ? [...domena.kvizi, kvizId] : [kvizId];
 
@@ -165,6 +178,19 @@ class Domena {
             return { message: 'Uspešna posodobitev domene', domena: domena };
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
+
+    static async najdiKvize(id) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+            const kvizi = domena.kvizi;
+
+            return kvizi;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju kvizov iz baze: ' + error.message);
         }
     }
 
@@ -178,16 +204,124 @@ class Domena {
                 const updatedKvizi = domena.kvizi.filter(obstojeciKvizId => obstojeciKvizId !== kvizId);
 
                 await db.collection("Domene_znanja").doc(id).update({ kvizi: updatedKvizi });
-                return { message: 'Kviz uspešno odstranjen iz domene', domena: domena };
+                return { message: 'Quiz uspešno odstranjen iz domene', domena: domena };
             } else {
-                return { message: 'Kviz ni del te domene', domena: domena };
+                return { message: 'Quiz ni del te domene', domena: domena };
             }
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
         }
     }
-    
-    //spremeni rezultat uporabnika
+
+    static async dodajRezultat(id, uporabnikId, vrednost) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+
+            const rezultat = `${uporabnikId};${vrednost}`;
+
+            let updatedRezultati = [];
+
+            if (domena.rezultati) {
+                const index = domena.rezultati.findIndex(r => {
+                    const [uporabnik] = r.split(';');
+                    return uporabnik === `${uporabnikId}`;
+                });
+
+                if (index !== -1) {
+                    domena.rezultati[index] = rezultat;
+                    updatedRezultati = [...domena.rezultati];
+                } else {
+                    updatedRezultati = [...domena.rezultati, rezultat];
+                }
+            } else {
+                updatedRezultati = [rezultat];
+            }
+
+            db.collection("Domene_znanja").doc(id).update({rezultati: updatedRezultati});
+            return { message: 'Uspešna posodobitev domene', domena: domena };
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
+
+    static async najdiRezultat(id, uporabnikId) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+
+            if (domena.rezultati && domena.rezultati.some(r => {
+                const [uporabnik] = r.split(';');
+                return uporabnik === `${uporabnikId}`;
+            })) {
+                const rezultat = domena.rezultati.find(r => {
+                    const [uporabnik] = r.split(';');
+                    return uporabnik === `${uporabnikId}`;
+                });
+                const rezultatValue = rezultat.split(';')[1];
+
+                return rezultatValue;
+            } else {
+                return null;
+            }
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
+
+    static async spremeniRezultat(id, uporabnikId, novaVrednost) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+
+            if (!domena.rezultati) {
+                return { message: 'Rezultati niso na voljo za to domeno', domena: domena };
+            }
+
+            const index = domena.rezultati.findIndex(r => {
+                const [uporabnik] = r.split(';');
+                return uporabnik === `${uporabnikId}`;
+            });
+
+            if (index !== -1) {
+                domena.rezultati[index] = `${uporabnikId};${novaVrednost}`;
+                await db.collection("Domene_znanja").doc(id).update({ rezultati: domena.rezultati });
+                return { message: 'Rezultat uspešno posodobljen', domena: domena };
+            } else {
+                return { message: 'Rezultat za tega uporabnika ne obstaja', domena: domena };
+            }
+        } catch (error) {
+            throw new Error('Napaka pri posodabljanju rezultata: ' + error.message);
+        }
+    }
+
+    static async odstraniRezultat(id, uporabnikId) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+
+            if (domena.rezultati && domena.rezultati.some(r => {
+                const [uporabnik] = r.split(';');
+                return uporabnik === `${uporabnikId}`;
+            })) {
+                const updatedRezultati = kviz.rezultati.filter(r => {
+                    const [uporabnik] = r.split(';');
+                    return uporabnik !== `${uporabnikId}`;
+                });
+
+                await db.collection("Domene_znanja").doc(id).update({ rezultati: updatedRezultati });
+                return { message: 'Rezultat uspešno odstranjen iz domene', domena: domena };
+            } else {
+                return { message: 'Rezultat ni del te domene', domena: domena };
+            }
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
 
     static async dodajGradivo(id, naziv, file) {
         const domenaRef = db.collection("Domene_znanja").doc(id);
@@ -201,13 +335,60 @@ class Domena {
         const updatedGradiva = [...(domena.gradiva || []), naziv];
         await domenaRef.update({ gradiva: updatedGradiva });
 
+        const gradivoRef = ref(storage, `${id}/${naziv}`);
+        /*try {
+            const url = await getDownloadURL(gradivoRef);
+        } catch (error) {
+            console.error('Error getting download URL:', error);
+        }*/
+
+
+
+            /*
+
+
+            async function uploadFile(filePath, targetFolder) {
+    try {
+        const fileName = path.basename(filePath);
+        const storageRef = ref(storage, `${targetFolder}/${fileName}`);
+        
+        const fileBuffer = fs.readFileSync(filePath);
+        const metadata = {
+            contentType: 'application/octet-stream'
+        };
+        
+        const uploadTask = uploadBytesResumable(storageRef, fileBuffer, metadata);
+        
+        uploadTask.on('state_changed', 
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+            }, 
+            (error) => {
+                console.error('Upload failed:', error);
+            }, 
+            () => {
+                console.log('Upload successful!');
+            }
+        );
+    } catch (error) {
+        console.error('Error uploading file:', error);
+    }
+}
+
+
+
+
+            */
         try {
-            const gradivoRef = ref(storage, `${id}/${naziv}`);
             uploadBytes(gradivoRef, file).then((snapshot) => {
                 console.log('Uploaded a blob or file!');
             }).catch((error) => {
-            console.error('Error uploading file:', error);
+                console.error('Error uploading file:', error);
             });
+            /*const gradivo = `${naziv};${url}`;
+
+            return { message: 'Uspešno dodano gradivo', gradivo: gradivo };*/
             return { message: 'Uspešno dodano gradivo', gradivo: naziv };
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
@@ -220,7 +401,21 @@ class Domena {
             const response = await domenaRef.get();
             const domena = response.data();
             const gradiva = domena.gradiva;
+            /*const files = [];
 
+            for (const gradivo of gradiva) {
+                const naziv = gradivo.split(';')[0];
+                const url = gradivo.split(';')[1];
+                files.push({naziv, url});
+            }
+
+            for (const gradivo of gradiva) {
+                const gradivoRef = ref(storage, `${id}/${gradivo.naziv}`);
+                const url = await getDownloadURL(gradivoRef);
+                files.push({naziv: naziv, url: url});
+            }
+
+            return files;*/
             return gradiva;
         } catch (error) {
             throw new Error('Napaka pri pridobivanju gradiv iz baze: ' + error.message);
@@ -229,8 +424,15 @@ class Domena {
 
     static async beriGradivo(id, naziv) {
         try {
-            // to do
-            return { message: 'Uspešno dodano gradivo', gradivo: naziv };
+            const gradivoRef = ref(storage, `${id}/${naziv}`);
+            const url = await getDownloadURL(gradivoRef);
+    
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const blob = await response.blob();
+            return blob;
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
         }
@@ -267,11 +469,11 @@ class Domena {
             const response = await domenaRef.get();
             const domena = response.data();
             if (domena == undefined) {
-                throw new Error('Domena ne obstaja');
+                throw new Error('Domain ne obstaja');
             }
             await db.collection("Domene_znanja").doc(id).delete();
 
-            return { message: 'Domena izbrisana', domena: domena };
+            return { message: 'Domain izbrisana', domena: domena };
         } catch (error) {
             throw new Error('Napaka pri brisanju domene iz baze: ' + error.message);
         }

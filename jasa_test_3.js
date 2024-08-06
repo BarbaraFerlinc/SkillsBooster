@@ -1,8 +1,9 @@
 require('dotenv').config();
-const { initializeApp } = require('firebase/app');
-const { getStorage, ref, listAll } = require('firebase/storage');
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
+const { initializeApp } = require('firebase/app');
+const { getStorage, ref, listAll, getDownloadURL } = require('firebase/storage');
 
 // Firebase configuration from .env file
 const firebaseConfig = {
@@ -18,36 +19,84 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
-const outputPath = path.join(__dirname, 'folder_details.json');
+const tempDataFilePath = path.join(__dirname, 'temp_data.json');
+const folderDetailsPath = path.join(__dirname, 'folder_details.json');
 
-async function fetchFolderDetails() {
-    const folderRef = ref(storage, '');
+// Function to fetch URLs from Firebase
+async function fetchFileUrls(folderName) {
+    const folderRef = ref(storage, folderName);
     const list = await listAll(folderRef);
 
-    const folderDetails = list.prefixes.map(prefix => ({
-        name: prefix.name,
-        url: `gs://${storage._bucket}/${prefix.fullPath}`,
-        model: "",
-        modelCreationTime: ""
+    const fileUrls = await Promise.all(list.items.map(async (itemRef) => {
+        const url = await getDownloadURL(itemRef);
+        return { ime: itemRef.name, url: url };
     }));
 
-    return folderDetails;
+    return fileUrls;
 }
 
-async function main() {
+// Function to process the folder
+async function processFolder(folderName) {
     try {
-        // Clear the JSON file before writing new data
-        fs.writeFileSync(outputPath, JSON.stringify([], null, 2));
+        const datoteke = await fetchFileUrls(folderName);
+        console.log('Pridobljene datoteke:', datoteke);
 
-        const folderDetails = await fetchFolderDetails();
-        console.log('Folders:', folderDetails);
+        // Save file information to a temporary JSON file
+        fs.writeFileSync(tempDataFilePath, JSON.stringify(datoteke, null, 2));
+        console.log('temp_data.json je bil posodobljen.');
 
-        fs.writeFileSync(outputPath, JSON.stringify(folderDetails, null, 2));
-        console.log('folder_details.json has been updated.');
+        // Define the Python script path
+        const pythonScriptPath = path.join(__dirname, '..', 'backend/AI', 'finetuning.py');
+
+        // Spawn the Python process with the temporary JSON file path as an argument
+        const pythonProcess = spawn('python', [pythonScriptPath, tempDataFilePath]);
+
+        let modelAdapterId = '';
+
+        pythonProcess.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+            const output = data.toString();
+            const match = output.match(/Model Adapter ID: (\S+)/);
+            if (match) {
+                modelAdapterId = match[1];
+            }
+        });
+
+        pythonProcess.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
+
+        pythonProcess.on('close', (code) => {
+            console.log(`Rezultat izvajanja Python skripte: ${code}`);
+            if (code === 0) {
+                updateFolderDetails(folderName, modelAdapterId);
+            }
+        });
     } catch (error) {
-        console.error('Error fetching folder details:', error);
+        console.error('Napaka pri pridobivanju datotek:', error);
     }
 }
 
-// Call the main function
-main();
+// Function to update the folder details JSON file
+function updateFolderDetails(folderName, modelAdapterId) {
+    const folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
+    const folderDetail = folderDetails.find(detail => detail.name === folderName);
+
+    if (folderDetail) {
+        folderDetail.model = modelAdapterId;
+        folderDetail.modelCreationTime = new Date().toISOString();
+    } else {
+        folderDetails.push({
+            name: folderName,
+            url: `gs://${firebaseConfig.storageBucket}/${folderName}`,
+            model: modelAdapterId,
+            modelCreationTime: new Date().toISOString()
+        });
+    }
+
+    fs.writeFileSync(folderDetailsPath, JSON.stringify(folderDetails, null, 2));
+    console.log(`Folder details for ${folderName} updated.`);
+}
+
+// Run the function for a specific folder
+processFolder('daj_bog_da_dela'); // Replace 'daj_bog_da_dela' with the desired folder name
