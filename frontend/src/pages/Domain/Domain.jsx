@@ -6,7 +6,7 @@ import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
 import reading from "../../images/read-svgrepo-com.png";
 import writing from "../../images/writing-svgrepo-com.png";
 import PropTypes from "prop-types";
-import AIAssistant from "../../partials/AIAssistant.jsx"; // Adjust the path according to your project structure
+import AIAssistant from "../../partials/AIAssistant.jsx";
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 import { useThemeProvider } from '../../utils/ThemeContext.jsx';
@@ -31,6 +31,8 @@ function Domain() {
     const [currentUser, setCurrentUser] = useState(null);
     const [fileAdded, setFileAdded] = useState(false);
     const [files, setFiles] = useState([]);
+    const [linkDeleted, setLinkDeleted] = useState(false);
+    const [links, setLinks] = useState([]);
     const [quizDeleted, setQuizDeleted] = useState(false);
     const [quizzes, setQuizzes] = useState([]);
 
@@ -75,6 +77,10 @@ function Domain() {
         fetchQuizzes();
     }, [id, quizDeleted]);
 
+    useEffect(() => {
+        fetchLinks();
+    }, [id, linkDeleted]);
+
     const fetchFiles = () => {
         const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         api.post('/domena/gradiva', { id: novId })
@@ -96,6 +102,19 @@ function Domain() {
                 const response = await api.post('/kviz/ids', { ids: kvizi });
                 setQuizzes(response.data);
                 setQuizDeleted(false);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    };
+
+    const fetchLinks = () => {
+        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post('/domena/linki', { id: novId })
+            .then(res => {
+                const linki = res.data;
+                setLinks(linki);
+                setLinkDeleted(false);
             })
             .catch(err => {
                 console.error(err);
@@ -191,10 +210,32 @@ function Domain() {
         setLink(e.target.value);
     };
 
-    const handleConfirmClick = () => {
-        // Handle the link confirmation logic here (e.g., save the link, etc.)
-        console.log('Link confirmed:', link);
+    const handleConfirmLink = () => {
+        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post(`/domena/dodaj-link`, { id: novId, link: link })
+            .then(res => {
+                setLinkDeleted(true);
+                setLink('');
         setShowInput(false);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    };
+
+    const handleOpenLink = async (link) => {
+        window.open(link, '_blank');
+    };
+
+    const handleLinkDelete = async (link) => {
+        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post(`/domena/odstrani-link`, { id: novId, link: link })
+            .then(res => {
+                setLinkDeleted(true);
+            })
+            .catch(err => {
+                console.error(err);
+            });
     };
 
     const textClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
@@ -236,7 +277,7 @@ function Domain() {
                         <div className="mt-8">
                             <div className="flex items-center">
                                 <img src={reading} alt="Icon" className="w-16 h-16 mr-4"/>
-                                <h3 className={`text-xl font-bold ${textClass}`}>Files</h3>
+                                <h3 className={`text-xl font-bold ${textClass}`}>Files & Important Links</h3>
                             </div>
 
                             <input
@@ -271,6 +312,26 @@ function Domain() {
                                     <span className="ml-2">Add file</span>
                                 </label>
                             )}
+
+                            <div className="gap-6 mt-4">
+                                {links.length === 0 ? (
+                                    <p>No links</p>
+                                ) : (
+                                    <ul>
+                                        {links.map((link, index) => (
+                                            <li key={index}
+                                                className={`flex items-center justify-between mb-2 ${subTextClass}`}>
+                                                <a href="#" onClick={() => handleOpenLink(link)}>{link}</a>
+                                                {currentUser && (currentUser.vloga === "boss") && (
+                                                    <button onClick={() => handleLinkDelete(link)}
+                                                            className="btn bg-red-500 hover:bg-red-600 text-white ml-4">Delete</button>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+
                             {currentUser && (currentUser.vloga === "boss") && (
                                 <div>
                                     <button
@@ -291,7 +352,7 @@ function Domain() {
                                             />
                                             <button
                                                 className="ml-2 btn bg-green-500 text-white py-1 px-3 rounded"
-                                                onClick={handleConfirmClick}
+                                                onClick={handleConfirmLink}
                                             >
                                                 Confirm
                                             </button>
@@ -344,11 +405,9 @@ function Domain() {
                                 </NavLink>
                             )}
                         </div>
-                        <div className="mt-8 sm:mt-12">
-                            <AIAssistant/>
-                        </div>
                     </div>
-                    {currentUser && (currentUser.vloga === "user") && (
+
+                    {currentUser && currentUser.vloga === "user" && (
                         <AIAssistant/>
                     )}
                 </main>

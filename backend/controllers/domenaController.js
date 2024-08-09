@@ -271,6 +271,51 @@ async function updateModelDomena(req, res) {
     }
 }
 
+async function dodajLinkDomena(req, res) {
+    const { id, link } = req.body;
+
+    if (!link ) {
+        return res.status(400).json({ error: 'Izbran mora biti link' });
+    }
+
+    try {
+        const updatedDomena = await Domena.dodajLink(id, link);
+        
+        res.status(200).json({ message: 'Uspešno posodobljena domena', domena: updatedDomena });
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri posodabljanju domene v bazi', details: error.message });
+    }
+}
+
+async function najdiLinkeDomena(req, res) {
+    const { id } = req.body;
+    try {
+        const domena = await Domena.najdiLinke(id);
+        if (!domena) {
+        return res.status(404).json({ error: 'Domain ne obstaja' });
+        }
+        res.status(200).json(domena);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri pridobivanju domene iz baze', details: error.message });
+    }
+}
+
+async function odstraniLinkDomena(req, res) {
+    const { id, link } = req.body;
+
+    if (!link ) {
+        return res.status(400).json({ error: 'Izbran mora biti link' });
+    }
+
+    try {
+        const updatedDomena = await Domena.odstraniLink(id, link);
+        
+        res.status(200).json({ message: 'Uspešno posodobljena domena', domena: updatedDomena });
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri posodabljanju domene v bazi', details: error.message });
+    }
+}
+
 async function dodajGradivoDomena(req, res) {
     const { id, naziv } = req.body;
     const file = req.file;
@@ -386,6 +431,9 @@ module.exports = {
     odstraniRezultatDomena,
     chatBoxDomena,
     updateModelDomena,
+    dodajLinkDomena,
+    najdiLinkeDomena,
+    odstraniLinkDomena,
     dodajGradivoDomena,
     najdiGradivadomena,
     beriGradivoDomena,

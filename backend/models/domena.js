@@ -23,7 +23,8 @@ class Domena {
                 kvizi: [],
                 zaposleni: [],
                 rezultati: [],
-                gradiva: []
+                gradiva: [],
+                linki: []
             };
 
             db.collection("Domene_znanja").doc(id).set(novaDomena);
@@ -359,6 +360,56 @@ class Domena {
             return "Yes";
         } catch (error) {
             throw new Error('Napaka pri posodabljanju modela: ' + error.message);
+        }
+    }
+
+    static async dodajLink(id, link) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+
+            if (domena.linki && domena.linki.includes(link)) {
+                return { message: 'Link je že vključen v to domeno', domena: domena };
+            }
+            const updatedLinki = domena.linki ? [...domena.linki, link] : [link];
+
+            db.collection("Domene_znanja").doc(id).update({linki: updatedLinki});
+            return { message: 'Uspešna posodobitev domene', domena: domena };
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
+
+    static async najdiLinke(id) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+            const linki = domena.linki;
+
+            return linki;
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju linkov iz baze: ' + error.message);
+        }
+    }
+
+    static async odstraniLink(id, link) {
+        try {
+            const domenaRef = db.collection("Domene_znanja").doc(id);
+            const response = await domenaRef.get();
+            const domena = response.data();
+
+            if (domena.linki && domena.linki.includes(link)) {
+                const updatedLinki = domena.linki.filter(obstojeciLink => obstojeciLink !== link);
+
+                await db.collection("Domene_znanja").doc(id).update({ linki: updatedLinki });
+                return { message: 'Link uspešno odstranjen iz domene', domena: domena };
+            } else {
+                return { message: 'Link ni del te domene', domena: domena };
+            }
+        } catch (error) {
+            throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
         }
     }
 

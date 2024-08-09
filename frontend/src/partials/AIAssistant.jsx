@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { AiOutlineWechatWork } from "react-icons/ai"; // Using react-icons for the assistant icon
+import { AiOutlineWechatWork } from "react-icons/ai";
 import api from '../services/api';
 
 function AIAssistant() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
-    const assistantRef = useRef(null); // Ref for the assistant box
-    const iconRef = useRef(null); // Ref for the assistant icon
+    const [waitingForResponse, setWaitingForResponse] = useState(false);
+    const assistantRef = useRef(null);
+    const iconRef = useRef(null);
 
     useEffect(() => {
-        // Function to close the assistant box when clicking outside
         const handleClickOutside = (event) => {
             if (
                 assistantRef.current && !assistantRef.current.contains(event.target) &&
@@ -20,10 +20,8 @@ function AIAssistant() {
             }
         };
 
-        // Attach the event listener
         document.addEventListener('mousedown', handleClickOutside);
 
-        // Clean up the event listener on component unmount
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
@@ -40,22 +38,20 @@ function AIAssistant() {
         if (input.trim() !== '') {
             setMessages([...messages, { text: input, fromUser: true }]);
             setInput('');
-            // tu še more bit nareto da če še ni odgovora je pokazano da čaka na odgovor
+            setWaitingForResponse(true);
 
             try {
                 const response = await api.post('/domena/chat-box', { query: input });
                 const assistantResponse = { text: response.data, fromUser: false };
+                console.log(response.data);
                 setMessages(prevMessages => [...prevMessages, assistantResponse]);
             } catch (error) {
                 console.error("Error:", error.response ? error.response.data : error.message);
                 const errorMessage = { text: 'Sorry, something went wrong.', fromUser: false };
                 setMessages(prevMessages => [...prevMessages, errorMessage]);
+            } finally {
+                setWaitingForResponse(false);
             }
-
-            // Simulate assistant response
-            /*setTimeout(() => {
-                setMessages(prevMessages => [...prevMessages, { text: 'This is a response from AI assistant.', fromUser: false }]);
-            }, 1000);*/
         }
     };
 
@@ -82,6 +78,13 @@ function AIAssistant() {
                                 </p>
                             </div>
                         ))}
+                        {waitingForResponse && (
+                            <div className="text-left">
+                                <p className="inline-block p-2 rounded-lg bg-gray-200">
+                                    ...
+                                </p>
+                            </div>
+                        )}
                     </div>
                     <div className="p-4 border-t border-gray-200 flex">
                         <input
