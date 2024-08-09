@@ -7,11 +7,15 @@ function AIAssistant() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const assistantRef = useRef(null); // Ref for the assistant box
+    const iconRef = useRef(null); // Ref for the assistant icon
 
     useEffect(() => {
         // Function to close the assistant box when clicking outside
         const handleClickOutside = (event) => {
-            if (assistantRef.current && !assistantRef.current.contains(event.target)) {
+            if (
+                assistantRef.current && !assistantRef.current.contains(event.target) &&
+                iconRef.current && !iconRef.current.contains(event.target)
+            ) {
                 setIsOpen(false);
             }
         };
@@ -58,6 +62,7 @@ function AIAssistant() {
     return (
         <div>
             <div
+                ref={iconRef}
                 className="fixed bottom-16 right-16 z-50 p-3 bg-indigo-600 text-white rounded-full cursor-pointer shadow-lg"
                 onClick={toggleChat}
             >

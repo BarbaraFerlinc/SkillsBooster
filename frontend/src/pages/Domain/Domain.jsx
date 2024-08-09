@@ -23,6 +23,9 @@ const initialDomain = {
 }
 
 function Domain() {
+    const [showInput, setShowInput] = useState(false);
+    const [link, setLink] = useState('');
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [currentDomain, setCurrentDomain] = useState(initialDomain);
     const [currentUser, setCurrentUser] = useState(null);
@@ -108,7 +111,7 @@ function Domain() {
             formData.append('id', novId);
             formData.append('naziv', selectedFile.name);
             formData.append('file', selectedFile);
-    
+
             api.post('/domena/dodaj-gradivo', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -131,7 +134,7 @@ function Domain() {
             .catch(err => {
                 console.error(err);
             });
-    } 
+    }
 
     const handleFileDelete = (fileName) => {
         const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
@@ -179,6 +182,20 @@ function Domain() {
                 console.error(err);
             });*/
     };
+    
+    const handleAddLinkClick = () => {
+        setShowInput(true);
+    };
+
+    const handleInputChange = (e) => {
+        setLink(e.target.value);
+    };
+
+    const handleConfirmClick = () => {
+        // Handle the link confirmation logic here (e.g., save the link, etc.)
+        console.log('Link confirmed:', link);
+        setShowInput(false);
+    };
 
     const textClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
     const subTextClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
@@ -196,7 +213,7 @@ function Domain() {
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
                         {/* Main Header */}
-                        <DynamicHeader domainName={currentDomain.naziv} />
+                        <DynamicHeader domainName={currentDomain.naziv}/>
 
                         {/* Domain Description and Keywords */}
                         <div className="mt-8">
@@ -218,7 +235,7 @@ function Domain() {
                         {/* Gradivo Section */}
                         <div className="mt-8">
                             <div className="flex items-center">
-                                <img src={reading} alt="Icon" className="w-16 h-16 mr-4" />
+                                <img src={reading} alt="Icon" className="w-16 h-16 mr-4"/>
                                 <h3 className={`text-xl font-bold ${textClass}`}>Files</h3>
                             </div>
 
@@ -235,7 +252,8 @@ function Domain() {
                                 ) : (
                                     <ul>
                                         {files.map((fileName, index) => (
-                                            <li key={index} className={`flex items-center justify-between mb-2 ${subTextClass}`}>
+                                            <li key={index}
+                                                className={`flex items-center justify-between mb-2 ${subTextClass}`}>
                                                 <a href="#" onClick={() => handleFileDownload(fileName)}>{fileName}</a>
                                                 {currentUser && (currentUser.vloga === "boss") && (
                                                     <button onClick={() => handleFileDelete(fileName)}
@@ -249,10 +267,40 @@ function Domain() {
 
                             {currentUser && (currentUser.vloga === "boss") && (
                                 <label htmlFor="fileInput"
-                                    className="btn bg-indigo-500 text-white py-2 px-5 rounded">
-                                <span className="ml-2">Add file</span>
+                                       className="btn bg-indigo-500 text-white py-2 px-5 rounded ">
+                                    <span className="ml-2">Add file</span>
                                 </label>
                             )}
+                            {currentUser && (currentUser.vloga === "boss") && (
+                                <div>
+                                    <button
+                                        className="btn bg-indigo-500 text-white py-2 px-5 rounded mt-2"
+                                        onClick={handleAddLinkClick}
+                                    >
+                                        <span className="ml-2">Add Link</span>
+                                    </button>
+
+                                    {showInput && (
+                                        <div className="mt-2">
+                                            <input
+                                                type="text"
+                                                value={link}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter your link"
+                                                className="border p-2 rounded"
+                                            />
+                                            <button
+                                                className="ml-2 btn bg-green-500 text-white py-1 px-3 rounded"
+                                                onClick={handleConfirmClick}
+                                            >
+                                                Confirm
+                                            </button>
+                                        </div>
+                                    )}
+
+                                </div>
+                            )}
+
                         </div>
 
                         {/* Kvizi Section */}
@@ -288,12 +336,16 @@ function Domain() {
                             </ul>
 
                             {currentUser && (currentUser.vloga === "boss") && (
-                                <NavLink to={`/addQuiz/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
+                                <NavLink
+                                    to={`/addQuiz/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
                                     <button className=" btn bg-indigo-500 text-white py-2 px-5 rounded">
                                         <span className="ml-2">Add Quiz</span>
                                     </button>
                                 </NavLink>
                             )}
+                        </div>
+                        <div className="mt-8 sm:mt-12">
+                            <AIAssistant/>
                         </div>
                     </div>
                     {currentUser && (currentUser.vloga === "user") && (

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import OpenQuestion from './OpenQuestions.jsx';
 import ClosedQuestion from './ClosedQuestions.jsx';
-import {useParams} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import api from '../../services/api.js';
 
 const initialDomain = {
@@ -13,14 +13,14 @@ const initialDomain = {
     rezultati: [],
     zaposleni: [],
     gradiva: []
-}
+};
 
 function AddQuiz() {
     const { domain } = useParams();
+    const navigate = useNavigate(); // Initialize useNavigate for navigation
     const [quizName, setQuizName] = useState('');
     const [questions, setQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState({ type: 'open', question: '', answer: '' });
-    const [questionAdded, setQuestionAdded] = useState(false);
     const [currentDomain, setCurrentDomain] = useState(initialDomain);
 
     useEffect(() => {
@@ -72,39 +72,40 @@ function AddQuiz() {
     const handleConfirmQuestion = () => {
         setQuestions([...questions, currentQuestion]);
         setCurrentQuestion({ type: 'open', question: '', answer: '' });
-        setQuestionAdded(true);
     };
 
-    useEffect(() => {
-        console.log(questions);
-        setQuestionAdded(false);
-    }, [domain, questionAdded]);
+    const handleDeleteQuestion = (index) => {
+        const updatedQuestions = questions.slice();
+        updatedQuestions.splice(index, 1);
+        setQuestions(updatedQuestions);
+    };
 
     const handleSubmitQuiz = async () => {
         const novId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         const vprasanja = dodajVprasanja(novId);
         const vprasanjaId = [];
 
-        vprasanja.forEach(async q => {
+        for (const q of vprasanja) {
             vprasanjaId.push(`${novId}_${q.vprasanje.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`);
-
             await api.post(`/vprasanje/dodaj`, q);
-        })
-        
+        }
+
         await api.post(`/kviz/dodaj`, { naziv: quizName, vprasanja: vprasanjaId });
-        
         await api.post(`/domena/dodaj-kviz`, { id: domain, kvizId: novId });
 
         for (const userId of currentDomain.zaposleni) {
             await api.post(`/kviz/dodaj-rezultat`, { id: novId, uporabnikId: userId, vrednost: '0' });
         }
-        
-        window.location.href = `/domain/${domain}`;
+
+        navigate(`/domain/${domain}`); // Redirect to the domain page after submitting the quiz
+    };
+
+    const handleCancel = () => {
+        navigate(`/domain/${domain}`); // Redirect to the domain page when cancel is clicked
     };
 
     const dodajVprasanja = (kvizId) => {
-        let vprasanja = [];
-        questions.forEach(question => {
+        return questions.map(question => {
             let odgovori;
             if (question.type === "open") {
                 odgovori = [question.answer];
@@ -112,19 +113,14 @@ function AddQuiz() {
                 odgovori = question.answer.map(answer => `${answer.text};${answer.isCorrect}`);
             }
 
-            const vprasanje = {
+            return {
                 vprasanje: question.question,
                 tip: question.type,
                 kviz: kvizId,
                 odgovori: odgovori
-            }
-
-            console.log(vprasanje);
-            vprasanja.push(vprasanje);
+            };
         });
-        console.log(vprasanja);
-        return vprasanja;
-    }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -141,7 +137,7 @@ function AddQuiz() {
                     />
                 </div>
                 {questions.map((q, index) => (
-                    <div key={index} className="mb-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                    <div key={index} className="mb-4 p-4 border border-gray-300 rounded-lg bg-gray-50 relative">
                         <h3 className="font-semibold">{q.question}</h3>
                         {q.type === 'open' ? (
                             <p>{q.answer}</p>
@@ -152,6 +148,12 @@ function AddQuiz() {
                                 ))}
                             </ul>
                         )}
+                        <button
+                            onClick={() => handleDeleteQuestion(index)}
+                            className="absolute top-2 right-2 bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
+                        >
+                            Delete
+                        </button>
                     </div>
                 ))}
                 <div className="mb-6">
@@ -194,6 +196,12 @@ function AddQuiz() {
                         className="bg-green-500 text-white py-2 px-5 rounded"
                     >
                         Submit Quiz
+                    </button>
+                    <button
+                        onClick={handleCancel}
+                        className="bg-red-500 text-white py-2 px-5 rounded"
+                    >
+                        Cancel
                     </button>
                 </div>
             </div>
