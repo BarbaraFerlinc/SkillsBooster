@@ -226,15 +226,15 @@ function BossProfile() {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-                    <div className={`p-8 rounded-md shadow-md w-1/2 ${bgClass}`}>
-                        <h2 className={`text-xl font-semibold mb-4 ${textClass}`}>Add User to Domain</h2>
+                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+                    <div className={`p-6 rounded-md shadow-md w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl ${bgClass}`}>
+                        <h2 className={`text-lg sm:text-xl md:text-2xl font-semibold mb-4 ${textClass}`}>Add User to Domain</h2>
                         <div className="mb-4">
-                            <label className="block mb-2">Select Domain:</label>
+                            <label className="block text-sm md:text-base mb-2">Select Domain:</label>
                             <select
                                 value={selectedDomain.naziv}
                                 onChange={handleDomainSelection}
-                                className="w-full p-2 border rounded-md "
+                                className="w-full p-2 border rounded-md"
                             >
                                 <option value="">Select a domain</option>
                                 {domains.map((domain, index) => (
@@ -243,7 +243,7 @@ function BossProfile() {
                             </select>
                         </div>
                         <div className="mb-4">
-                            <label className="block mb-2">Select User:</label>
+                            <label className="block text-sm md:text-base mb-2">Select User:</label>
                             {allUsers.filter(user => !filteredUsers.includes(user.email)).map(user => (
                                 <div key={user.email} className="flex items-center mb-2">
                                     <input
@@ -252,20 +252,20 @@ function BossProfile() {
                                         onChange={() => handleUserSelection(user.email)}
                                         className="mr-2"
                                     />
-                                    <span>{user.ime_priimek} ({user.email})</span>
+                                    <span className="text-sm md:text-base">{user.ime_priimek} ({user.email})</span>
                                 </div>
                             ))}
                         </div>
                         <div className="flex justify-end">
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="btn bg-red-500 text-white py-2 px-5 rounded mr-1"
+                                className="btn bg-red-500 text-white py-2 px-4 sm:px-5 rounded mr-1"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleSubmit}
-                                className="btn bg-green-500 text-white py-2 px-5 rounded mr-1"
+                                className="btn bg-green-500 text-white py-2 px-4 sm:px-5 rounded"
                             >
                                 Submit
                             </button>
@@ -273,6 +273,7 @@ function BossProfile() {
                     </div>
                 </div>
             )}
+
             <div className="flex">
                 <div className="w-full mt-4">
                     <div className="flex items-center mb-4">
