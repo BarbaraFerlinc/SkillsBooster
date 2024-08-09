@@ -36,7 +36,7 @@ function Dashboard() {
                             {/* Card 1 */}
                             <div
                                 className="col-span-12 sm:col-span-6 xl:col-span-4 bg-white shadow-lg rounded-sm border border-slate-200 p-4">
-                                <h2 className="text-lg font-semibold text-slate-800 mb-2">Register your comany</h2>
+                                <h2 className="text-lg font-semibold text-slate-800 mb-2">Register your company</h2>
                                 <p className="text-sm text-slate-600 mb-4">Create a new account to get started with our
                                     services.</p>
                                 <NavLink to="/register"

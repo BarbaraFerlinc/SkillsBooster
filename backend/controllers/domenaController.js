@@ -241,6 +241,36 @@ async function odstraniRezultatDomena(req, res) {
     }
 }
 
+async function chatBoxDomena(req, res) {
+    const { query } = req.body;
+
+    if (!query) {
+        return res.status(400).json({ error: 'Query je zahtevan' });
+    }
+
+    try {
+        const response = await Domena.chatBox(query);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri dostopanju do modela', details: error.message });
+    }
+}
+
+async function updateModelDomena(req, res) {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ error: 'Id je zahtevan' });
+    }
+
+    try {
+        const response = await Domena.updateModel(id);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri dostopanju do modela', details: error.message });
+    }
+}
+
 async function dodajGradivoDomena(req, res) {
     const { id, naziv } = req.body;
     const file = req.file;
@@ -354,6 +384,8 @@ module.exports = {
     najdiRezultatDomena,
     spremeniRezultatDomena,
     odstraniRezultatDomena,
+    chatBoxDomena,
+    updateModelDomena,
     dodajGradivoDomena,
     najdiGradivadomena,
     beriGradivoDomena,

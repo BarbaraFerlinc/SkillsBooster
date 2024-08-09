@@ -19,6 +19,7 @@ def main(temp_file_path):
 
     gradient_access_token = os.getenv('GRADIENT_ACCESS_TOKEN')
     gradient_workspace_id = os.getenv('GRADIENT_WORKSPACE_ID')
+    # to je statičen url se mi zdi
     gradient_model_url = os.getenv('GRADIENT_MODEL_URL')
 
     if not gradient_access_token or not gradient_workspace_id:

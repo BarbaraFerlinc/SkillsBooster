@@ -1,5 +1,6 @@
 const db = require('../pb');
 const { storage, ref, uploadBytes, deleteObject, uploadBytesResumable, listAll, getDownloadURL } = require('../firebase');
+const axios = require('axios');
 
 class Domena {
     static async dodaj(naziv, opis, kljucna_znanja, lastnik) {
@@ -320,6 +321,44 @@ class Domena {
             }
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
+
+    static async chatBox(query) {
+        try {
+            // tu more bit drugi url glede na vsak model (to mislim da je staticni url od poskusnega modela)
+            const url = `https://api.gradient.ai/api/models/${"model glede na domeno iz folder_details.json"}/complete`;
+
+            const payload = {
+                autoTemplate: true,
+                query: query,
+                maxGeneratedTokenCount: 200
+            };
+
+            const headers = {
+                accept: "application/json",
+                "x-gradient-workspace-id": process.env.GRADIENT_WORKSPACE_ID,
+                "content-type": "application/json",
+                authorization: `Bearer ${process.env.GRADIENT_ACCESS_TOKEN}`
+            };
+
+            const response = await axios.post(url, payload, { headers });
+            console.log("Status Code:", response.status);
+            console.log("Response Headers:", response.headers);
+            console.log("Response Body:", response.data);
+            return response.data.generatedOutput;
+        } catch (error) {
+            console.error("Error:", error.response ? error.response.data : error.message);
+        }
+    }
+
+    static async updateModel(id) {
+        try {
+            // dodaj jasa_test_4.js
+
+            return "Yes";
+        } catch (error) {
+            throw new Error('Napaka pri posodabljanju modela: ' + error.message);
         }
     }
 

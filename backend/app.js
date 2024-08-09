@@ -13,7 +13,6 @@ var kvizRouter = require('./routes/kvizRouter');
 var podjetjeRouter = require('./routes/podjetjeRouter');
 var uporabnikRouter = require('./routes/uporabnikRouter');
 var vprasanjeRouter = require('./routes/vprasanjeRouter');
-var znanjeRouter = require('./routes/znanjeRouter');
 
 const app = express();
 
@@ -40,7 +39,6 @@ app.use('/kviz/', kvizRouter);
 app.use('/podjetje/', podjetjeRouter);
 app.use('/uporabnik/', uporabnikRouter);
 app.use('/vprasanje/', vprasanjeRouter);
-app.use('/znanje/', znanjeRouter);
 
 app.listen(process.env.PORT || 9000, () => {
     console.log("Strežnik na portu " + 9000);

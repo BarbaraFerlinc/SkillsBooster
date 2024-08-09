@@ -1,5 +1,4 @@
 const Kviz = require('../models/kviz');
-//const axios = require('axios');
 
 async function dodajKviz(req, res) {
     const { naziv, vprasanja } = req.body;
@@ -14,21 +13,6 @@ async function dodajKviz(req, res) {
       res.status(200).json({ message: 'Uspešno dodan kviz', kviz: novKviz });
     } catch (error) {
       res.status(500).json({ error: 'Napaka pri vstavljanju kviza v bazo', details: error.message });
-    }
-}
-
-async function avtPreverjanje(req, res) {
-    const { query } = req.body;
-
-    if (!query) {
-        return res.status(400).json({ error: 'Query je zahtevan' });
-    }
-
-    try {
-        const response = await Kviz.dostopDoModela(query);
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json({ error: 'Napaka pri dostopanju do modela', details: error.message });
     }
 }
 
@@ -185,6 +169,19 @@ async function odstraniRezultatKviz(req, res) {
     }
 }
 
+async function preveriOdgovorKviz(req, res) {
+    const { id, query, answer } = req.body;
+    try {
+        const kviz = await Kviz.preveriOdgovor(id, query, answer);
+        /*if (!kviz) {
+            return res.status(404).json({ error: 'Quiz ne obstaja' });
+        }*/
+        res.status(200).json("true ali false");
+    } catch (error) {
+        res.status(500).json({ error: 'Napaka pri preverjanju odgovora', details: error.message });
+    }
+}
+
 async function izbrisiKviz(req, res) {
     const { id } = req.params;
     try {
@@ -227,7 +224,7 @@ module.exports = {
     najdiRezultatKviz,
     spremeniRezultatKviz,
     odstraniRezultatKviz,
+    preveriOdgovorKviz,
     izbrisiKviz,
-    najdiKviz,
-    avtPreverjanje
+    najdiKviz
 };

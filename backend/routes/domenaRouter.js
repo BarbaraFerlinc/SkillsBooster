@@ -22,6 +22,8 @@ router.post('/dodaj-rezultat', domenaController.dodajRezultatDomena);
 router.post('/najdi-rezultat', domenaController.najdiRezultatDomena);
 router.post('/spremeni-rezultat', domenaController.spremeniRezultatDomena);
 router.put('/odstrani-rezultat/:id', domenaController.odstraniRezultatDomena);
+router.post('/update-model', domenaController.updateModelDomena);
+router.post('/chat-box', domenaController.chatBoxDomena);
 router.post('/dodaj-gradivo', upload.single('file'), domenaController.dodajGradivoDomena);
 router.post('/gradiva', domenaController.najdiGradivadomena);
 router.post('/beri-gradivo', domenaController.beriGradivoDomena);

@@ -19,6 +19,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
+// v domena.js -> updateModel
+
 const tempDataFilePath = path.join(__dirname, 'temp_data.json');
 const folderDetailsPath = path.join(__dirname, 'folder_details.json');
 

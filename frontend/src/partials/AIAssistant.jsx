@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AiOutlineWechatWork } from "react-icons/ai"; // Using react-icons for the assistant icon
+import api from '../services/api';
 
 function AIAssistant() {
     const [isOpen, setIsOpen] = useState(false);
@@ -31,14 +32,26 @@ function AIAssistant() {
         }
     };
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (input.trim() !== '') {
             setMessages([...messages, { text: input, fromUser: true }]);
             setInput('');
+            // tu še more bit nareto da če še ni odgovora je pokazano da čaka na odgovor
+
+            try {
+                const response = await api.post('/domena/chat-box', { query: input });
+                const assistantResponse = { text: response.data, fromUser: false };
+                setMessages(prevMessages => [...prevMessages, assistantResponse]);
+            } catch (error) {
+                console.error("Error:", error.response ? error.response.data : error.message);
+                const errorMessage = { text: 'Sorry, something went wrong.', fromUser: false };
+                setMessages(prevMessages => [...prevMessages, errorMessage]);
+            }
+
             // Simulate assistant response
-            setTimeout(() => {
+            /*setTimeout(() => {
                 setMessages(prevMessages => [...prevMessages, { text: 'This is a response from AI assistant.', fromUser: false }]);
-            }, 1000);
+            }, 1000);*/
         }
     };
 

@@ -17,8 +17,10 @@ def download_file(url, output_path):
 def main(temp_file_path):
     print("python laufa")
     # Nastavitve okoljskih spremenljivk
-    os.environ['GRADIENT_ACCESS_TOKEN'] = "zHkm0nTvAVXsUobrgw4UelOfRQsKRCl2"
-    os.environ['GRADIENT_WORKSPACE_ID'] = "86abdbb7-ca5f-4f71-9882-01970e111de7_workspace"
+    gradient_access_token = os.getenv('GRADIENT_ACCESS_TOKEN')
+    gradient_workspace_id = os.getenv('GRADIENT_WORKSPACE_ID')
+    # to je statičen url se mi zdi
+    gradient_model_url = os.getenv('GRADIENT_MODEL_URL')
 
     print("Nalaganje podatkov...")  # Debugging print
     with open(temp_file_path, 'r', encoding='utf-8') as file:
@@ -64,12 +66,12 @@ def main(temp_file_path):
     deli_vsebine = [celotna_vsebina[i:i+1000] for i in range(0, len(celotna_vsebina), 1000)]
 
     # API zahtevek za generiranje vprašanj in odgovorov za vsak del vsebine
-    url = "https://api.gradient.ai/api/models/399e5ea8-21ba-4558-89b3-d962f7efd0db_model_adapter/complete"
+    url = gradient_model_url
     headers = {
         "accept": "application/json",
-        "x-gradient-workspace-id": "86abdbb7-ca5f-4f71-9882-01970e111de7_workspace",
+        "x-gradient-workspace-id": gradient_workspace_id,
         "content-type": "application/json",
-        "authorization": "Bearer zHkm0nTvAVXsUobrgw4UelOfRQsKRCl2"
+        "authorization": f"Bearer {gradient_access_token}"
     }
 
     # Priprava spremenljivke za shranjevanje vzorcev

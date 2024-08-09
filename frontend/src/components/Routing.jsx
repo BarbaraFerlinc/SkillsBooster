@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import api from "../services/api";
 
-function UserRouting() {
+function Routing() {
     const { user } = UserAuth();
     const navigate = useNavigate();
     const [currentUser, setCurrentUser] = useState(null);
@@ -31,9 +31,7 @@ function UserRouting() {
 
     useEffect(() => {
         if (!loading) {
-            if (!user) {
-                navigate("/login");
-            } else if (currentUser && currentUser.vloga !== "user") {
+            if (currentUser) {
                 navigate("/profile");
             }
         }
@@ -45,4 +43,4 @@ function UserRouting() {
 
     return <Outlet />;
 }
-export default UserRouting;
+export default Routing;

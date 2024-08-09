@@ -1,5 +1,5 @@
 /// EVALUACIJA PRAVILNOSTI TRUE/FALSE
-
+// v kviz.js -> preverjanjeOdgovora
 
 
 const axios = require('axios');

@@ -116,6 +116,15 @@ function SolveQuiz() {
                 }
             } else if (question.tip === 'open') {
                 // tu se more dodat AI
+                /*api.post('/kviz/preveri-odgovor', { id: novId, query: question.nekaj??, answer: userAnswer })
+                .then(res => {
+                    if (res.data == 'true') {
+                        correctAnswers++;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                });*/
                 if (userAnswer === question.odgovori[0]) {
                     correctAnswers++;
                 }

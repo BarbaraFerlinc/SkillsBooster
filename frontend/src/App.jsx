@@ -23,6 +23,7 @@ import { AuthContextProvider } from './context/AuthContext.jsx';
 import PrivateRouting from './components/PrivateRouting.jsx';
 import BossRouting from './components/BossRouting.jsx';
 import UserRouting from './components/UserRouting.jsx';
+import Routing from './components/Routing.jsx';
 import SolveQuiz from "./pages/Quiz/SolveQuiz.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 
@@ -40,10 +41,12 @@ function App() {
 
       <AuthContextProvider>
         <Routes>
-          <Route exact path="/" element={<Dashboard />} />
-          <Route exact path="/register" element={<Registration />} />
-          <Route exact path="/login" element={<Login />} />
-          <Route exact path="/reset" element={<ResetPassword />} />
+          <Route path='' element={<Routing />}>
+            <Route exact path="/" element={<Dashboard />} />
+            <Route exact path="/register" element={<Registration />} />
+            <Route exact path="/login" element={<Login />} />
+            <Route exact path="/reset" element={<ResetPassword />} />
+          </Route>
 
           <Route path='' element={<PrivateRouting />}>
             <Route path="/profile" element={<Profile />} />

@@ -169,6 +169,17 @@ function Domain() {
             });
     };
 
+    const handleUpdateModel = () => {
+        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        /*api.post(`/domena/update-model`, { id: novId })
+            .then(res => {
+                console.log(res.data);
+            })
+            .catch(err => {
+                console.error(err);
+            });*/
+    };
+
     const textClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
     const subTextClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
 
@@ -196,6 +207,13 @@ function Domain() {
                             <h2 className={`text-xl font-bold ${textClass}`}>Key Skills</h2>
                             <p className={`mt-4 ${subTextClass}`}>{currentDomain.kljucna_znanja || "No key skills available."}</p>
                         </div>
+
+                        {currentUser && (currentUser.vloga === "boss") && (
+                            <div className='mt-8'>
+                                <button onClick={() => handleUpdateModel()}
+                                        className=" btn bg-indigo-500 text-white py-2 px-5 rounded">Update model</button>
+                            </div>
+                        )}
 
                         {/* Gradivo Section */}
                         <div className="mt-8">
@@ -231,8 +249,8 @@ function Domain() {
 
                             {currentUser && (currentUser.vloga === "boss") && (
                                 <label htmlFor="fileInput"
-                                       className="btn bg-indigo-500 text-white py-2 px-5 rounded">
-                                    <span className="ml-2">Add file</span>
+                                    className="btn bg-indigo-500 text-white py-2 px-5 rounded">
+                                <span className="ml-2">Add file</span>
                                 </label>
                             )}
                         </div>
@@ -278,7 +296,9 @@ function Domain() {
                             )}
                         </div>
                     </div>
-                    <AIAssistant/>
+                    {currentUser && (currentUser.vloga === "user") && (
+                        <AIAssistant/>
+                    )}
                 </main>
             </div>
         </div>

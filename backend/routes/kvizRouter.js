@@ -13,10 +13,9 @@ router.post('/dodaj-rezultat', kvizController.dodajRezultatKviz);
 router.post('/najdi-rezultat', kvizController.najdiRezultatKviz);
 router.post('/spremeni-rezultat', kvizController.spremeniRezultatKviz);
 router.put('/odstrani-rezultat/:id', kvizController.odstraniRezultatKviz);
+router.post('/preveri-odgovor', kvizController.preveriOdgovorKviz);
 router.delete('/:id', kvizController.izbrisiKviz);
 router.post('/id', kvizController.najdiKviz);
-//router.post('/avtPreverjanje', kvizController.dostopDoModelaKviz);
-router.post('/avtPreverjanje', kvizController.avtPreverjanje);
 
 module.exports = router;
 
