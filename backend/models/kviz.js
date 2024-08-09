@@ -1,4 +1,5 @@
 const db = require('../pb');
+const axios = require('axios');
 
 class Kviz {
     static async dodaj(naziv, vprasanja) {
@@ -221,10 +222,25 @@ class Kviz {
     static async preveriOdgovor(id, query, answer) {
         try {
             // dodaj jasa_test_2.js
-
-            return "true ali false";
+            const rightAnswer = '';
+            // ali je del 'to the question ${query} potreben??
+            const prompt = `Given the expected response: ${rightAnswer}, and the generated response: ${answer} to the question ${query}, does the generated response accurately capture the key information? Yes or No.`;
+            const response = await axios.post('https://api.gradient.ai/api/models/399e5ea8-21ba-4558-89b3-d962f7efd0db_model_adapter/complete', {
+                query: prompt,
+                maxGeneratedTokenCount: 100
+            }, {
+                headers: {
+                    'accept': 'application/json',
+                    'x-gradient-workspace-id': process.env.GRADIENT_WORKSPACE_ID,
+                    'content-type': 'application/json',
+                    'authorization': `Bearer ${process.env.GRADIENT_ACCESS_TOKEN}`
+                }
+            });
+            
+            const evaluationResult = response.data.generatedOutput;
+            return evaluationResult.includes('Yes');
         } catch (error) {
-            throw new Error('Napaka pri preverjanju pravilnosti odgovora: ' + error.message);
+            throw new Error('Error evaluating response: ' + error.message);
         }
     }
 

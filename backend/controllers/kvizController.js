@@ -172,11 +172,8 @@ async function odstraniRezultatKviz(req, res) {
 async function preveriOdgovorKviz(req, res) {
     const { id, query, answer } = req.body;
     try {
-        const kviz = await Kviz.preveriOdgovor(id, query, answer);
-        /*if (!kviz) {
-            return res.status(404).json({ error: 'Quiz ne obstaja' });
-        }*/
-        res.status(200).json("true ali false");
+        const response = await Kviz.preveriOdgovor(id, query, answer);
+        res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ error: 'Napaka pri preverjanju odgovora', details: error.message });
     }

@@ -37,6 +37,7 @@ async function evaluateResponseWithModel(modelAdapter, prompt) {
 (async () => {
     const modelAdapter = {}; // This can be an empty object since the function doesn't use it directly
 
+    // const prompt = `Given the expected response: ${rightAnswer}, and the generated response: ${answer} to the question ${query}, does the generated response accurately capture the key information? Yes or No.`;
     const prompt1 = "Given the expected response: 'The sky is cloudy.', and the generated response: 'The sky is sunny.', does the generated response accurately capture the key information? Yes or No.";
     const prompt2 = "Given the expected response: 'Water is wet.', and the generated response: 'Water is wet.', does the generated response accurately capture the key information? Yes or No.";
     const prompt3 = "Given the expected response: 'Fire is hot.', and the generated response: 'Fire is cold.', does the generated response accurately capture the key information? Yes or No.";

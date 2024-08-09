@@ -256,7 +256,7 @@ function Domain() {
                         {/* Main Header */}
                         <DynamicHeader domainName={currentDomain.naziv}/>
 
-                        {/* Domain Description and Keywords */}
+                        {/* Domain Description and Key Skills */}
                         <div className="mt-8">
                             <h2 className={`text-xl font-bold ${textClass}`}>Description</h2>
                             <p className={`mt-4 ${subTextClass}`}>{currentDomain.opis || "No description available."}</p>
@@ -273,7 +273,7 @@ function Domain() {
                             </div>
                         )}
 
-                        {/* Gradivo Section */}
+                        {/* Files & Links Section */}
                         <div className="mt-8">
                             <div className="flex items-center">
                                 <img src={reading} alt="Icon" className="w-16 h-16 mr-4"/>
@@ -356,6 +356,12 @@ function Domain() {
                                             >
                                                 Confirm
                                             </button>
+                                            <button
+                                                className="ml-2 btn bg-red-500 text-white py-1 px-3 rounded"
+                                                onClick={() => { setShowInput(false); setLink(''); }}
+                                            >
+                                                Cancel
+                                            </button>
                                         </div>
                                     )}
 
@@ -364,7 +370,7 @@ function Domain() {
 
                         </div>
 
-                        {/* Kvizi Section */}
+                        {/* Quizzes Section */}
                         <div className="mt-8">
                             <div className="flex items-center">
                                 <img src={writing} alt="Icon" className="w-16 h-16 mr-4"/>

@@ -1,6 +1,10 @@
 const db = require('../pb');
 const { storage, ref, uploadBytes, deleteObject, uploadBytesResumable, listAll, getDownloadURL } = require('../firebase');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const { spawn } = require('child_process');
+const { messaging } = require('firebase-admin');
 
 class Domena {
     static async dodaj(naziv, opis, kljucna_znanja, lastnik) {
@@ -325,17 +329,29 @@ class Domena {
         }
     }
 
-    static async chatBox(query) {
+    static async chatBox(id, query) {
         try {
-            // tu more bit drugi url glede na vsak model (to mislim da je staticni url od poskusnega modela)
-            const url = `https://api.gradient.ai/api/models/${"model glede na domeno iz folder_details.json"}/complete`;
+            const data = await fs.promises.readFile('folder_details.json', 'utf8');
+            const folderDetails = JSON.parse(data);
 
+            const folder = folderDetails.find(folder => folder.name === id);
+            if (!folder) {
+                console.error(`Model for domain "${id}" not found.`);
+            return;
+            }
+
+            const model = folder.model;
+            if (!model) {
+                console.error(`Model is empty for domain "${id}".`);
+                return;
+            }
+
+            const url = `https://api.gradient.ai/api/models/${model}/complete`;
             const payload = {
                 autoTemplate: true,
                 query: query,
                 maxGeneratedTokenCount: 200
             };
-
             const headers = {
                 accept: "application/json",
                 "x-gradient-workspace-id": process.env.GRADIENT_WORKSPACE_ID,
@@ -356,8 +372,63 @@ class Domena {
     static async updateModel(id) {
         try {
             // dodaj jasa_test_4.js
+            const tempDataFilePath = path.join(__dirname, 'temp_data.json');
+            const folderDetailsPath = path.join(__dirname, 'folder_details.json');
 
-            return "Yes";
+            const folderRef = ref(storage, id);
+            const list = await listAll(folderRef);
+            const datoteke = await Promise.all(list.items.map(async (itemRef) => {
+                const url = await getDownloadURL(itemRef);
+                return { ime: itemRef.name, url: url };
+            }));
+            console.log('Pridobljene datoteke:', datoteke);
+
+            // Save file information to a temporary JSON file
+            fs.writeFileSync(tempDataFilePath, JSON.stringify(datoteke, null, 2));
+            console.log('temp_data.json je bil posodobljen.');
+            // Define the Python script path
+            const pythonScriptPath = path.join(__dirname, '..', 'AI', 'finetuning.py');
+            // Spawn the Python process with the temporary JSON file path as an argument
+            const pythonProcess = spawn('python', [pythonScriptPath, tempDataFilePath]);
+
+            let modelAdapterId = '';
+            pythonProcess.stdout.on('data', (data) => {
+                console.log(`stdout: ${data}`);
+                const output = data.toString();
+                const match = output.match(/Model Adapter ID: (\S+)/);
+                if (match) {
+                    modelAdapterId = match[1];
+                }
+            });
+
+            pythonProcess.stderr.on('data', (data) => {
+                console.error(`stderr: ${data}`);
+            });
+
+            pythonProcess.on('close', (code) => {
+                console.log(`Rezultat izvajanja Python skripte: ${code}`);
+                if (code === 0) {
+                    const folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
+                    const folderDetail = folderDetails.find(detail => detail.name === id);
+
+                    if (folderDetail) {
+                        folderDetail.model = modelAdapterId;
+                        folderDetail.modelCreationTime = new Date().toISOString();
+                    } else {
+                        folderDetails.push({
+                            name: id,
+                            url: `gs://${firebaseConfig.storageBucket}/${id}`,
+                            model: modelAdapterId,
+                            modelCreationTime: new Date().toISOString()
+                        });
+                    }
+
+                    fs.writeFileSync(folderDetailsPath, JSON.stringify(folderDetails, null, 2));
+                    console.log(`Folder details for ${id} updated.`);
+                }
+            });
+
+            return { message: 'Uspešna posodobitev modela.' };
         } catch (error) {
             throw new Error('Napaka pri posodabljanju modela: ' + error.message);
         }

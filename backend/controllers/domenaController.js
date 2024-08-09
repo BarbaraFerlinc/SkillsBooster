@@ -242,14 +242,14 @@ async function odstraniRezultatDomena(req, res) {
 }
 
 async function chatBoxDomena(req, res) {
-    const { query } = req.body;
+    const { id, query } = req.body;
 
     if (!query) {
         return res.status(400).json({ error: 'Query je zahtevan' });
     }
 
     try {
-        const response = await Domena.chatBox(query);
+        const response = await Domena.chatBox(id, query);
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ error: 'Napaka pri dostopanju do modela', details: error.message });
