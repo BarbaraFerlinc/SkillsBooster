@@ -13,7 +13,7 @@ const axios = require('axios');
  */
 async function evaluateResponseWithModel(modelAdapter, prompt) {
     try {
-        const response = await axios.post('https://api.gradient.ai/api/models/399e5ea8-21ba-4558-89b3-d962f7efd0db_model_adapter/complete', {
+        const response = await axios.post('https://api.gradient.ai/api/models/cff35de2-fd8c-45cb-b408-2799beaa0cd6_model_adapter/complete', {
             query: prompt,
             maxGeneratedTokenCount: 100
         }, {
@@ -40,6 +40,17 @@ async function evaluateResponseWithModel(modelAdapter, prompt) {
     const prompt1 = "Given the expected response: 'The sky is cloudy.', and the generated response: 'The sky is sunny.', does the generated response accurately capture the key information? Yes or No.";
     const prompt2 = "Given the expected response: 'Water is wet.', and the generated response: 'Water is wet.', does the generated response accurately capture the key information? Yes or No.";
     const prompt3 = "Given the expected response: 'Fire is hot.', and the generated response: 'Fire is cold.', does the generated response accurately capture the key information? Yes or No.";
+    const prompt4 = "Given the expected response: 'The stock market closed lower today due to concerns over rising interest rates.', and the generated response: 'The stock market closed higher today due to optimism about future earnings.', does the generated response accurately capture the key information? Yes or No.";
+    const prompt5 = "Given the expected response: 'Global warming is causing glaciers to melt at an unprecedented rate.', and the generated response: 'Global warming is causing an increase in average temperatures worldwide.', does the generated response accurately capture the key information? Yes or No.";
+    const prompt6 = "Given the expected response: 'The novel was well-received by critics for its innovative narrative structure and complex characters.', and the generated response: 'The novel received mixed reviews from critics, with some praising its narrative structure and others criticizing its characters.', does the generated response accurately capture the key information? Yes or No.";
+    const prompt7 = "Given the expected response: 'The company's revenue increased by 15% in the last quarter due to strong sales in the European market.', and the generated response: 'The company's revenue increased by 15% in the last quarter, driven by strong performance in the Asian market.', does the generated response accurately capture the key information? Yes or No.";
+    const prompt8 = "Given the expected response: 'The scientist received the Nobel Prize for her groundbreaking research in quantum physics.', and the generated response: 'The scientist received an award for her research in quantum physics.', does the generated response accurately capture the key information? Yes or No.";
+    const prompt9 = "Given the expected response: 'The scientist received the Nobel Prize for her groundbreaking research in quantum physics.', and the generated response: 'The scientist received an important award for her research in quantum physics.', does the generated response capture the key information? Yes or No.";
+    const prompt10 = "Given the expected response: 'The scientist received the Nobel Prize for her groundbreaking research in quantum physics.', and the generated response: 'The scientist received an important award for her groundbreaking research in quantum physics.', does the generated response capture the key information? Yes or No.";
+
+    
+
+    
 
     const result1 = await evaluateResponseWithModel(modelAdapter, prompt1);
     console.log(`Evaluation 1 successful: ${result1}`);  // Expected: false
@@ -49,6 +60,24 @@ async function evaluateResponseWithModel(modelAdapter, prompt) {
 
     const result3 = await evaluateResponseWithModel(modelAdapter, prompt3);
     console.log(`Evaluation 3 successful: ${result3}`);  // Expected: false
+    const result4 = await evaluateResponseWithModel(modelAdapter, prompt4);
+    console.log(`Evaluation 4 successful: ${result4}`);  // Expected: false
+    const result5 = await evaluateResponseWithModel(modelAdapter, prompt5);
+    console.log(`Evaluation 5 successful: ${result5}`);  // Expected: false
+    const result6 = await evaluateResponseWithModel(modelAdapter, prompt6);
+    console.log(`Evaluation 6 successful: ${result6}`);  // Expected: false
+    const result7 = await evaluateResponseWithModel(modelAdapter, prompt7);
+
+    console.log(`Evaluation 7 successful: ${result7}`);  // Expected: false
+    const result8 = await evaluateResponseWithModel(modelAdapter, prompt8);
+    console.log(`Evaluation 8 successful: ${result8}`);  // Expected: false
+    const result9 = await evaluateResponseWithModel(modelAdapter, prompt9);
+    console.log(`Evaluation 9 successful: ${result9}`);  // Expected: false - ker spusti nobel prize in groundbreaking
+    const result10 = await evaluateResponseWithModel(modelAdapter, prompt10);
+    console.log(`Evaluation 10 successful: ${result10}`);  // Expected: true
+
+
+
 })();
 
 /*
