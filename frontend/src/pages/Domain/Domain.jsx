@@ -269,7 +269,7 @@ function Domain() {
                         {currentUser && (currentUser.vloga === "boss") && (
                             <div className='mt-8'>
                                 <button onClick={() => handleUpdateModel()}
-                                        className=" btn bg-indigo-500 text-white py-2 px-5 rounded">Update model</button>
+                                        className=" btn bg-green-500 text-white py-2 px-5 rounded">Update model</button>
                             </div>
                         )}
 

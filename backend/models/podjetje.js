@@ -3,11 +3,12 @@ const db = require('../pb');
 class Podjetje {
     static async dodaj(naziv, naslov, postna_stevilka, admin_email) {
         try {
-            const id = admin_email.split('@')[1];
+            const id = naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             const novoPodjetje = {
                 naziv: naziv,
                 naslov: naslov,
-                postna_stevilka: postna_stevilka
+                postna_stevilka: postna_stevilka,
+                admin: admin_email
             };
 
             db.collection("Podjetja").doc(id).set(novoPodjetje);

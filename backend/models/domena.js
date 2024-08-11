@@ -4,7 +4,9 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
-const { messaging } = require('firebase-admin');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 class Domena {
     static async dodaj(naziv, opis, kljucna_znanja, lastnik) {
@@ -331,7 +333,7 @@ class Domena {
 
     static async chatBox(id, query) {
         try {
-            const data = await fs.promises.readFile('folder_details.json', 'utf8');
+            /*const data = await fs.promises.readFile('folder_details.json', 'utf8');
             const folderDetails = JSON.parse(data);
 
             const folder = folderDetails.find(folder => folder.name === id);
@@ -344,9 +346,11 @@ class Domena {
             if (!model) {
                 console.error(`Model is empty for domain "${id}".`);
                 return;
-            }
+            }*/
 
-            const url = `https://api.gradient.ai/api/models/${model}/complete`;
+            //const url = `https://api.gradient.ai/api/models/${model}/complete`;
+            // fallback opcija
+            const url = `https://api.gradient.ai/api/models/cff35de2-fd8c-45cb-b408-2799beaa0cd6_model_adapter/complete`;
             const payload = {
                 autoTemplate: true,
                 query: query,
@@ -354,9 +358,9 @@ class Domena {
             };
             const headers = {
                 accept: "application/json",
-                "x-gradient-workspace-id": process.env.GRADIENT_WORKSPACE_ID,
+                "x-gradient-workspace-id": '86abdbb7-ca5f-4f71-9882-01970e111de7_workspace',
                 "content-type": "application/json",
-                authorization: `Bearer ${process.env.GRADIENT_ACCESS_TOKEN}`
+                authorization: `Bearer zHkm0nTvAVXsUobrgw4UelOfRQsKRCl2`
             };
 
             const response = await axios.post(url, payload, { headers });

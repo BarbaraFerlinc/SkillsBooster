@@ -6,7 +6,6 @@ class Uporabnik {
         try {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(geslo, saltRounds);
-            console.log("Geslo: ", geslo, " in ", original_geslo);
 
             // potem original geslo namesto v bazo, pošlje na mail uporabnika
             const id = email;
@@ -55,8 +54,6 @@ class Uporabnik {
 
     static async getByAdmin(adminEmail) {
         try {
-            const podjetje = adminEmail.split('@')[1];
-
             const uporabnikiRef = db.collection("Uporabniki");
             const response = await uporabnikiRef.get();
             const uporabniki = [];
@@ -64,7 +61,7 @@ class Uporabnik {
                 const data = doc.data();
                 const admin = data.admin;
                 const email = data.email;
-                if (email && admin && admin.split('@')[1] === podjetje && email != adminEmail) {
+                if (email && admin && admin === adminEmail && email != adminEmail) {
                     uporabniki.push(data);
             }
             });
@@ -77,8 +74,6 @@ class Uporabnik {
 
     static async getByBoss(bossEmail, adminEmail) {
         try {
-            const podjetje = adminEmail.split('@')[1];
-
             const uporabnikiRef = db.collection("Uporabniki");
             const response = await uporabnikiRef.get();
             const uporabniki = [];
@@ -86,7 +81,7 @@ class Uporabnik {
                 const data = doc.data();
                 const admin = data.admin;
                 const email = data.email;
-                if (email && admin && admin.split('@')[1] === podjetje && email != adminEmail && email != bossEmail) {
+                if (email && admin && admin === adminEmail && email != adminEmail && email != bossEmail) {
                     uporabniki.push(data);
             }
             });
