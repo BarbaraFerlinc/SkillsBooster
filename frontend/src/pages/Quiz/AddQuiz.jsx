@@ -22,6 +22,7 @@ function AddQuiz() {
     const [questions, setQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState({ type: 'open', question: '', answer: '' });
     const [currentDomain, setCurrentDomain] = useState(initialDomain);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (domain) {
@@ -70,8 +71,10 @@ function AddQuiz() {
     };
 
     const handleConfirmQuestion = () => {
-        setQuestions([...questions, currentQuestion]);
-        setCurrentQuestion({ type: 'open', question: '', answer: '' });
+        if (validateQuestion()){
+            setQuestions([...questions, currentQuestion]);
+            setCurrentQuestion({ type: 'open', question: '', answer: '' });
+        }
     };
 
     const handleDeleteQuestion = (index) => {
@@ -80,24 +83,83 @@ function AddQuiz() {
         setQuestions(updatedQuestions);
     };
 
+    const validateQuestion = () => {
+        let formErrors = {};
+        let formIsValid = true;
+    
+        if (!currentQuestion.question) {
+            formIsValid = false;
+            formErrors["question"] = "Question is required.";
+        }
+    
+        if (currentQuestion.type === 'closed') {
+            if (!currentQuestion.answer || currentQuestion.answer.length === 0) {
+                formIsValid = false;
+                formErrors["options"] = "At least one option is required.";
+            } else {
+                let hasCorrectAnswer = false;
+                currentQuestion.answer.forEach((option, index) => {
+                    if (!option.text) {
+                        formIsValid = false;
+                        formErrors[`option_${index}`] = `Text is required.`;
+                    }
+                    if (option.isCorrect === 'true') {
+                        hasCorrectAnswer = true;
+                    }
+                });
+
+                if (!hasCorrectAnswer) {
+                    formIsValid = false;
+                    formErrors["correct"] = "There must be at least one correct answer.";
+                }
+            }
+        } else if (currentQuestion.type === 'open' && !currentQuestion.answer) {
+            formIsValid = false;
+            formErrors["answer"] = "Answer is required";
+        }
+    
+        setErrors(formErrors);
+        return formIsValid;
+    }
+
+    const validateQuiz = () => {
+        let formErrors = {};
+        let formIsValid = true;
+    
+        if (!quizName) {
+            formIsValid = false;
+            formErrors["name"] = "Quiz name is required.";
+        }
+
+        if (questions.length === 0) {
+            formIsValid = false;
+            formErrors["questions"] = "You must add at least one question.";
+        }
+    
+        setErrors(formErrors);
+        return formIsValid;
+    }
+
     const handleSubmitQuiz = async () => {
-        const novId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        const vprasanja = dodajVprasanja(novId);
-        const vprasanjaId = [];
+        if (validateQuiz()){
+            const novId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const vprasanja = dodajVprasanja(novId);
+            const vprasanjaId = [];
 
-        for (const q of vprasanja) {
-            vprasanjaId.push(`${novId}_${q.vprasanje.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`);
-            await api.post(`/vprasanje/dodaj`, q);
+            for (const q of vprasanja) {
+                vprasanjaId.push(`${novId}_${q.vprasanje.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`);
+                await api.post(`/vprasanje/dodaj`, q);
+            }
+
+            await api.post(`/kviz/dodaj`, { naziv: quizName, vprasanja: vprasanjaId });
+            await api.post(`/domena/dodaj-kviz`, { id: domain, kvizId: novId });
+
+            for (const userId of currentDomain.zaposleni) {
+                await api.post(`/kviz/dodaj-rezultat`, { id: novId, uporabnikId: userId, vrednost: '0' });
+            }
+
+            navigate(`/domain/${domain}`); // Redirect to the domain page after submitting the quiz
         }
-
-        await api.post(`/kviz/dodaj`, { naziv: quizName, vprasanja: vprasanjaId });
-        await api.post(`/domena/dodaj-kviz`, { id: domain, kvizId: novId });
-
-        for (const userId of currentDomain.zaposleni) {
-            await api.post(`/kviz/dodaj-rezultat`, { id: novId, uporabnikId: userId, vrednost: '0' });
-        }
-
-        navigate(`/domain/${domain}`); // Redirect to the domain page after submitting the quiz
     };
 
     const handleCancel = () => {
@@ -135,6 +197,7 @@ function AddQuiz() {
                         className="w-full p-3 border border-gray-300 rounded"
                         placeholder="Enter the name of the quiz"
                     />
+                    <small className="text-red-500">{errors.name}</small>
                 </div>
                 {questions.map((q, index) => (
                     <div key={index} className="mb-4 p-4 border border-gray-300 rounded-lg bg-gray-50 relative">
@@ -173,6 +236,7 @@ function AddQuiz() {
                         answer={currentQuestion.answer}
                         onQuestionChange={handleQuestionChange}
                         onAnswerChange={handleAnswerChange}
+                        error={errors.question}
                     />
                 ) : (
                     <ClosedQuestion
@@ -182,8 +246,17 @@ function AddQuiz() {
                         onOptionChange={handleOptionChange}
                         addOption={addOption}
                         onAnswerTypeChange={handleAnswerTypeChange}
+                        error={errors.question}
                     />
                 )}
+                <small className="text-red-500">{errors.options}</small>
+                {currentQuestion.type === 'closed' && currentQuestion.answer.map((_, index) => (
+                    <small key={index} className="text-red-500">{errors[`option_${index}`]}</small>
+                ))}
+                <small className="text-red-500">{errors.answer}</small>
+                <small className="text-red-500">{errors.correct}</small>
+                <small className="text-red-500">{errors.questions}</small>
+
                 <div className="flex justify-between mt-6">
                     <button
                         onClick={handleConfirmQuestion}

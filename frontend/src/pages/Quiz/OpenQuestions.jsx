@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function OpenQuestion({ question, answer, onQuestionChange, onAnswerChange }) {
+function OpenQuestion({ question, answer, onQuestionChange, onAnswerChange, error }) {
     return (
         <div>
             <div className="mb-4">
@@ -12,6 +12,7 @@ function OpenQuestion({ question, answer, onQuestionChange, onAnswerChange }) {
                     onChange={onQuestionChange}
                     className="w-full p-2 border border-gray-300 rounded"
                 />
+                <small className="text-red-500">{error}</small>
             </div>
             <div className="mb-4">
                 <label className="block text-lg font-semibold mb-2">Answer:</label>
@@ -31,6 +32,7 @@ OpenQuestion.propTypes = {
     answer: PropTypes.string.isRequired,
     onQuestionChange: PropTypes.func.isRequired,
     onAnswerChange: PropTypes.func.isRequired,
+    error: PropTypes.string,
 };
 
 export default OpenQuestion;

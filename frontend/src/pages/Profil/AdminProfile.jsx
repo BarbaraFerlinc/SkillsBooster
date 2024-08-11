@@ -14,6 +14,7 @@ function AdminProfile() {
     const [newUserName, setNewUserName] = useState('');
     const [newUserEmail, setNewUserEmail] = useState('');
     const [newUserRole, setNewUserRole] = useState('user');
+    const [errors, setErrors] = useState({});
 
     const { user } = UserAuth();
     const { currentTheme } = useThemeProvider();
@@ -51,48 +52,86 @@ function AdminProfile() {
         setShowModal(true);
     };
 
-    const handleConfirmAddUser = async () => {
-        var config = {apiKey: import.meta.env.VITE_API_KEY,
-                authDomain: import.meta.env.VITE_AUTH_DOMAIN,
-                projectId: import.meta.env.VITE_PROJECT_ID,
-                storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
-                messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-                appId: import.meta.env.VITE_APP_ID};
-        var secondaryApp = initializeApp(config, "Secondary");
-        let auth = getAuth(secondaryApp);
-        
-        const newUser = {
-            ime_priimek: newUserName,
-            email: newUserEmail,
-            geslo: Math.random().toString(36).slice(-12),
-            vloga: newUserRole,
-            admin: currentUser.email
-        };
-
-        try {
-            await createUserWithEmailAndPassword(auth, newUserEmail, newUser.geslo);
-
-            await signOut(auth);
-
-            const response = await api.post("/uporabnik/dodaj", newUser, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-            });
-
-            setUserAdded(true);
-            setShowModal(false);
-            setNewUserName('');
-            setNewUserEmail('');
-            setNewUserRole('user');
-        } catch (error) {
-            console.error("Error adding new user:", error);
-        } finally {
-            if (secondaryApp) {
-                secondaryApp.delete();
+    const validateForm = () => {
+        let formErrors = {};
+        let formIsValid = true;
+    
+        if (!newUserName) {
+            formIsValid = false;
+            formErrors["name"] = "Please add user's name";
+        }
+    
+        if (!newUserEmail) {
+            formIsValid = false;
+            formErrors["email"] = "Please add user's email";
+        } else {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(newUserEmail)) {
+                formIsValid = false;
+                formErrors["email"] = "Please enter a valid email address";
             }
         }
+        
+        if (!newUserRole) {
+            formIsValid = false;
+            formErrors["role"] = "Please add user's role";
+        }
+    
+        setErrors(formErrors);
+        return formIsValid;
+    }
+
+    const handleConfirmAddUser = async () => {
+        if (validateForm()){
+            var config = {apiKey: import.meta.env.VITE_API_KEY,
+                    authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+                    projectId: import.meta.env.VITE_PROJECT_ID,
+                    storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+                    messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+                    appId: import.meta.env.VITE_APP_ID};
+            var secondaryApp = initializeApp(config, "Secondary");
+            let auth = getAuth(secondaryApp);
+            
+            const newUser = {
+                ime_priimek: newUserName,
+                email: newUserEmail,
+                geslo: Math.random().toString(36).slice(-12),
+                vloga: newUserRole,
+                admin: currentUser.email
+            };
+
+            try {
+                await createUserWithEmailAndPassword(auth, newUserEmail, newUser.geslo);
+                await signOut(auth);
+
+                const response = await api.post("/uporabnik/dodaj", newUser, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                });
+
+                setUserAdded(true);
+                setShowModal(false);
+                setNewUserName('');
+                setNewUserEmail('');
+                setNewUserRole('user');
+            } catch (error) {
+                console.error("Error adding new user:", error);
+            } finally {
+                if (secondaryApp) {
+                    secondaryApp.delete();
+                }
+            }
+        }
+    };
+
+    const handleCancel = () => {
+        setShowModal(false);
+        setNewUserName('');
+        setNewUserEmail('');
+        setNewUserRole('user');
+        setErrors({});
     };
 
     const textClass = currentTheme === 'dark' ? 'text-black' : 'text-gray-800';
@@ -119,6 +158,7 @@ function AdminProfile() {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 required
                             />
+                            <small className="text-red-500">{errors.name}</small>
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -131,6 +171,7 @@ function AdminProfile() {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 required
                             />
+                            <small className="text-red-500">{errors.email}</small>
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -144,10 +185,11 @@ function AdminProfile() {
                                 <option value="user">User</option>
                                 <option value="boss">Manager</option>
                             </select>
+                            <small className="text-red-500">{errors.role}</small>
                         </div>
                         <div className="flex items-center justify-between">
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={handleCancel}
                                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             >
                                 Cancel

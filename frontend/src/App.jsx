@@ -5,10 +5,7 @@ import {
   useLocation,
   Navigate
 } from 'react-router-dom';
-
 import './css/style.css';
-
-
 
 // Import pages
 import Dashboard from './pages/Dashboard';
@@ -47,8 +44,9 @@ function App() {
               <Route exact path="/" element={<Dashboard />} />
               <Route exact path="/register" element={<Registration />} />
               <Route exact path="/login" element={<Login />} />
-              <Route exact path="/reset" element={<ResetPassword />} />
             </Route>
+
+            <Route exact path="/reset" element={<ResetPassword />} />
 
             <Route path='' element={<PrivateRouting />}>
               <Route path="/profile" element={<Profile />} />

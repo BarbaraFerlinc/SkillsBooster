@@ -333,24 +333,23 @@ class Domena {
 
     static async chatBox(id, query) {
         try {
-            /*const data = await fs.promises.readFile('folder_details.json', 'utf8');
+            const data = await fs.promises.readFile('folder_details.json', 'utf8');
             const folderDetails = JSON.parse(data);
 
+            let model = null;
             const folder = folderDetails.find(folder => folder.name === id);
             if (!folder) {
-                console.error(`Model for domain "${id}" not found.`);
-            return;
+                console.log(`Model for domain "${id}" not found.`);
+                model = 'cff35de2-fd8c-45cb-b408-2799beaa0cd6_model_adapter';
+            } else {
+                model = folder.model;
+                if (!model) {
+                    console.log(`Model is empty for domain "${id}".`);
+                    model = 'cff35de2-fd8c-45cb-b408-2799beaa0cd6_model_adapter';
+                }
             }
 
-            const model = folder.model;
-            if (!model) {
-                console.error(`Model is empty for domain "${id}".`);
-                return;
-            }*/
-
-            //const url = `https://api.gradient.ai/api/models/${model}/complete`;
-            // fallback opcija
-            const url = `https://api.gradient.ai/api/models/cff35de2-fd8c-45cb-b408-2799beaa0cd6_model_adapter/complete`;
+            const url = `https://api.gradient.ai/api/models/${model}/complete`;
             const payload = {
                 autoTemplate: true,
                 query: query,
@@ -358,9 +357,9 @@ class Domena {
             };
             const headers = {
                 accept: "application/json",
-                "x-gradient-workspace-id": '86abdbb7-ca5f-4f71-9882-01970e111de7_workspace',
+                "x-gradient-workspace-id": process.env.GRADIENT_WORKSPACE_ID,
                 "content-type": "application/json",
-                authorization: `Bearer zHkm0nTvAVXsUobrgw4UelOfRQsKRCl2`
+                authorization: `Bearer ${process.env.GRADIENT_ACCESS_TOKEN}`
             };
 
             const response = await axios.post(url, payload, { headers });

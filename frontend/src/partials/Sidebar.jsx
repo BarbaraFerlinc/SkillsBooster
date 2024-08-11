@@ -13,6 +13,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const [domains, setDomains] = useState([]);
   const [showAddDomainCard, setShowAddDomainCard] = useState(false);
   const [newDomain, setNewDomain] = useState({ naziv: '', opis: '', kljucna_znanja: '' });
+  const [errors, setErrors] = useState({});
 
   const { user } = UserAuth();
 
@@ -80,15 +81,17 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   const handleSubmitDomain = async () => {
     try {
-      newDomain.lastnik = currentUser.email;
-      const response = await api.post('/domena/dodaj', newDomain, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
-      setShowAddDomainCard(false);
-      //fetchDomeneForOwner(currentUser); // Refresh domains after adding new one
+      if (validateForm()){
+        newDomain.lastnik = currentUser.email;
+        const response = await api.post('/domena/dodaj', newDomain, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        });
+        setShowAddDomainCard(false);
+      }
+      
     } catch (er) {
       console.log("Napaka pri dodajanju domene", er);
     }
@@ -132,13 +135,41 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   });
 
   useEffect(() => {
-    localStorage.setItem('sidebar-expanded', sidebarExpanded);
-    if (sidebarExpanded) {
-      document.querySelector('body').classList.add('sidebar-expanded');
-    } else {
-      document.querySelector('body').classList.remove('sidebar-expanded');
-    }
+      localStorage.setItem('sidebar-expanded', sidebarExpanded);
+      if (sidebarExpanded) {
+        document.querySelector('body').classList.add('sidebar-expanded');
+      } else {
+        document.querySelector('body').classList.remove('sidebar-expanded');
+      }
   }, [sidebarExpanded]);
+
+  const validateForm = () => {
+    let formErrors = {};
+    let formIsValid = true;
+
+    if (!newDomain.naziv) {
+        formIsValid = false;
+        formErrors["naziv"] = "Please add domain's name";
+    }
+
+    if (!newDomain.opis) {
+        formIsValid = false;
+        formErrors["opis"] = "Please add description";
+    }
+    
+    if (!newDomain.kljucna_znanja) {
+        formIsValid = false;
+        formErrors["kljucna_znanja"] = "Please add key skills";
+    }
+
+    setErrors(formErrors);
+    return formIsValid;
+  }
+
+  const handleCancel = () => {
+    setShowAddDomainCard(false)
+    setErrors({});
+  }
 
   return (
       <div>
@@ -210,6 +241,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                           value={newDomain.naziv}
                           onChange={(e) => setNewDomain({ ...newDomain, naziv: e.target.value })}
                       />
+                      <small className="text-red-500">{errors.naziv}</small>
                     </div>
                     <div className="mb-2">
                       <label className="block text-sm font-medium mb-1">Description</label>
@@ -219,6 +251,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                           value={newDomain.opis}
                           onChange={(e) => setNewDomain({ ...newDomain, opis: e.target.value })}
                       />
+                      <small className="text-red-500">{errors.opis}</small>
                     </div>
                     <div className="mb-2">
                       <label className="block text-sm font-medium mb-1">Key Skills</label>
@@ -228,10 +261,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                           value={newDomain.kljucna_znanja}
                           onChange={(e) => setNewDomain({ ...newDomain, kljucna_znanja: e.target.value })}
                       />
+                      <small className="text-red-500">{errors.kljucna_znanja}</small>
                     </div>
                     <div className="flex justify-end">
                       <button
-                          onClick={() => setShowAddDomainCard(false)}
+                          onClick={handleCancel}
                           className="btn bg-red-500 text-white py-2 px-5 rounded mr-2"
                       >
                         Cancel

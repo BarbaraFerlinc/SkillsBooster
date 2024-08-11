@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-
 import Sidebar from "../../partials/Sidebar.jsx";
 import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
@@ -35,7 +34,6 @@ function Quiz() {
         }
     }, [id]);
 
-    // Simulated function to fetch quiz result
     const fetchQuizResult = async () => {
         if (id && user) {
             const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
@@ -49,7 +47,6 @@ function Quiz() {
         }
     };
 
-    // useEffect to fetch quiz result on component mount
     useEffect(() => {
         if (user) {
             fetchQuizResult();
@@ -80,7 +77,7 @@ function Quiz() {
 
                         {/* Display quiz result percentage */}
                         {quizResult !== null && (
-                            <div className="mb-4"> {/* Added mb-4 for margin-bottom */}
+                            <div className="mb-4">
                                 <p>Your score: {quizResult}%</p>
                             </div>
                         )}

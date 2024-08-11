@@ -104,6 +104,11 @@ function SolveQuiz() {
         for (let i = 0; i < questions.length; i++) {
             const question = questions[i];
             const userAnswer = answers[i];
+
+            if (!userAnswer || userAnswer.length === 0) {
+                continue;
+            }
+
             if (question.tip === 'closed') {
                 const correctAnswersArray = question.odgovori
                     .filter(odgovor => odgovor.split(';')[1] === "true")

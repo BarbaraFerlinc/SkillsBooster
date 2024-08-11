@@ -1,45 +1,66 @@
 import React, { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext.jsx';
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
 
 function ResetPassword() {
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState();
     const [emailError, setEmailError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { sendPasswordResetEmail } = UserAuth();
+    const { logout } = UserAuth();
     const navigate = useNavigate();
+    const auth = getAuth();
+
+    const validateForm = (emailRegex) => {
+        let formIsValid = true;
+    
+        if (!email) {
+            formIsValid = false;
+            setEmailError('Email is required.');
+        }
+    
+        if (!emailRegex.test(email)) {
+            formIsValid = false;
+            setEmailError('Please provide a valid email address.');
+        }
+    
+        return formIsValid;
+      }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setEmailError('');
         const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
-        if (email === '') {
-            setEmailError('Email is required.');
-        } else if (!emailRegex.test(email)) {
-            setEmailError('Please provide a valid email address.');
-        }
+        if (validateForm(emailRegex)){
+            setLoading(true);
 
-        if (emailError) {
-            return;
-        }
+            try {
+                await sendPasswordResetEmail(auth, email)
+                    .then(() => {
+                        console.log('E-poštno sporočilo za ponastavitev gesla je bilo poslano.');
+                        setLoading(false);
+                        alert('Password reset email sent! Please check your inbox.');
 
-        setLoading(true);
-
-        try {
-            await sendPasswordResetEmail(email);
-            setLoading(false);
-            alert('Password reset email sent! Please check your inbox.');
-            navigate('/login');
-        } catch (error) {
-            setLoading(false);
-            if (error.message === "Firebase: Error (auth/user-not-found).") {
-                setEmailError("No user found with this email address.");
-            } else if (error.message === "Firebase: Error (auth/invalid-email).") {
-                setEmailError("Invalid email address format.");
-            } else {
-                setEmailError("Failed to send password reset email. Please try again.");
+                        logout();
+                        navigate('/');
+                    })
+                    .catch((error) => {
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        console.error('Napaka:', errorCode, errorMessage);
+                    });
+                
+            } catch (error) {
+                setLoading(false);
+                if (error.code === 'auth/user-not-found') {
+                    setEmailError("No user found with this email address.");
+                } else if (error.code === 'auth/invalid-email') {
+                    setEmailError("Invalid email address format.");
+                } else {
+                    setEmailError("Failed to send password reset email. Please try again.");
+                }
             }
         }
     };
@@ -56,7 +77,6 @@ function ResetPassword() {
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            required
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
                         {emailError && <p className="text-red-500">{emailError}</p>}

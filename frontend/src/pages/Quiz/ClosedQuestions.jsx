@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function ClosedQuestion({ question, options, onQuestionChange, onOptionChange, addOption, onAnswerTypeChange }) {
+function ClosedQuestion({ question, options, onQuestionChange, onOptionChange, addOption, onAnswerTypeChange, error }) {
     return (
         <div>
             <div className="mb-4">
@@ -12,6 +12,7 @@ function ClosedQuestion({ question, options, onQuestionChange, onOptionChange, a
                     onChange={onQuestionChange}
                     className="w-full p-2 border border-gray-300 rounded"
                 />
+                <small className="text-red-500">{error}</small>
             </div>
             <div className="mb-4">
                 <label className="block text-lg font-semibold mb-2">Options:</label>
@@ -56,6 +57,7 @@ ClosedQuestion.propTypes = {
     onOptionChange: PropTypes.func.isRequired,
     addOption: PropTypes.func.isRequired,
     onAnswerTypeChange: PropTypes.func.isRequired,
+    error: PropTypes.string,
 };
 
 export default ClosedQuestion;

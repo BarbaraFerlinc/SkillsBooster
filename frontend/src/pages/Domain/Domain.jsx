@@ -35,6 +35,7 @@ function Domain() {
     const [links, setLinks] = useState([]);
     const [quizDeleted, setQuizDeleted] = useState(false);
     const [quizzes, setQuizzes] = useState([]);
+    const [errors, setErrors] = useState({});
 
     const { id } = useParams();
     const { user } = UserAuth();
@@ -210,17 +211,32 @@ function Domain() {
         setLink(e.target.value);
     };
 
+    const validateForm = () => {
+        let formErrors = {};
+        let formIsValid = true;
+    
+        if (!link) {
+            formIsValid = false;
+            formErrors["link"] = "Please add link";
+        }
+    
+        setErrors(formErrors);
+        return formIsValid;
+      }
+
     const handleConfirmLink = () => {
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post(`/domena/dodaj-link`, { id: novId, link: link })
-            .then(res => {
-                setLinkDeleted(true);
-                setLink('');
-        setShowInput(false);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+        if (validateForm()){
+            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post(`/domena/dodaj-link`, { id: novId, link: link })
+                .then(res => {
+                    setLinkDeleted(true);
+                    setLink('');
+            setShowInput(false);
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        }
     };
 
     const handleOpenLink = async (link) => {
@@ -342,27 +358,30 @@ function Domain() {
                                     </button>
 
                                     {showInput && (
-                                        <div className="mt-2">
-                                            <input
-                                                type="text"
-                                                value={link}
-                                                onChange={handleInputChange}
-                                                placeholder="Enter your link"
-                                                className="border p-2 rounded"
-                                            />
-                                            <button
-                                                className="ml-2 btn bg-green-500 text-white py-1 px-3 rounded"
-                                                onClick={handleConfirmLink}
-                                            >
-                                                Confirm
-                                            </button>
-                                            <button
-                                                className="ml-2 btn bg-red-500 text-white py-1 px-3 rounded"
-                                                onClick={() => { setShowInput(false); setLink(''); }}
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
+                                        <>
+                                            <div className="mt-2">
+                                                <input
+                                                    type="text"
+                                                    value={link}
+                                                    onChange={handleInputChange}
+                                                    placeholder="Enter your link"
+                                                    className="border p-2 rounded"
+                                                />
+                                                <button
+                                                    className="ml-2 btn bg-green-500 text-white py-1 px-3 rounded"
+                                                    onClick={handleConfirmLink}
+                                                >
+                                                    Confirm
+                                                </button>
+                                                <button
+                                                    className="ml-2 btn bg-red-500 text-white py-1 px-3 rounded"
+                                                    onClick={() => { setShowInput(false); setLink(''); }}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                            <small className="text-red-500">{errors.link}</small>
+                                        </>
                                     )}
 
                                 </div>
@@ -414,7 +433,7 @@ function Domain() {
                     </div>
 
                     {currentUser && currentUser.vloga === "user" && (
-                        <AIAssistant/>
+                        <AIAssistant domain={currentDomain.naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()} />
                     )}
                 </main>
             </div>

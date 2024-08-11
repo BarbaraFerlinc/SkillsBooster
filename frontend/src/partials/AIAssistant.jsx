@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AiOutlineWechatWork } from "react-icons/ai";
+import PropTypes from 'prop-types';
 import api from '../services/api';
 
-function AIAssistant() {
+function AIAssistant({ domain }) {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
@@ -41,9 +42,8 @@ function AIAssistant() {
             setWaitingForResponse(true);
 
             try {
-                const response = await api.post('/domena/chat-box', { query: input });
+                const response = await api.post('/domena/chat-box', { id: domain, query: input });
                 const assistantResponse = { text: response.data, fromUser: false };
-                console.log(response.data);
                 setMessages(prevMessages => [...prevMessages, assistantResponse]);
             } catch (error) {
                 console.error("Error:", error.response ? error.response.data : error.message);
@@ -52,6 +52,12 @@ function AIAssistant() {
             } finally {
                 setWaitingForResponse(false);
             }
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSendMessage();
         }
     };
 
@@ -91,14 +97,16 @@ function AIAssistant() {
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
+                            onKeyPress={handleKeyPress}
                             className="flex-1 border border-gray-300 rounded-l-lg p-2"
                             placeholder="Type a message..."
                         />
                         <button
                             onClick={handleSendMessage}
-                            className="bg-indigo-600 text-white p-2 rounded-r-lg"
+                            className={`bg-indigo-600 text-white p-2 rounded-r-lg ${waitingForResponse ? 'opacity-75 cursor-not-allowed' : ''}`}
+                            disabled={waitingForResponse}
                         >
-                            Send
+                            {waitingForResponse ? 'Send' : 'Send'}
                         </button>
                     </div>
                 </div>
@@ -106,5 +114,9 @@ function AIAssistant() {
         </div>
     );
 }
+
+AIAssistant.propTypes = {
+    domain: PropTypes.string.isRequired,
+};
 
 export default AIAssistant;
