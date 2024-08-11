@@ -8,11 +8,17 @@ import io
 from gradientai import Gradient
 import random
 
-def download_file(url, output_path):
+
+def download_file(url, destination):
+    if not url.startswith('http://') and not url.startswith('https://'):
+        raise ValueError(f"Invalid URL: {url}. A valid scheme (http or https) is required.")
+    
     response = requests.get(url)
-    with open(output_path, 'wb') as file:
-        file.write(response.content)
-    return output_path
+    with open(destination, 'wb') as f:
+        f.write(response.content)
+    print(f"Downloaded file from {url} to {destination}.")
+    return destination
+
 
 def main(temp_file_path):
     print("python laufa")
