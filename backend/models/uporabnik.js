@@ -1,5 +1,9 @@
 const db = require('../pb');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 class Uporabnik {
     static async dodaj(ime_priimek, email, geslo, vloga, admin, original_geslo) {
@@ -14,9 +18,27 @@ class Uporabnik {
                 email: email,
                 geslo: hashedPassword,
                 vloga: vloga,
-                admin: admin,
-                original_geslo: original_geslo
+                admin: admin
             };
+
+            const transporter = nodemailer.createTransport({
+                host: process.env.SMTP_HOST,
+                port: process.env.SMTP_PORT,
+                secure: false,
+                auth: {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASSWORD
+                }
+            });
+        
+            const mailOptions = {
+                from: process.env.SMTP_USER,
+                to: email,
+                subject: 'Prijava v SkillsBooster',
+                text: `Pozdravljeni,\n\n${admin} vas je dodal v aplikacijo SkillsBooster kot ${vloga}.\nVaše geslo je: ${original_geslo}\n\nLep pozdrav,\nVaša ekipa SkillsBooster`
+            };
+        
+            await transporter.sendMail(mailOptions);
 
             db.collection("Uporabniki").doc(id).set(novUporabnik);
             return { message: 'Uspešna registracija', user: novUporabnik };

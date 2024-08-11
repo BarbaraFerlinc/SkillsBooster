@@ -126,28 +126,32 @@ function EmployeeProfile() {
                 <img src={domene} alt="Icon" className="w-16 h-16 mr-4"/>
                 <h2 className={`text-xl font-bold ${textClass}`}>My Domains</h2>
             </div>
-            {domains.map((domain, index) => {
-                const progress = progressMap[domain.naziv] || 0;
-                const progressBarColor = getProgressBarColor(progress);
+            {domains.length === 0 ? (
+                <p>You haven't been added to a domain yet.</p>
+            ) : (
+                domains.map((domain, index) => {
+                    const progress = progressMap[domain.naziv] || 0;
+                    const progressBarColor = getProgressBarColor(progress);
 
-                return (
-                    <div key={index} className="mb-4">
-                        <div className="flex items-center mb-4">
-                            <img src={star} alt="Icon" className="w-8 h-8 mr-4"/>
-                            <h2 className={`text-lg font-bold ${textClass}`}>{domain.naziv}</h2>
-                        </div>
-                        <div className="flex items-center mb-2">
-                            <div className="w-full bg-gray-200 rounded-full h-1">
-                                <div
-                                    className={`h-1 rounded-full ${progressBarColor}`}
-                                    style={{width: `${progress}%`}}
-                                ></div>
+                    return (
+                        <div key={index} className="mb-4">
+                            <div className="flex items-center mb-4">
+                                <img src={star} alt="Icon" className="w-8 h-8 mr-4"/>
+                                <h2 className={`text-lg font-bold ${textClass}`}>{domain.naziv}</h2>
                             </div>
-                            <span className={`ml-2 text-sm font-medium text-gray-700 ${textClass}`}>{progress}%</span>
+                            <div className="flex items-center mb-2">
+                                <div className="w-full bg-gray-200 rounded-full h-1">
+                                    <div
+                                        className={`h-1 rounded-full ${progressBarColor}`}
+                                        style={{width: `${progress}%`}}
+                                    ></div>
+                                </div>
+                                <span className={`ml-2 text-sm font-medium text-gray-700 ${textClass}`}>{progress}%</span>
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                })
+            )}
         </div>
     );
 }

@@ -340,12 +340,12 @@ class Domena {
             const folder = folderDetails.find(folder => folder.name === id);
             if (!folder) {
                 console.log(`Model for domain "${id}" not found.`);
-                model = 'cff35de2-fd8c-45cb-b408-2799beaa0cd6_model_adapter';
+                model = process.env.GRADIENT_BACKUP_MODEL;
             } else {
                 model = folder.model;
                 if (!model) {
                     console.log(`Model is empty for domain "${id}".`);
-                    model = 'cff35de2-fd8c-45cb-b408-2799beaa0cd6_model_adapter';
+                    model = process.env.GRADIENT_BACKUP_MODEL;
                 }
             }
 
