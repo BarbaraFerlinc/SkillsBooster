@@ -1,50 +1,61 @@
 # SkillsBooster
-### 1. Admin registration
-   1. When the dashboard of the app opens, click on the button "Go to Regestration", to register your company
-   2. Fill in the form and click on "Register"
-   3. Then you can login as Admin
+___
+### Description
+___
+Our platform offers a comprehensive tool designed to support companies in 
+evaluating and developing their employees' knowledge through customizable
+self-assessment questionnaires and AI-generated learning contend.
 
-#### 1.2 Add Users
-1. As you login as Admin, you'll e directed to the Admin profile, wher you can add the users of the company
-2. Click on the button "Add Users"
-3. Fill the form and select the role for the user
-4. Click "Confirm", the user will show in the table below
+The solution aids management in ensuring the continuous growth of their team's skills.
+### Key functionalities
+___
+#### * Knowledge Domain Management:
++ Easily add and manage knowledge domains
++ Define and edit key competencies within each domain
+#### * Question Management
+* User-friendly interface for creating, editing and deleting questions within a domain
+* Option to include correct and incorrect answers for each question
+* Link questions to theoretical knowledge or relevant learning resources
+#### * AI Integration
+* AI-powered generation of simple answers
+* Analysis of user responses to identify knowledge gaps
+* Automated suggestions for knowledge improvement, including learning materials based on incorrect answers.
+#### * Learning Material
+* Link or upload learning materials such as articles, videos, e-books, or web resources relevant to knowledge enhancement.
+* Organize learning materials by domain and specific competencies.
+#### * Skills Matrix Generation 
++ Track employee progress and compare knowledge levels
++ Automatically generate and update a Skills Matrix based on employee progress
+#### Responsiveness and Accessibility 
++ Intuitive and uer-friendly interface for easy navigation and use
++ Accessible on various devices (computers, tablets and smartphones) with adaptability to different screen sizes.
 
-### 2. User Login
-### 2.1 Manager
-#### 2.1.1 Add Domain
-1. On the left side of the screen, where the menu is, click on "Add Domain" button
-2. Fill in the form and click "Submit"
-3. The domain will appear on the menu
+### Technologies used
+___
+<div style="width: 100%; text-align: center;">
 
-#### 2.1.2 Add User/s to Domain
-1. On the Manager profile, you'll see a button "Add User to Domain"
-2. Click on the button
-3. Select User/s and select the Domain
-4. Click "Submit" and the users will show on the Domains below
+|                                                                                     React JSX                                                                                     |                                                                               JavaScript                                                                                |                                                                                Python                                                                                |                                                                                   Firebase                                                                                    |                                                                                     OpenAI                                                                                     |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| :-----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | 
+| <a href="https://reactjs.org/docs/introducing-jsx.html" title="React JSX"><img src="https://github.com/get-icon/geticon/raw/master/icons/react.svg" alt="React JSX" width="50px" height="50px"></a> | <a href="https://www.javascript.com/" title="JavaScript"><img src="https://github.com/get-icon/geticon/raw/master/icons/javascript.svg" alt="JavaScript" width="50px" height="50px"></a> | <a href="https://www.python.org/" title="Python"><img src="https://github.com/get-icon/geticon/raw/master/icons/python.svg" alt="Python" width="50px" height="50px"></a> | <a href="https://firebase.google.com/" title="Firebase"><img src="https://github.com/get-icon/geticon/raw/master/icons/firebase.svg" alt="Firebase" width="50px" height="50px"></a> | <a href="https://openai.com/" title="OpenAI"><img src="https://assets-global.website-files.com/5e6aa3e3f001fae105b8e1e7/63920ffe0f48f96db746221d_open-ai-logo-8B9BFEDC26-seeklogo.com.png" alt="OpenAI" width="50px" height="50px"></a> |
 
-#### 2.1.3 Add Files
-When on a specific domain
-1. Under section Files, click on button "Add Files"
-2. Select files from file explorer
+</div>
 
-#### 2.1.4 Add Quiz
-Wen on a specific domain
-1. Under the section Quizzes, click on button "Add Quiz"
-2. Fill in the form and select the type of question 
-   1. Closed Question: 
-      1. Write the question 
-      2. Click on "Add Option" and write options
-      3. Select the correct answer
-      4. Click on "Confirm Question" to add question on the list
-   2. Open Question: 
-      1. Write question and write answer
-      2. Click "Confirm Question" to add question on the list
-3. When you click "Confirm Question", you can start writing a new one
-4. When you are satisfied with questions, click "Submit Quiz"
-### 2.2 User
-As a User you can view your Profile, the Domains you are added in, solve Quizzes, download files and use AI Assistant to help you learn
 
-#### 2.2.1 Reset Password
-1. On your profile, click on "Forgot Password"
-2. Write your Email, and the password will be sent to you via Email
+## Backend
+___
+### Installation
+___
+### Development
+___
+### Testing
+___
+### Build
+___
+
+## Frontend
+___
+### Installation
+___
+### Development
+___
+### Build
