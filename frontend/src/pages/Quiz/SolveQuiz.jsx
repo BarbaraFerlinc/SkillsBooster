@@ -53,7 +53,6 @@ function SolveQuiz() {
         console.log(answers);
     }, [answers]);
 
-    // Function to handle selecting an answer for closed questions
     const handleSelectAnswer = (optionIndex) => {
         const updatedAnswers = [...answers];
         const selectedOption = questions[currentQuestionIndex].odgovori[optionIndex].split(';')[0];
@@ -69,37 +68,33 @@ function SolveQuiz() {
         setAnswers(updatedAnswers);
     };
 
-    // Function to handle inputting an answer for open questions
     const handleInputAnswer = (e) => {
         const updatedAnswers = [...answers];
         updatedAnswers[currentQuestionIndex] = e.target.value;
         setAnswers(updatedAnswers);
     };
 
-    // Function to go to the next question
     const handleNextQuestion = () => {
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         }
     };
 
-    // Function to go to the previous question
     const handlePreviousQuestion = () => {
         if (currentQuestionIndex > 0) {
             setCurrentQuestionIndex(currentQuestionIndex - 1);
         }
     };
 
-    // Function to end the quiz
     const handleEndQuiz = async () => {
-        const score = calculateScore();
+        const score = await calculateScore();
         const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         await api.post(`/kviz/spremeni-rezultat`, { id: novId, uporabnikId: user.email, novaVrednost: score });
         
-        window.location.href = `/quiz/${id}/${domain}?score=${score}`;
+        //window.location.href = `/quiz/${id}/${domain}?score=${score}`;
     };
 
-    const calculateScore = () => {
+    const calculateScore = async () => {
         let correctAnswers = 0;
         for (let i = 0; i < questions.length; i++) {
             const question = questions[i];
@@ -120,19 +115,19 @@ function SolveQuiz() {
                     correctAnswers++;
                 }
             } else if (question.tip === 'open') {
-                // tu se more dodat AI
-                /*api.post('/kviz/preveri-odgovor', { id: novId, query: question.nekaj??, answer: userAnswer })
+                await api.post('/kviz/preveri-odgovor', { rightAnswer: question.odgovori[0], answer: userAnswer })
                 .then(res => {
+                    console.log("open: ", res.data);
                     if (res.data == 'true') {
                         correctAnswers++;
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                });*/
-                if (userAnswer === question.odgovori[0]) {
+                });
+                /*if (userAnswer === question.odgovori[0]) {
                     correctAnswers++;
-                }
+                }*/
             }
         }
         const score = Math.round((correctAnswers / questions.length) * 100);

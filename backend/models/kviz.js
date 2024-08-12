@@ -1,5 +1,8 @@
 const db = require('../pb');
 const axios = require('axios');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 class Kviz {
     static async dodaj(naziv, vprasanja) {
@@ -219,13 +222,11 @@ class Kviz {
         }
     }
 
-    static async preveriOdgovor(id, query, answer) {
+    static async preveriOdgovor(rightAnswer, answer) {
         try {
-            // dodaj jasa_test_2.js
-            const rightAnswer = '';
-            // ali je del 'to the question ${query} potreben??
-            const prompt = `Given the expected response: ${rightAnswer}, and the generated response: ${answer} to the question ${query}, does the generated response accurately capture the key information? Yes or No.`;
-            const response = await axios.post('https://api.gradient.ai/api/models/399e5ea8-21ba-4558-89b3-d962f7efd0db_model_adapter/complete', {
+            const prompt = `Given the response: ${rightAnswer}, and the response: ${answer}, is second response correct enough? Yes or No.`;
+            const model = process.env.GRADIENT_BACKUP_MODEL;
+            const response = await axios.post(`https://api.gradient.ai/api/models/${model}/complete`, {
                 query: prompt,
                 maxGeneratedTokenCount: 100
             }, {
