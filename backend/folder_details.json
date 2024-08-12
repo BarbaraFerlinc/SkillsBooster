@@ -2,8 +2,8 @@
   {
     "name": "brandnew",
     "url": "gs://[object Object]/brandnew",
-    "model": "",
-    "modelCreationTime": ""
+    "model": "68167302-85ec-4951-ba50-30af0c3c3190_model_adapter",
+    "modelCreationTime": "2024-08-12T21:12:35.571Z"
   },
   {
     "name": "daj_bog_da_dela",
@@ -22,5 +22,11 @@
     "url": "gs://[object Object]/seenadomena",
     "model": "",
     "modelCreationTime": ""
+  },
+  {
+    "name": "datascience",
+    "url": "gs://[object Object]/datascience",
+    "model": "68167302-85ec-4951-ba50-30af0c3c3190_model_adapter",
+    "modelCreationTime": "2024-08-12T21:15:15.461Z"
   }
 ]

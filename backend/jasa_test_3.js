@@ -1,53 +1,97 @@
 require('dotenv').config();
-const { initializeApp } = require('firebase/app');
-const { getStorage, ref, listAll } = require('firebase/storage');
-const fs = require('fs');
-const path = require('path');
+const fetch = require('node-fetch'); // Ensure you have node-fetch installed: npm install node-fetch
 
-// Firebase configuration from .env file
-const firebaseConfig = {
-    apiKey: process.env.EXPRESS_APP_API_KEY,
-    authDomain: process.env.EXPRESS_APP_AUTH_DOMAIN,
-    projectId: process.env.EXPRESS_APP_PROJECT_ID,
-    storageBucket: process.env.EXPRESS_APP_STORAGE_BUCKET,
-    messagingSenderId: process.env.EXPRESS_APP_MESSAGING_SENDER_ID,
-    appId: process.env.EXPRESS_APP_APP_ID
-};
+class Kviz {
+    static async preveriOdgovor(id, query, answer) {
+        try {
+            // Simulated quiz data (instead of fetching from a database)
+            const quizzes = {
+                'testKviz1': {
+                    vprasanja: [
+                        { id: 'q1', vprasanje: 'What is 2 + 2?', pravilenOdgovor: '4' },
+                        { id: 'q2', vprasanje: 'Capital of France?', pravilenOdgovor: 'Paris' },
+                    ]
+                },
+                'testKviz2': {
+                    vprasanja: [
+                        { id: 'q1', vprasanje: 'Who wrote "1984"?', pravilenOdgovor: 'George Orwell' },
+                        { id: 'q2', vprasanje: 'Square root of 16?', pravilenOdgovor: '4' },
+                    ]
+                }
+            };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const storage = getStorage(app);
+            const kviz = quizzes[id];
 
-const outputPath = path.join(__dirname, 'folder_details.json');
+            if (!kviz) {
+                throw new Error('Kviz ne obstaja');
+            }
 
-async function fetchFolderDetails() {
-    const folderRef = ref(storage, '');
-    const list = await listAll(folderRef);
+            const vprasanje = kviz.vprasanja.find(vprasanje => vprasanje.id === query || vprasanje.vprasanje === query);
 
-    const folderDetails = list.prefixes.map(prefix => ({
-        name: prefix.name,
-        url: `gs://${storage._bucket}/${prefix.fullPath}`,
-        model: "",
-        modelCreationTime: ""
-    }));
+            if (!vprasanje) {
+                throw new Error('Vprašanje ne obstaja v tem kvizu');
+            }
 
-    return folderDetails;
-}
+            const rightAnswer = vprasanje.pravilenOdgovor || '';
 
-async function main() {
-    try {
-        // Clear the JSON file before writing new data
-        fs.writeFileSync(outputPath, JSON.stringify([], null, 2));
+            const prompt = `Given the expected response: '${rightAnswer}', and the generated response: '${answer}' to the question '${vprasanje.vprasanje}', does the generated response accurately capture the key information? Yes or No.`;
 
-        const folderDetails = await fetchFolderDetails();
-        console.log('Folders:', folderDetails);
+            const responseGPT = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        { role: 'system', content: 'You are a helpful assistant.' },
+                        { role: 'user', content: prompt }
+                    ],
+                    max_tokens: 150,
+                    temperature: 0,
+                    top_p: 1,
+                    n: 1,
+                    stop: ["\n"]
+                })
+            });
 
-        fs.writeFileSync(outputPath, JSON.stringify(folderDetails, null, 2));
-        console.log('folder_details.json has been updated.');
-    } catch (error) {
-        console.error('Error fetching folder details:', error);
+            const data = await responseGPT.json();
+
+            // Log the entire response for debugging
+            console.log('OpenAI API response:', JSON.stringify(data, null, 2));
+
+            if (!data.choices || data.choices.length === 0) {
+                throw new Error('No choices returned by the API');
+            }
+
+            const evaluationResult = data.choices[0].message.content.trim();
+
+            return evaluationResult.toLowerCase().includes('yes');
+        } catch (error) {
+            throw new Error('Error evaluating response: ' + error.message);
+        }
     }
 }
 
-// Call the main function
-main();
+const runTests = async () => {
+    const testCases = [
+        { id: 'testKviz1', query: 'q1', answer: '4', expected: true },
+        { id: 'testKviz1', query: 'q2', answer: 'paris', expected: true },
+        { id: 'testKviz2', query: 'q1', answer: 'george orwell', expected: true },
+        { id: 'testKviz2', query: 'q2', answer: 'five', expected: false },
+        { id: 'testKviz2', query: 'q2', answer: '4', expected: true },
+    ];
+
+    for (let i = 0; i < testCases.length; i++) {
+        const { id, query, answer, expected } = testCases[i];
+        try {
+            const result = await Kviz.preveriOdgovor(id, query, answer);
+            console.log(`Test ${i + 1} - Expected: ${expected}, Got: ${result}, ${result === expected ? 'PASS' : 'FAIL'}`);
+        } catch (error) {
+            console.log(`Test ${i + 1} - Error: ${error.message}`);
+        }
+    }
+};
+
+runTests();

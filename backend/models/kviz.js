@@ -221,28 +221,55 @@ class Kviz {
 
     static async preveriOdgovor(id, query, answer) {
         try {
-            // dodaj jasa_test_2.js
-            const rightAnswer = '';
-            // ali je del 'to the question ${query} potreben??
-            const prompt = `Given the expected response: ${rightAnswer}, and the generated response: ${answer} to the question ${query}, does the generated response accurately capture the key information? Yes or No.`;
-            const response = await axios.post('https://api.gradient.ai/api/models/399e5ea8-21ba-4558-89b3-d962f7efd0db_model_adapter/complete', {
-                query: prompt,
-                maxGeneratedTokenCount: 100
-            }, {
-                headers: {
-                    'accept': 'application/json',
-                    'x-gradient-workspace-id': process.env.GRADIENT_WORKSPACE_ID,
-                    'content-type': 'application/json',
-                    'authorization': `Bearer ${process.env.GRADIENT_ACCESS_TOKEN}`
-                }
-            });
+           
+            const kvizRef = db.collection("Kvizi").doc(id);
+            const response = await kvizRef.get();
+            const kviz = response.data();
+    
+            if (!kviz) {
+                throw new Error('Kviz ne obstaja');
+            }
+    
+          
+            const vprasanje = kviz.vprasanja.find(vprasanje => vprasanje.id === query || vprasanje.vprasanje === query);
+    
+            if (!vprasanje) {
+                throw new Error('Vprašanje ne obstaja v tem kvizu');
+            }
+    
+            const rightAnswer = vprasanje.pravilenOdgovor || ''; 
+    
+          
+            const prompt = `Given the expected response: '${rightAnswer}', and the generated response: '${answer}' to the question '${vprasanje.vprasanje}', does the generated response accurately capture the key information? Yes or No.`;
+    
             
-            const evaluationResult = response.data.generatedOutput;
-            return evaluationResult.includes('Yes');
+            const responseGPT = await fetch('https://api.openai.com/v1/chat/completionss', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` 
+                },
+                body: JSON.stringify({
+                    prompt: prompt,
+                    max_tokens: 150,
+                    temperature: 0, 
+                    top_p: 1,
+                    n: 1,
+                    stop: ["\n"]
+                })
+            });
+    
+            
+            const data = await responseGPT.json();
+            const evaluationResult = data.choices[0].text.trim();
+    
+            
+            return evaluationResult.toLowerCase().includes('yes');
         } catch (error) {
             throw new Error('Error evaluating response: ' + error.message);
         }
     }
+    
 
     static async izbrisi(id) {
         try {
