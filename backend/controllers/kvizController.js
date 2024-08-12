@@ -170,9 +170,9 @@ async function odstraniRezultatKviz(req, res) {
 }
 
 async function preveriOdgovorKviz(req, res) {
-    const { id, query, answer } = req.body;
+    const { rightAnswer, answer } = req.body;
     try {
-        const response = await Kviz.preveriOdgovor(id, query, answer);
+        const response = await Kviz.preveriOdgovor(rightAnswer, answer);
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ error: 'Napaka pri preverjanju odgovora', details: error.message });

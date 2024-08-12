@@ -39,6 +39,37 @@ class Domena {
             throw new Error('Napaka pri vstavljanju domene v bazo: ' + error.message);
         }
     }
+    // ang dodaj
+    static async add(name, description, key_skills, owner) {
+        try {
+            const id = name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
+            const empty = Buffer.alloc(0);
+            const folder = ref(storage, `${id}/.placeholder`);
+            uploadBytes(folder, empty).then((snapshot) => {
+                console.log('Uploaded a blob or file!');
+            }).catch((error) => {
+                console.error('Error uploading file:', error);
+            });
+
+            const newDomain = {
+                name: name,
+                description: description,
+                key_skills: key_skills,
+                owner: owner,
+                quizzes: [],
+                employees: [],
+                results: [],
+                learning_materials: [],
+                links: []
+            };
+
+            db.collection("Knowledge_domains").doc(id).set(newDomain);
+            return { message: 'Domain added successfully', domain: newDomain };
+        } catch (error) {
+            throw new Error('Error inserting the domain into the database: ' + error.message);
+        }
+    }
 
     static async vse() {
         try {
@@ -54,6 +85,21 @@ class Domena {
             throw new Error('Napaka pri pridobivanju domen iz baze: ' + error.message);
         }
     }
+    // ang vse
+    static async all() {
+        try {
+            const domainsRef = db.collection("Knowledge_domains");
+            const response = await domainsRef.get();
+            const domains = [];
+            response.forEach(doc => {
+                domains.push(doc.data());
+            });
+
+            return domains;
+        } catch (error) {
+            throw new Error('Error retrieving domains from the database: ' + error.message);
+        }
+    }
 
     static async getById(id) {
         try {
@@ -64,6 +110,18 @@ class Domena {
             return domena;
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
+    // ang getById
+    static async getByIdAng(id) {
+        try {
+            const domainRef = db.collection("Knowledge_domains").doc(id);
+            const response = await domainRef.get();
+            const domain = response.data();
+
+            return domain;
+        } catch (error) {
+            throw new Error('Error retrieving domain from database: ' + error.message);
         }
     }
 
@@ -81,6 +139,21 @@ class Domena {
             throw new Error('Napaka pri pridobivanju domen iz baze: ' + error.message);
         }
     }
+    // ang getByUser
+    static async getByUserAng(id) {
+        try {
+            const domainsRef = db.collection("Knowledge_domains");
+            const response = await domainsRef.where('employees', 'array-contains', `${id}`).get();
+            const domains = [];
+            response.forEach(doc => {
+                domains.push(doc.data());
+            });
+
+            return domains;
+        } catch (error) {
+            throw new Error('Error retrieving domains from the database: ' + error.message);
+        }
+    }
 
     static async getByOwner(id) {
         try {
@@ -94,6 +167,21 @@ class Domena {
             return domene;
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domen iz baze: ' + error.message);
+        }
+    }
+    // ang getByOwner
+    static async getByOwnerAng(id) {
+        try {
+            const domainsRef = db.collection("Knowledge_domains");
+            const response = await domainsRef.where('owner', '==', `${id}`).get();
+            const domains = [];
+            response.forEach(doc => {
+                domains.push(doc.data());
+            });
+
+            return domains;
+        } catch (error) {
+            throw new Error('Error retrieving domains from the database: ' + error.message);
         }
     }
 
@@ -113,6 +201,25 @@ class Domena {
             }
         } catch (error) {
             throw new Error('Napaka pri posodabljanju domene v bazi: ' + error.message);
+        }
+    }
+    // ang spremeni
+    static async change(id, name, description, key_skills) {
+        try {
+            if (this.getById(id) != undefined) {
+                const domain = {
+                    name: name,
+                    description: description,
+                    key_skills: key_skills
+                };
+
+                db.collection("Knowledge_domains").doc(id).update(domain);
+                return { message: 'Domain update successful', domain: domain };
+            } else {
+                return { message: 'Domain update failed', domain: undefined };
+            }
+        } catch (error) {
+            throw new Error('Error updating domain in database: ' + error.message);
         }
     }
 
@@ -136,6 +243,29 @@ class Domena {
             return { message: 'Uspešna posodobitev domene', domena: domena };
         } catch (error) {
             throw new Error('Napaka pri pridobivanju domene iz baze: ' + error.message);
+        }
+    }
+    // ang dodajUporabnika
+    static async addUser(id, userId) {
+        try {
+            const domainRef = db.collection("Knowledge_domains").doc(id);
+            const response = await domainRef.get();
+            const domain = response.data();
+
+            if (domain.employees && domain.employees.includes(userId)) {
+                return { message: 'The user is already included in this domain', domain: domain };
+            }
+            const updatedEmployees = domain.employees ? [...domain.employees, userId] : [userId];
+
+            if (domain.results && domain.results.includes(`${userId};0`)) {
+                return { message: 'The user is already included in this domain', domain: domain };
+            }
+            const updatedResults = domain.results ? [...domain.results, `${userId};0`] : [`${userId};0`];
+
+            db.collection("Knowledge_domains").doc(id).update({employees: updatedEmployees, results: updatedResults});
+            return { message: 'Domain update successful', domain: domain };
+        } catch (error) {
+            throw new Error('Error retrieving domain from database: ' + error.message);
         }
     }
 
@@ -374,7 +504,6 @@ class Domena {
 
     static async updateModel(id) {
         try {
-            // dodaj jasa_test_4.js
             const tempDataFilePath = path.join(__dirname, 'temp_data.json');
             const folderDetailsPath = path.join(__dirname, 'folder_details.json');
 
@@ -386,54 +515,53 @@ class Domena {
             }));
             console.log('Pridobljene datoteke:', datoteke);
 
-            // Save file information to a temporary JSON file
             fs.writeFileSync(tempDataFilePath, JSON.stringify(datoteke, null, 2));
             console.log('temp_data.json je bil posodobljen.');
-            // Define the Python script path
-            const pythonScriptPath = path.join(__dirname, '..', 'AI', 'finetuning.py');
-            // Spawn the Python process with the temporary JSON file path as an argument
-            const pythonProcess = spawn('python', [pythonScriptPath, tempDataFilePath]);
 
-            let modelAdapterId = '';
-            pythonProcess.stdout.on('data', (data) => {
-                console.log(`stdout: ${data}`);
-                const output = data.toString();
-                const match = output.match(/Model Adapter ID: (\S+)/);
-                if (match) {
-                    modelAdapterId = match[1];
+            const apiUrl = process.env.API_URL;
+            console.log(apiUrl);
+            const response = await axios.post(apiUrl, {
+                datoteke: datoteke
+            }, {
+                timeout: 30 * 60 * 1000 // 30 minutes
+            });
+    
+            // Log the full server response
+            console.log('Response from the server:', JSON.stringify(response.data, null, 2));
+    
+            // If the response contains a modelAdapterId, update the folder details
+            if (response.data && response.data.modelAdapterId) {
+                const modelAdapterId = response.data.modelAdapterId;
+                const folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
+                const folderDetail = folderDetails.find(detail => detail.name === id);
+
+                if (folderDetail) {
+                    folderDetail.model = modelAdapterId;
+                    folderDetail.modelCreationTime = new Date().toISOString();
+                } else {
+                    folderDetails.push({
+                        name: id,
+                        url: `gs://${firebaseConfig.storageBucket}/${id}`,
+                        model: modelAdapterId,
+                        modelCreationTime: new Date().toISOString()
+                    });
                 }
-            });
 
-            pythonProcess.stderr.on('data', (data) => {
-                console.error(`stderr: ${data}`);
-            });
-
-            pythonProcess.on('close', (code) => {
-                console.log(`Rezultat izvajanja Python skripte: ${code}`);
-                if (code === 0) {
-                    const folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
-                    const folderDetail = folderDetails.find(detail => detail.name === id);
-
-                    if (folderDetail) {
-                        folderDetail.model = modelAdapterId;
-                        folderDetail.modelCreationTime = new Date().toISOString();
-                    } else {
-                        folderDetails.push({
-                            name: id,
-                            url: `gs://${firebaseConfig.storageBucket}/${id}`,
-                            model: modelAdapterId,
-                            modelCreationTime: new Date().toISOString()
-                        });
-                    }
-
-                    fs.writeFileSync(folderDetailsPath, JSON.stringify(folderDetails, null, 2));
-                    console.log(`Folder details for ${id} updated.`);
-                }
-            });
+                fs.writeFileSync(folderDetailsPath, JSON.stringify(folderDetails, null, 2));
+                console.log(`Folder details for ${id} updated.`);
+            }
 
             return { message: 'Uspešna posodobitev modela.' };
         } catch (error) {
-            throw new Error('Napaka pri posodabljanju modela: ' + error.message);
+            if (error.response) {
+                console.error('Error status: ' + error.response.status);
+                console.error('Error data: ' + JSON.stringify(error.response.data, null, 2));
+            } else if (error.request) {
+                console.error('No response received: ' + error.request);
+            } else {
+                console.error('Error in setup:: ' + error.message);
+            }
+            console.error('Napaka pri pridobivanju datotek ali pošiljanju zahtevka:', error.config);
         }
     }
 

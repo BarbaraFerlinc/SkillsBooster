@@ -1,5 +1,8 @@
 const db = require('../pb');
 const axios = require('axios');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 class Kviz {
     static async dodaj(naziv, vprasanja) {
@@ -219,8 +222,9 @@ class Kviz {
         }
     }
 
-    static async preveriOdgovor(id, query, answer) {
+    static async preveriOdgovor(rightAnswer, answer) {
         try {
+<<<<<<< HEAD
            
             const kvizRef = db.collection("Kvizi").doc(id);
             const response = await kvizRef.get();
@@ -242,6 +246,21 @@ class Kviz {
           
             const prompt = `Given the expected response: '${rightAnswer}', and the generated response: '${answer}' to the question '${vprasanje.vprasanje}', does the generated response accurately capture the key information? Yes or No.`;
     
+=======
+            const prompt = `Given the response: ${rightAnswer}, and the response: ${answer}, is second response correct enough? Yes or No.`;
+            const model = process.env.GRADIENT_BACKUP_MODEL;
+            const response = await axios.post(`https://api.gradient.ai/api/models/${model}/complete`, {
+                query: prompt,
+                maxGeneratedTokenCount: 100
+            }, {
+                headers: {
+                    'accept': 'application/json',
+                    'x-gradient-workspace-id': process.env.GRADIENT_WORKSPACE_ID,
+                    'content-type': 'application/json',
+                    'authorization': `Bearer ${process.env.GRADIENT_ACCESS_TOKEN}`
+                }
+            });
+>>>>>>> 4b59679b0f979326d2029d39de17d1d500f73e36
             
             const responseGPT = await fetch('https://api.openai.com/v1/chat/completionss', {
                 method: 'POST',

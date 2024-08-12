@@ -1,7 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
+const axios = require('axios');
 const { initializeApp } = require('firebase/app');
 const { getStorage, ref, listAll, getDownloadURL } = require('firebase/storage');
 
@@ -19,10 +19,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
-// v domena.js -> updateModel
-
 const tempDataFilePath = path.join(__dirname, 'temp_data.json');
-const folderDetailsPath = path.join(__dirname, 'folder_details.json');
+const folderDetailsPath = path.join(__dirname, 'model_info.json');
 
 // Function to fetch URLs from Firebase
 async function fetchFileUrls(folderName) {
@@ -47,35 +45,35 @@ async function processFolder(folderName) {
         fs.writeFileSync(tempDataFilePath, JSON.stringify(datoteke, null, 2));
         console.log('temp_data.json je bil posodobljen.');
 
-        // Define the Python script path
-        const pythonScriptPath = path.join(__dirname, '..', 'AI', 'finetuning.py');
+        // Send a POST request to the deployed FastAPI endpoint
+        const apiUrl = 'https://ai-1-r4zl.onrender.com/process_files'; // Replace with your actual deployed URL
 
-        // Spawn the Python process with the temporary JSON file path as an argument
-        const pythonProcess = spawn('python', [pythonScriptPath, tempDataFilePath]);
-
-        let modelAdapterId = '';
-
-        pythonProcess.stdout.on('data', (data) => {
-            console.log(`stdout: ${data}`);
-            const output = data.toString();
-            const match = output.match(/Model Adapter ID: (\S+)/);
-            if (match) {
-                modelAdapterId = match[1];
-            }
+        // Axios request with extended timeout
+        const response = await axios.post(apiUrl, {
+            datoteke: datoteke
+        }, {
+            timeout: 30 * 60 * 1000 // 30 minutes
         });
 
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`stderr: ${data}`);
-        });
+        // Log the full server response
+        console.log('Response from the server:', JSON.stringify(response.data, null, 2));
 
-        pythonProcess.on('close', (code) => {
-            console.log(`Rezultat izvajanja Python skripte: ${code}`);
-            if (code === 0) {
-                updateFolderDetails(folderName, modelAdapterId);
-            }
-        });
+        // If the response contains a modelAdapterId, update the folder details
+        if (response.data && response.data.modelAdapterId) {
+            updateFolderDetails(folderName, response.data.modelAdapterId);
+        }
+
     } catch (error) {
-        console.error('Napaka pri pridobivanju datotek:', error);
+        // Enhanced error logging
+        if (error.response) {
+            console.error(`Error Status: ${error.response.status}`);
+            console.error(`Error Data: ${JSON.stringify(error.response.data, null, 2)}`);
+        } else if (error.request) {
+            console.error('No response received:', error.request);
+        } else {
+            console.error('Error in setup:', error.message);
+        }
+        console.error('Napaka pri pridobivanju datotek ali pošiljanju zahtevka:', error.config);
     }
 }
 
@@ -101,4 +99,4 @@ function updateFolderDetails(folderName, modelAdapterId) {
 }
 
 // Run the function for a specific folder
-processFolder('daj_bog_da_dela'); // Replace 'daj_bog_da_dela' with the desired folder name
+processFolder('novadomena'); // Replace 'daj_bog_da_dela' with the desired folder name
