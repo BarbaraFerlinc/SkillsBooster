@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import WelcomeBanner from '../partials/dashboard/WelcomeBanner';
 
@@ -10,9 +9,6 @@ function Dashboard() {
 
     return (
         <div className="flex h-screen overflow-hidden">
-            {/* Sidebar */}
-            {/*<Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />*/}
-
             {/* Content area */}
             <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                 {/* Site header */}
@@ -40,7 +36,7 @@ function Dashboard() {
                                 <p className="text-sm text-slate-600 mb-4">Create a new account to get started with our
                                     services.</p>
                                 <NavLink to="/register"
-                                         className="btn bg-purple-300 hover:bg-purple-400 text-white"> {/* Change bg-blue-500 to bg-purple-300 */}
+                                         className="btn bg-purple-300 hover:bg-purple-400 text-white">
                                     Go to Registration
                                 </NavLink>
                             </div>
@@ -51,7 +47,7 @@ function Dashboard() {
                                 <h2 className="text-lg font-semibold text-slate-800 mb-2">Login</h2>
                                 <p className="text-sm text-slate-600 mb-4">Already have an account? Log in here.</p>
                                 <NavLink to="/login"
-                                         className="btn bg-blue-300 hover:bg-blue-400 text-white"> {/* Change bg-green-500 to bg-blue-300 */}
+                                         className="btn bg-blue-300 hover:bg-blue-400 text-white">
                                     Go to Login
                                 </NavLink>
                             </div>

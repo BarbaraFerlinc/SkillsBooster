@@ -8,24 +8,24 @@ import {useThemeProvider} from "../../utils/ThemeContext.jsx";
 function AdminProfile() {
     const [currentUser, setCurrentUser] = useState(null);
     const [users, setUsers] = useState([]);
-
     const [userAdded, setUserAdded] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [newUserName, setNewUserName] = useState('');
     const [newUserEmail, setNewUserEmail] = useState('');
     const [newUserRole, setNewUserRole] = useState('user');
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const { user } = UserAuth();
     const { currentTheme } = useThemeProvider();
 
     useEffect(() => {
         if (user) {
-            const uporabnikovEmail = user.email;
-            api.post('/uporabnik/profil', { id: uporabnikovEmail })
+            const userEmail = user.email;
+            api.post('/user/id', { id: userEmail })
                 .then(res => {
-                    const profil = res.data;
-                    setCurrentUser(profil);
+                    const profile = res.data;
+                    setCurrentUser(profile);
                 })
                 .catch(err => {
                     console.error(err);
@@ -35,16 +35,16 @@ function AdminProfile() {
 
     useEffect(() => {
         if (currentUser) {
-            const fetchUporabniki = async () => {
+            const fetchUsers = async () => {
                 try {
-                    const response = await api.post('/uporabnik/adminEmail', { adminEmail: currentUser.email });
+                    const response = await api.post('/user/adminEmail', { adminEmail: currentUser.email });
                     setUsers(response.data);
                     setUserAdded(false);
                 } catch (er) {
-                    console.log("Napaka pri pridobivanju uporabnikov", er);
+                    console.log("Error retrieving users", er);
                 }
             }
-            fetchUporabniki();
+            fetchUsers();
         }
     }, [currentUser, userAdded]);
 
@@ -83,6 +83,8 @@ function AdminProfile() {
 
     const handleConfirmAddUser = async () => {
         if (validateForm()){
+            setLoading(true);
+
             var config = {apiKey: import.meta.env.VITE_API_KEY,
                     authDomain: import.meta.env.VITE_AUTH_DOMAIN,
                     projectId: import.meta.env.VITE_PROJECT_ID,
@@ -93,18 +95,18 @@ function AdminProfile() {
             let auth = getAuth(secondaryApp);
             
             const newUser = {
-                ime_priimek: newUserName,
+                full_name: newUserName,
                 email: newUserEmail,
-                geslo: Math.random().toString(36).slice(-12),
-                vloga: newUserRole,
+                password: Math.random().toString(36).slice(-12),
+                role: newUserRole,
                 admin: currentUser.email
             };
 
             try {
-                await createUserWithEmailAndPassword(auth, newUserEmail, newUser.geslo);
+                await createUserWithEmailAndPassword(auth, newUserEmail, newUser.password);
                 await signOut(auth);
 
-                const response = await api.post("/uporabnik/dodaj", newUser, {
+                const response = await api.post("/user/add", newUser, {
                     headers: {
                         "Content-Type": "application/json",
                         Accept: "application/json",
@@ -191,16 +193,17 @@ function AdminProfile() {
                             <button
                                 onClick={handleCancel}
                                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                disabled={loading}
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleConfirmAddUser}
-                                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                disabled={loading}
                             >
-                                Confirm
+                                {loading ? 'Confirm' : 'Confirm'}
                             </button>
-
                         </div>
                     </div>
                 </div>
@@ -219,9 +222,9 @@ function AdminProfile() {
                 {users.map(user => (
                     <tr key={user.id}>
 
-                        <td className={`py-2 px-15 border-b  ${textClass}`}>{user.ime_priimek}</td>
+                        <td className={`py-2 px-15 border-b  ${textClass}`}>{user.full_name}</td>
                         <td className={`py-2 px-15  border-b ${textClass}`}>{user.email}</td>
-                        <td className={`py-2 px-15  border-b ${textClass}`}>{user.vloga}</td>
+                        <td className={`py-2 px-15  border-b ${textClass}`}>{user.role}</td>
                         <td className={`py-2 px-15  border-b ${textClass}`}>
 
                         </td>

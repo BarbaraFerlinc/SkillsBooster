@@ -12,20 +12,19 @@ import { UserAuth } from '../../context/AuthContext.jsx';
 import { useThemeProvider } from '../../utils/ThemeContext.jsx';
 
 const initialDomain = {
-    kljucna_znanja: "",
-    kvizi: [],
+    key_skills: "",
+    quizzes: [],
     lastnik: "",
-    naziv: "No Domain",
-    opis: "",
-    rezultati: [],
-    zaposleni: [],
-    gradiva: []
+    name: "No Domain",
+    description: "",
+    results: [],
+    employees: [],
+    learning_materials: []
 }
 
 function Domain() {
     const [showInput, setShowInput] = useState(false);
     const [link, setLink] = useState('');
-
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [currentDomain, setCurrentDomain] = useState(initialDomain);
     const [currentUser, setCurrentUser] = useState(null);
@@ -39,15 +38,15 @@ function Domain() {
 
     const { id } = useParams();
     const { user } = UserAuth();
-    const { currentTheme } = useThemeProvider(); // Get the current theme
+    const { currentTheme } = useThemeProvider();
 
     useEffect(() => {
         if (id) {
-            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            api.post('/domena/id', { id: novId })
+            const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post('/domain/id', { id: newId })
                 .then(res => {
-                    const domena = res.data;
-                    setCurrentDomain(domena);
+                    const domain = res.data;
+                    setCurrentDomain(domain);
                 })
                 .catch(err => {
                     console.error(err);
@@ -57,12 +56,12 @@ function Domain() {
 
     useEffect(() => {
         if (user) {
-            const uporabnikovEmail = user.email;
+            const userEmail = user.email;
 
-            api.post('/uporabnik/profil', { id: uporabnikovEmail })
+            api.post('/user/id', { id: userEmail })
                 .then(res => {
-                    const profil = res.data;
-                    setCurrentUser(profil);
+                    const profile = res.data;
+                    setCurrentUser(profile);
                 })
                 .catch(err => {
                     console.error(err);
@@ -83,11 +82,11 @@ function Domain() {
     }, [id, linkDeleted]);
 
     const fetchFiles = () => {
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post('/domena/gradiva', { id: novId })
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post('/domain/materials', { id: newId })
             .then(res => {
-                const gradiva = res.data;
-                setFiles(gradiva);
+                const materials = res.data;
+                setFiles(materials);
                 setFileAdded(false);
             })
             .catch(err => {
@@ -96,11 +95,11 @@ function Domain() {
     };
 
     const fetchQuizzes = () => {
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post('/domena/kvizi', { id: novId })
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post('/domain/quizzes', { id: newId })
             .then(async res => {
-                const kvizi = res.data;
-                const response = await api.post('/kviz/ids', { ids: kvizi });
+                const quizzesData = res.data;
+                const response = await api.post('/quiz/ids', { ids: quizzesData });
                 setQuizzes(response.data);
                 setQuizDeleted(false);
             })
@@ -110,11 +109,11 @@ function Domain() {
     };
 
     const fetchLinks = () => {
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post('/domena/linki', { id: novId })
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post('/domain/links', { id: newId })
             .then(res => {
-                const linki = res.data;
-                setLinks(linki);
+                const linksData = res.data;
+                setLinks(linksData);
                 setLinkDeleted(false);
             })
             .catch(err => {
@@ -124,15 +123,15 @@ function Domain() {
 
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
         if (selectedFile) {
-            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             const formData = new FormData();
-            console.log(selectedFile);
-            formData.append('id', novId);
-            formData.append('naziv', selectedFile.name);
+            formData.append('id', newId);
+            formData.append('name', selectedFile.name);
             formData.append('file', selectedFile);
 
-            api.post('/domena/dodaj-gradivo', formData, {
+            api.post('/domain/add-material', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -146,8 +145,8 @@ function Domain() {
     };
 
     const handleFileDownload = (fileName) => {
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post(`/domena/beri-gradivo`, { id: novId, naziv: fileName })
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post(`/domain/read-material`, { id: newId, name: fileName })
             .then(res => {
                 window.open(res.data, '_blank');
             })
@@ -157,8 +156,8 @@ function Domain() {
     }
 
     const handleFileDelete = (fileName) => {
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post(`/domena/izbrisi-gradivo`, { id: novId, naziv: fileName })
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post(`/domain/delete-material`, { id: newId, name: fileName })
             .then(res => {
                 setFileAdded(true);
             })
@@ -168,9 +167,9 @@ function Domain() {
     };
 
     const handleQuizDelete = async (quizName) => {
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        const kvizId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post(`/domena/odstrani-kviz`, { id: novId, kvizId: kvizId })
+        const quizId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post(`/domain/delete-quiz`, { id: newId, quizId: quizId })
             .then(res => {
                 setQuizDeleted(true);
             })
@@ -178,14 +177,14 @@ function Domain() {
                 console.error(err);
             });
 
-        await api.post('/kviz/id', { id: kvizId })
+        await api.post('/quiz/id', { id: quizId })
             .then(res => {
-                const kviz = res.data;
-                kviz.vprasanja.forEach(vprasanje => {
-                    api.delete(`/vprasanje/${vprasanje}`);
+                const quiz = res.data;
+                quiz.questions.forEach(question => {
+                    api.delete(`/question/${question}`);
                 });
 
-                api.delete(`/kviz/${kvizId}`);
+                api.delete(`/quiz/${quizId}`);
             })
             .catch(err => {
                 console.error(err);
@@ -193,8 +192,8 @@ function Domain() {
     };
 
     const handleUpdateModel = () => {
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        /*api.post(`/domena/update-model`, { id: novId })
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        /*api.post(`/domain/update-model`, { id: newId })
             .then(res => {
                 console.log(res.data);
             })
@@ -226,8 +225,8 @@ function Domain() {
 
     const handleConfirmLink = () => {
         if (validateForm()){
-            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            api.post(`/domena/dodaj-link`, { id: novId, link: link })
+            const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post(`/domain/add-link`, { id: newId, link: link })
                 .then(res => {
                     setLinkDeleted(true);
                     setLink('');
@@ -244,8 +243,8 @@ function Domain() {
     };
 
     const handleLinkDelete = async (link) => {
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post(`/domena/odstrani-link`, { id: novId, link: link })
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post(`/domain/delete-link`, { id: newId, link: link })
             .then(res => {
                 setLinkDeleted(true);
             })
@@ -270,19 +269,19 @@ function Domain() {
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
                         {/* Main Header */}
-                        <DynamicHeader domainName={currentDomain.naziv}/>
+                        <DynamicHeader domainName={currentDomain.name}/>
 
                         {/* Domain Description and Key Skills */}
                         <div className="mt-8">
                             <h2 className={`text-xl font-bold ${textClass}`}>Description</h2>
-                            <p className={`mt-4 ${subTextClass}`}>{currentDomain.opis || "No description available."}</p>
+                            <p className={`mt-4 ${subTextClass}`}>{currentDomain.description || "No description available."}</p>
                         </div>
                         <div className="mt-8">
                             <h2 className={`text-xl font-bold ${textClass}`}>Key Skills</h2>
-                            <p className={`mt-4 ${subTextClass}`}>{currentDomain.kljucna_znanja || "No key skills available."}</p>
+                            <p className={`mt-4 ${subTextClass}`}>{currentDomain.key_skills || "No key skills available."}</p>
                         </div>
 
-                        {currentUser && (currentUser.vloga === "boss") && (
+                        {currentUser && (currentUser.role === "boss") && (
                             <div className='mt-8'>
                                 <button onClick={() => handleUpdateModel()}
                                         className=" btn bg-green-500 text-white py-2 px-5 rounded">Update model</button>
@@ -293,7 +292,7 @@ function Domain() {
                         <div className="mt-8">
                             <div className="flex items-center">
                                 <img src={reading} alt="Icon" className="w-16 h-16 mr-4"/>
-                                <h3 className={`text-xl font-bold ${textClass}`}>Files & Important Links</h3>
+                                <h3 className={`text-xl font-bold ${textClass}`}>Learning material</h3>
                             </div>
 
                             <input
@@ -312,7 +311,7 @@ function Domain() {
                                             <li key={index}
                                                 className={`flex items-center justify-between mb-2 ${subTextClass}`}>
                                                 <a href="#" onClick={() => handleFileDownload(fileName)}>{fileName}</a>
-                                                {currentUser && (currentUser.vloga === "boss") && (
+                                                {currentUser && (currentUser.role === "boss") && (
                                                     <button onClick={() => handleFileDelete(fileName)}
                                                             className="btn bg-red-500 hover:bg-red-600 text-white ml-4">Delete</button>
                                                 )}
@@ -322,7 +321,7 @@ function Domain() {
                                 )}
                             </div>
 
-                            {currentUser && (currentUser.vloga === "boss") && (
+                            {currentUser && (currentUser.role === "boss") && (
                                 <label htmlFor="fileInput"
                                        className="btn bg-indigo-500 text-white py-2 px-5 rounded ">
                                     <span className="ml-2">Add file</span>
@@ -338,7 +337,7 @@ function Domain() {
                                             <li key={index}
                                                 className={`flex items-center justify-between mb-2 ${subTextClass}`}>
                                                 <a href="#" onClick={() => handleOpenLink(link)}>{link}</a>
-                                                {currentUser && (currentUser.vloga === "boss") && (
+                                                {currentUser && (currentUser.role === "boss") && (
                                                     <button onClick={() => handleLinkDelete(link)}
                                                             className="btn bg-red-500 hover:bg-red-600 text-white ml-4">Delete</button>
                                                 )}
@@ -348,7 +347,7 @@ function Domain() {
                                 )}
                             </div>
 
-                            {currentUser && (currentUser.vloga === "boss") && (
+                            {currentUser && (currentUser.role === "boss") && (
                                 <div>
                                     <button
                                         className="btn bg-indigo-500 text-white py-2 px-5 rounded mt-2"
@@ -403,14 +402,14 @@ function Domain() {
                                     quizzes.map((quiz, index) => (
                                         <li key={index} className="flex items-center justify-between mb-2">
                                             <NavLink
-                                                to={`/quiz/${quiz.naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}
+                                                to={`/quiz/${quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}
                                                 className={`flex items-center justify-between mb-2 ${subTextClass}`}
                                             >
-                                                {quiz.naziv}
+                                                {quiz.name}
                                             </NavLink>
-                                            {currentUser && (currentUser.vloga === "boss") && (
+                                            {currentUser && (currentUser.role === "boss") && (
                                                 <button
-                                                    onClick={() => handleQuizDelete(quiz.naziv)}
+                                                    onClick={() => handleQuizDelete(quiz.name)}
                                                     className="btn bg-red-500 hover:bg-red-600 text-white ml-4"
                                                 >
                                                     Delete
@@ -421,7 +420,7 @@ function Domain() {
                                 )}
                             </ul>
 
-                            {currentUser && (currentUser.vloga === "boss") && (
+                            {currentUser && (currentUser.role === "boss") && (
                                 <NavLink
                                     to={`/addQuiz/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
                                     <button className=" btn bg-indigo-500 text-white py-2 px-5 rounded">
@@ -432,8 +431,8 @@ function Domain() {
                         </div>
                     </div>
 
-                    {currentUser && currentUser.vloga === "user" && (
-                        <AIAssistant domain={currentDomain.naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()} />
+                    {currentUser && currentUser.role === "user" && (
+                        <AIAssistant domain={currentDomain.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()} />
                     )}
                 </main>
             </div>

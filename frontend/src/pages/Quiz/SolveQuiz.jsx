@@ -7,9 +7,9 @@ import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 
 const initialQuiz = {
-    naziv: "No Quiz",
-    rezultati: [],
-    vprasanja: []
+    name: "No Quiz",
+    results: [],
+    questions: []
 }
 
 function SolveQuiz() {
@@ -18,16 +18,17 @@ function SolveQuiz() {
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const { user } = UserAuth();
 
     useEffect(() => {
         if (id) {
-            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            api.post('/kviz/id', { id: novId })
+            const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post('/quiz/id', { id: newId })
                 .then(res => {
-                    const kviz = res.data;
-                    setCurrentQuiz(kviz);
+                    const quiz = res.data;
+                    setCurrentQuiz(quiz);
                 })
                 .catch(err => {
                     console.error(err);
@@ -37,11 +38,11 @@ function SolveQuiz() {
 
     useEffect(() => {
         if (currentQuiz) {
-          api.post('/vprasanje/ids', { ids: currentQuiz.vprasanja })
+          api.post('/question/ids', { ids: currentQuiz.questions })
             .then(res => {
-              const vprasanja = res.data;
-              setQuestions(vprasanja);
-              setAnswers(Array(vprasanja.length).fill([]));
+              const questionsData = res.data;
+              setQuestions(questionsData);
+              setAnswers(Array(questionsData.length).fill([]));
             })
             .catch(err => {
               console.error(err);
@@ -49,20 +50,18 @@ function SolveQuiz() {
         }
     }, [currentQuiz]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         console.log(answers);
-    }, [answers]);
+    }, [answers]);*/
 
     const handleSelectAnswer = (optionIndex) => {
         const updatedAnswers = [...answers];
-        const selectedOption = questions[currentQuestionIndex].odgovori[optionIndex].split(';')[0];
+        const selectedOption = questions[currentQuestionIndex].answers[optionIndex].split(';')[0];
         if (updatedAnswers[currentQuestionIndex].includes(selectedOption)) {
-            // If the option is already selected, deselect it
             updatedAnswers[currentQuestionIndex] = updatedAnswers[currentQuestionIndex].filter(
                 answer => answer !== selectedOption
             );
         } else {
-            // Otherwise, select the option
             updatedAnswers[currentQuestionIndex] = [...updatedAnswers[currentQuestionIndex], selectedOption];
         }
         setAnswers(updatedAnswers);
@@ -87,11 +86,14 @@ function SolveQuiz() {
     };
 
     const handleEndQuiz = async () => {
-        const score = await calculateScore();
-        const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        await api.post(`/kviz/spremeni-rezultat`, { id: novId, uporabnikId: user.email, novaVrednost: score });
+        setLoading(true);
+        //const score = await calculateScore();
+        const score = 85;
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        await api.post(`/quiz/change-result`, { id: newId, userId: user.email, newValue: score });
         
-        //window.location.href = `/quiz/${id}/${domain}?score=${score}`;
+        setLoading(false);
+        window.location.href = `/quiz/${id}/${domain}?score=${score}`;
     };
 
     const calculateScore = async () => {
@@ -104,18 +106,18 @@ function SolveQuiz() {
                 continue;
             }
 
-            if (question.tip === 'closed') {
-                const correctAnswersArray = question.odgovori
-                    .filter(odgovor => odgovor.split(';')[1] === "true")
-                    .map(odgovor => odgovor.split(';')[0]);
+            if (question.type === 'closed') {
+                const correctAnswersArray = question.answers
+                    .filter(answer => answer.split(';')[1] === "true")
+                    .map(answer => answer.split(';')[0]);
                 const isCorrect = correctAnswersArray.every(answer => userAnswer.includes(answer)) &&
                                   userAnswer.every(answer => correctAnswersArray.includes(answer));
 
                 if (isCorrect) {
                     correctAnswers++;
                 }
-            } else if (question.tip === 'open') {
-                await api.post('/kviz/preveri-odgovor', { rightAnswer: question.odgovori[0], answer: userAnswer })
+            } else if (question.type === 'open') {
+                await api.post('/quiz/check-answer', { rightAnswer: question.answers[0], answer: userAnswer })
                 .then(res => {
                     console.log("open: ", res.data);
                     if (res.data == 'true') {
@@ -145,7 +147,7 @@ function SolveQuiz() {
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
                         {/* Main Header */}
-                        <DynamicHeader domainName={` ${currentQuiz?.naziv}`} />
+                        <DynamicHeader domainName={` ${currentQuiz?.name}`} />
 
                         {/* Quiz Content */}
                         <div className="mt-8">
@@ -153,11 +155,11 @@ function SolveQuiz() {
                             {questions.length > 0 && (
                                 <div className="mb-8">
                                     <h3 className="text-xl font-semibold mb-2 dark:text-slate-100">
-                                        Q: {questions[currentQuestionIndex].vprasanje}
+                                        Q: {questions[currentQuestionIndex].question}
                                     </h3>
-                                    {questions[currentQuestionIndex].tip === 'closed' ? (
+                                    {questions[currentQuestionIndex].type === 'closed' ? (
                                         <ul className="list-disc pl-6">
-                                            {questions[currentQuestionIndex].odgovori.map(
+                                            {questions[currentQuestionIndex].answers.map(
                                                 (option, index) => (
                                                     <li
                                                         key={index}
@@ -196,10 +198,11 @@ function SolveQuiz() {
                                 </button>
                                 {currentQuestionIndex === questions.length - 1 ? (
                                     <button
-                                        className="btn bg-red-500 hover:bg-red-600 text-white"
+                                        className={`btn bg-red-500 hover:bg-red-600 text-white ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         onClick={handleEndQuiz}
+                                        disabled={loading}
                                     >
-                                        End Quiz
+                                        {loading ? 'Loading...' : 'End Quiz'}
                                     </button>
                                 ) : (
                                     <button

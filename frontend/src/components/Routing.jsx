@@ -12,12 +12,12 @@ function Routing() {
 
     useEffect(() => {
         if (user) {
-          const uporabnikovEmail = user.email;
+          const userEmail = user.email;
     
-          api.post('/uporabnik/profil', { id: uporabnikovEmail })
+          api.post('/user/id', { id: userEmail })
             .then(res => {
-              const profil = res.data;
-              setCurrentUser(profil);
+              const profile = res.data;
+              setCurrentUser(profile);
               setLoading(false);
             })
             .catch(err => {

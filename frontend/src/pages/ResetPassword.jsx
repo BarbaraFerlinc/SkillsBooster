@@ -39,7 +39,6 @@ function ResetPassword() {
             try {
                 await sendPasswordResetEmail(auth, email)
                     .then(() => {
-                        console.log('E-poštno sporočilo za ponastavitev gesla je bilo poslano.');
                         setLoading(false);
                         alert('Password reset email sent! Please check your inbox.');
 

@@ -12,12 +12,12 @@ function AdminRouting() {
 
     useEffect(() => {
         if (user) {
-          const uporabnikovEmail = user.email;
+          const userEmail = user.email;
     
-          api.post('/uporabnik/profil', { id: uporabnikovEmail })
+          api.post('/user/id', { id: userEmail })
             .then(res => {
-              const profil = res.data;
-              setCurrentUser(profil);
+              const profile = res.data;
+              setCurrentUser(profile);
               setLoading(false);
             })
             .catch(err => {
@@ -33,13 +33,12 @@ function AdminRouting() {
         if (!loading) {
             if (!user) {
                 navigate("/login");
-            } else if (currentUser && currentUser.vloga !== "admin") {
+            } else if (currentUser && currentUser.role !== "admin") {
                 navigate("/profile");
             }
         }
     }, [user, currentUser, loading, navigate]);
 
-    // se pokaže okno za nalaganje
     if (loading) {
         return <div>Loading...</div>;
     }
