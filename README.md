@@ -40,6 +40,10 @@ ___
 
 </div>
 
+### Architecture
+<img src="dokumentacija/ArhitectureSkillsBooster (1).png" alt="System Architecture" width="500">
+
+
 
 ## Backend
 ___
