@@ -1,0 +1,27 @@
+# Web framework and dependencies
+fastapi==0.95.2
+uvicorn==0.22.0
+pydantic==1.10.7
+
+# HTTP requests
+requests==2.31.0
+
+# AI and NLP
+openai==1.2
+torch==2.0.1
+transformers==4.30.2
+tokenizers==0.13.3
+
+# File handling and processing
+PyPDF2==3.0.1
+python-docx==0.8.11
+pillow==9.5.0  # PIL package for image handling
+pytesseract==0.3.10
+tqdm==4.65.0  # Progress bar for terminal applications
+
+# Compression and other utilities
+pylzma==0.5.0
+python-dotenv==1.0.0
+
+
+
