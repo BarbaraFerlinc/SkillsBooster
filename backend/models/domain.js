@@ -391,6 +391,14 @@ class Domain {
                 });
                 const data = await responseGPT.json();
                 const evaluationResult = data.choices[0].message.content.trim();
+
+                /*const completion = await openai.chat.completions.create({
+                    messages: [{ role: "system", content: "You are a teacher whose primary purpose is to explain every concept in meticulous detail, ensuring clarity and understanding for the student. Your explanations should be thorough, step-by-step, and consider that the student may have no prior knowledge of the subject. Please use clear language, provide examples, and make complex ideas as simple as possible." }],
+                    model: "ft:gpt-4o-mini-2024-07-18:personal::9wcAcylo",
+                  });
+                console.log(completion.choices[0]);*/
+
+                
                 return evaluationResult;
             //}
         } catch (error) {
