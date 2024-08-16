@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, NavLink } from 'react-router-dom';
 import Sidebar from "../../partials/Sidebar.jsx";
 import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
@@ -67,13 +67,13 @@ function Quiz() {
                         <DynamicHeader domainName={currentQuiz?.naziv}/>
 
                         {/* Conditionally render Solve Quiz link only if quizResult is null */}
-                        {<a
-                            href={`/solveQuiz/${id}/${domain}`}
+                        <NavLink
+                            to={`/solveQuiz/${id}/${domain}`}
                             className="block py-2 px-4 text-lg text-blue-700 hover:text-gray-900 mb-4"
                             style={{ textDecoration: 'none' }}
                         >
                             Solve Quiz
-                        </a>}
+                        </NavLink>
 
                         {/* Display quiz result percentage */}
                         {quizResult !== null && (

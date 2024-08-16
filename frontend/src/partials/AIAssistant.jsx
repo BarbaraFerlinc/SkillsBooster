@@ -43,7 +43,6 @@ function AIAssistant({ domain }) {
 
             try {
                 const response = await api.post('/domain/chat-box', { id: domain, query: input });
-                console.log(response);
                 let assistantResponse = {};
                 if (response.data == '' || !response) {
                     assistantResponse = { text: 'Something went wrong.', fromUser: false };
