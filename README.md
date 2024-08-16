@@ -57,9 +57,52 @@ ___
 ___
 
 ## Frontend
+
+### Project setup
+
+```bash
+npm install
+```
+
+#### Compiles and hot-reloads for development
+```bash
+npm run dev
+```
+
+#### Compiles and minifies for production
+```bash
+npm run build
+```
+
 ___
 ### Installation
-___
+
+1. **Clone the Repository:**
+
+   ```bash
+   git clone https://github.com/BarbaraFerlinc/SkillsBooster.git
+   cd <repository-directory>
+
+Install dependicies
+````bash
+npm install
+````
+
 ### Development
+Create a new file .env in frontend directory
 ___
+1. **Start the Development Server:**
+
+   To start the development server, run the following command:
+
+
+   ```bash
+   npm run dev
+```
+
 ### Build
+To create a production build of the application, run the following command:
+
+   ```bash
+   npm run build
+```
