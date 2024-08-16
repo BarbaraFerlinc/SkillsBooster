@@ -23,6 +23,7 @@ function AddQuiz() {
     const [currentQuestion, setCurrentQuestion] = useState({ type: 'open', question: '', answer: '' });
     const [currentDomain, setCurrentDomain] = useState(initialDomain);
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (domain) {
@@ -142,6 +143,7 @@ function AddQuiz() {
 
     const handleSubmitQuiz = async () => {
         if (validateQuiz()){
+            setLoading(true);
             const newId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             const questionsData = addQuestions(newId);
             const questionsId = [];
@@ -158,6 +160,7 @@ function AddQuiz() {
                 await api.post(`/quiz/add-result`, { id: newId, userId: userId, value: '0' });
             }
 
+            setLoading(false);
             navigate(`/domain/${domain}`);
         }
     };
@@ -266,9 +269,10 @@ function AddQuiz() {
                     </button>
                     <button
                         onClick={handleSubmitQuiz}
-                        className="bg-green-500 text-white py-2 px-5 rounded"
+                        className={`bg-green-500 text-white py-2 px-5 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={loading}
                     >
-                        Submit Quiz
+                        {loading ? 'Submit Quiz' : 'Submit Quiz'}
                     </button>
                     <button
                         onClick={handleCancel}

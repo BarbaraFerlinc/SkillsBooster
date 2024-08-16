@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../../partials/Sidebar.jsx';
 import Header from '../../partials/Header.jsx';
 import DynamicHeader from '../../partials/dashboard/DynamicHeader.jsx';
@@ -14,6 +14,7 @@ const initialQuiz = {
 
 function SolveQuiz() {
     const { id, domain } = useParams();
+    const navigate = useNavigate();
     const [currentQuiz, setCurrentQuiz] = useState(initialQuiz);
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -88,7 +89,8 @@ function SolveQuiz() {
         await api.post(`/quiz/change-result`, { id: newId, userId: user.email, newValue: score });
         
         setLoading(false);
-        window.location.href = `/quiz/${id}/${domain}?score=${score}`;
+        //window.location.href = `/quiz/${id}/${domain}?score=${score}`;
+        navigate(`/quiz/${id}/${domain}?score=${score}`);
     };
 
     const calculateScore = async () => {
