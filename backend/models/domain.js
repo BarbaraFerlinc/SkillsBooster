@@ -333,7 +333,7 @@ class Domain {
 
     static async chatBox(id, query) {
         try {
-            const data = await fs.promises.readFile('model_info.json', 'utf8');
+            /*const data = await fs.promises.readFile('model_info.json', 'utf8');
             const folderDetails = JSON.parse(data);
 
             let model = null;
@@ -363,10 +363,36 @@ class Domain {
             };
 
             const response = await axios.post(url, payload, { headers });
-            console.log("Status Code:", response.status);
-            console.log("Response Headers:", response.headers);
-            console.log("Response Body:", response.data);
-            return response.data.generatedOutput;
+            console.log("model, ", response);
+            if (response) {
+                console.log("Status Code:", response.status);
+                console.log("Response Headers:", response.headers);
+                console.log("Response Body:", response.data);
+                return response.data.generatedOutput;
+            } else {*/
+                const responseGPT = await fetch(process.env.OPENAI_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [
+                            { role: 'system', content: 'You are a teacher whose primary purpose is to explain every concept in meticulous detail, ensuring clarity and understanding for the student. Your explanations should be thorough, step-by-step, and consider that the student may have no prior knowledge of the subject. Please use clear language, provide examples, and make complex ideas as simple as possible.' },
+                            { role: 'user', content: query }
+                        ],
+                        max_tokens: 150,
+                        temperature: 0,
+                        top_p: 1,
+                        n: 1,
+                        stop: ["\n"]
+                    })
+                });
+                const data = await responseGPT.json();
+                const evaluationResult = data.choices[0].message.content.trim();
+                return evaluationResult;
+            //}
         } catch (error) {
             console.error("Error:", error.response ? error.response.data : error.message);
         }
