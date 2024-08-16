@@ -222,24 +222,37 @@ class Quiz {
         }
     }
 
-    static async checkAnswer(rightAnswer, answer) {
+    static async checkAnswer(query, rightAnswer, answer) {
         try {
-            const prompt = `Given the response: ${rightAnswer}, and the response: ${answer}, is second response correct enough? Yes or No.`;
-            const model = process.env.GRADIENT_BACKUP_MODEL;
-            const response = await axios.post(`https://api.gradient.ai/api/models/${model}/complete`, {
-                query: prompt,
-                maxGeneratedTokenCount: 100
-            }, {
-                headers: {
-                    'accept': 'application/json',
-                    'x-gradient-workspace-id': process.env.GRADIENT_WORKSPACE_ID,
-                    'content-type': 'application/json',
-                    'authorization': `Bearer ${process.env.GRADIENT_ACCESS_TOKEN}`
-                }
-            });
+            const prompt = `Given the expected response: '${rightAnswer}', and the generated response: '${answer}' to the question '${query}', does the generated response accurately capture the key information? Yes or No.`;
             
-            const evaluationResult = response.data.generatedOutput;
-            return evaluationResult.includes('Yes');
+            const responseGPT = await fetch(process.env.OPENAI_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        { role: 'system', content: 'You are a helpful assistant.' },
+                        { role: 'user', content: prompt }
+                    ],
+                    max_tokens: 150,
+                    temperature: 0,
+                    top_p: 1,
+                    n: 1,
+                    stop: ["\n"]
+                })
+            });
+
+            const data = await responseGPT.json();
+            if (!data.choices || data.choices.length === 0) {
+                throw new Error('No choices returned by the API');
+            }
+            
+            const evaluationResult = data.choices[0].message.content.trim();
+            return evaluationResult.toLowerCase().includes('yes');
         } catch (error) {
             throw new Error('Error evaluating response: ' + error.message);
         }

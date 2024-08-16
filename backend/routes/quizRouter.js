@@ -13,7 +13,7 @@ router.post('/add-result', quizController.addResultQuiz);
 router.post('/find-result', quizController.findResultQuiz);
 router.post('/change-result', quizController.changeResultQuiz);
 router.put('/delete-result/:id', quizController.deleteResultQuiz);
-router.post('/ckeck-answer', quizController.checkAnswerQuiz);
+router.post('/check-answer', quizController.checkAnswerQuiz);
 router.delete('/:id', quizController.deleteQuiz);
 
 module.exports = router;

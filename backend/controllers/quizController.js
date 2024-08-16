@@ -173,9 +173,9 @@ async function deleteResultQuiz(req, res) {
 }
 
 async function checkAnswerQuiz(req, res) {
-    const { rightAnswer, answer } = req.body;
+    const { query, rightAnswer, answer } = req.body;
     try {
-        const response = await Quiz.checkAnswer(rightAnswer, answer);
+        const response = await Quiz.checkAnswer(query, rightAnswer, answer);
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ error: 'Error checking answer', details: error.message });

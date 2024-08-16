@@ -50,10 +50,6 @@ function SolveQuiz() {
         }
     }, [currentQuiz]);
 
-    /*useEffect(() => {
-        console.log(answers);
-    }, [answers]);*/
-
     const handleSelectAnswer = (optionIndex) => {
         const updatedAnswers = [...answers];
         const selectedOption = questions[currentQuestionIndex].answers[optionIndex].split(';')[0];
@@ -87,8 +83,7 @@ function SolveQuiz() {
 
     const handleEndQuiz = async () => {
         setLoading(true);
-        //const score = await calculateScore();
-        const score = 85;
+        const score = await calculateScore();
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         await api.post(`/quiz/change-result`, { id: newId, userId: user.email, newValue: score });
         
@@ -97,44 +92,45 @@ function SolveQuiz() {
     };
 
     const calculateScore = async () => {
-        let correctAnswers = 0;
+        let totalPoints = 0;
+        let maxPoints = 0;
+    
         for (let i = 0; i < questions.length; i++) {
             const question = questions[i];
             const userAnswer = answers[i];
-
+    
             if (!userAnswer || userAnswer.length === 0) {
                 continue;
             }
-
+    
             if (question.type === 'closed') {
                 const correctAnswersArray = question.answers
                     .filter(answer => answer.split(';')[1] === "true")
                     .map(answer => answer.split(';')[0]);
-                const isCorrect = correctAnswersArray.every(answer => userAnswer.includes(answer)) &&
-                                  userAnswer.every(answer => correctAnswersArray.includes(answer));
-
-                if (isCorrect) {
-                    correctAnswers++;
-                }
+    
+                const correctCount = userAnswer.filter(answer => correctAnswersArray.includes(answer)).length;
+                const possibleCorrectCount = correctAnswersArray.length;
+    
+                totalPoints += (correctCount / possibleCorrectCount);
+                maxPoints += 1;    
             } else if (question.type === 'open') {
-                await api.post('/quiz/check-answer', { rightAnswer: question.answers[0], answer: userAnswer })
+                console.log(question.question);
+                await api.post('/quiz/check-answer', { query: question.question, rightAnswer: question.answers[0], answer: userAnswer })
                 .then(res => {
-                    console.log("open: ", res.data);
-                    if (res.data == 'true') {
-                        correctAnswers++;
+                    if (res.data === true) {
+                        totalPoints += 1;
                     }
                 })
                 .catch(err => {
                     console.error(err);
                 });
-                /*if (userAnswer === question.odgovori[0]) {
-                    correctAnswers++;
-                }*/
+                maxPoints += 1;
             }
         }
-        const score = Math.round((correctAnswers / questions.length) * 100);
+        const score = Math.round((totalPoints / maxPoints) * 100);
         return score;
     };
+    
 
     return (
         <div className="flex h-screen overflow-hidden">
