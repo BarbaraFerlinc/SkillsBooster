@@ -224,29 +224,6 @@ class Kviz {
 
     static async preveriOdgovor(rightAnswer, answer) {
         try {
-<<<<<<< HEAD
-           
-            const kvizRef = db.collection("Kvizi").doc(id);
-            const response = await kvizRef.get();
-            const kviz = response.data();
-    
-            if (!kviz) {
-                throw new Error('Kviz ne obstaja');
-            }
-    
-          
-            const vprasanje = kviz.vprasanja.find(vprasanje => vprasanje.id === query || vprasanje.vprasanje === query);
-    
-            if (!vprasanje) {
-                throw new Error('Vprašanje ne obstaja v tem kvizu');
-            }
-    
-            const rightAnswer = vprasanje.pravilenOdgovor || ''; 
-    
-          
-            const prompt = `Given the expected response: '${rightAnswer}', and the generated response: '${answer}' to the question '${vprasanje.vprasanje}', does the generated response accurately capture the key information? Yes or No.`;
-    
-=======
             const prompt = `Given the response: ${rightAnswer}, and the response: ${answer}, is second response correct enough? Yes or No.`;
             const model = process.env.GRADIENT_BACKUP_MODEL;
             const response = await axios.post(`https://api.gradient.ai/api/models/${model}/complete`, {
@@ -260,30 +237,9 @@ class Kviz {
                     'authorization': `Bearer ${process.env.GRADIENT_ACCESS_TOKEN}`
                 }
             });
->>>>>>> 4b59679b0f979326d2029d39de17d1d500f73e36
-            
-            const responseGPT = await fetch('https://api.openai.com/v1/chat/completionss', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` 
-                },
-                body: JSON.stringify({
-                    prompt: prompt,
-                    max_tokens: 150,
-                    temperature: 0, 
-                    top_p: 1,
-                    n: 1,
-                    stop: ["\n"]
-                })
-            });
-    
-            
-            const data = await responseGPT.json();
-            const evaluationResult = data.choices[0].text.trim();
-    
-            
-            return evaluationResult.toLowerCase().includes('yes');
+
+            const evaluationResult = response.data.generatedOutput;
+            return evaluationResult.includes('Yes');
         } catch (error) {
             throw new Error('Error evaluating response: ' + error.message);
         }
