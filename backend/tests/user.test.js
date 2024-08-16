@@ -1,81 +1,119 @@
 const request = require('supertest');
 const app = require('../app');
 const User = require('../models/user');
-const bcrypt = require('bcrypt');
 
 jest.mock('../models/user');
 jest.mock('bcrypt');
 
-describe('User API', () => {
-  describe('POST /user', () => {
-    it('should return 400 if fields are missing', async () => {
-      const res = await request(app).post('/user/').send({
+describe('User Controller', () => {
+  it('should add a new user', async () => {
+      const mockUser = {
         full_name: 'John Doe',
-      });
-      expect(res.statusCode).toBe(400);
-      expect(res.body).toHaveProperty('error', 'Vsa polja morajo biti izpolnjena');
-    });
-
-    it('should return 200 and add a new user', async () => {
-      bcrypt.hash.mockResolvedValue('hashedpassword');
-      User.add.mockResolvedValue({
-        id: 1,
-        full_name: 'John Doe',
-        email: 'skills.booster@outlook.com',
+        email: 'john.doe@test.com',
+        password: 'password',
         role: 'user',
-        admin: false,
-      });
+        admin: 'jane.smith@test.com',
+        original_password: 'original'
+      };
+      
+      User.add.mockResolvedValue(mockUser);
 
-      const res = await request(app).post('/user/').send({
+      const response = await request(app).post('/user/add').send(mockUser);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body.user).toEqual(mockUser);
+  });
+
+  it('should return 400 if required fields are missing when adding a new user', async () => {
+      const incompleteUser = {
+        email: 'john.doe@test.com',
+        password: 'password'
+      };
+
+      const response = await request(app).post('/user/add').send(incompleteUser);
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.error).toBe('All fields must be filled');
+  });
+
+  it('should return all users', async () => {
+      const mockUsers = [
+          { full_name: 'John Doe', role: 'boss' },
+          { full_name: 'John Smith', role: 'user' }
+      ];
+
+      User.all.mockResolvedValue(mockUsers);
+
+      const response = await request(app).get('/user/all');
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual(mockUsers);
+  });
+
+  it('should return a specific user', async () => {
+      const mockUser = {
         full_name: 'John Doe',
-        email: 'skills.booster@outlook.com',
-        password: 'password123',
+        email: 'john.doe@test.com',
         role: 'user',
-        admin: false,
-      });
+        admin: 'jane.smith@test.com'
+      };
+      const id = 'john.doe@test.com';
 
-      expect(res.statusCode).toBe(200);
-      expect(res.body).toHaveProperty('message', 'Successful registration');
-      expect(res.body.user).toHaveProperty('id', 1);
-    });
+      User.getById.mockResolvedValue(mockUser);
+
+      const response = await request(app).post('/user/id').send({id});
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual(mockUser);
   });
 
-  describe('GET /user', () => {
-    it('should return 200 and all users', async () => {
-      User.all.mockResolvedValue([{ id: 1, full_name: 'John Doe' }]);
+  it('should return all users from admin', async () => {
+    const mockUsers = [
+      { full_name: 'John Doe', email: 'john.doe@test.com', role: 'user', admin: 'jane.smith@test.com' },
+      { full_name: 'John Smith', email: 'john.smith@test.com', role: 'user', admin: 'jane.smith@test.com' }
+    ]
 
-      const res = await request(app).get('/user/');
-      expect(res.statusCode).toBe(200);
-      expect(res.body).toBeInstanceOf(Array);
-      expect(res.body[0]).toHaveProperty('full_name', 'John Doe');
-    });
+    const mockValues = { adminEmail: 'jane.smith@test.com' };
+
+    User.getByAdmin.mockResolvedValue(mockUsers);
+
+    const response = await request(app).post('/user/adminEmail').send(mockValues);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(mockUsers);
   });
 
-  describe('GET /user/:id', () => {
-    it('should return 200 and the requested user', async () => {
-      User.getById.mockResolvedValue({ id: 1, full_name: 'John Doe' });
+  it('should return all users from boss', async () => {
+    const mockUsers = [
+      { full_name: 'John Doe', email: 'john.doe@test.com', role: 'user', admin: 'jane.smith@test.com' },
+      { full_name: 'John Smith', email: 'john.smith@test.com', role: 'user', admin: 'jane.smith@test.com' }
+    ]
+    
+    const mockValues = {
+      adminEmail: 'jane.smith@test.com',
+      bossEmail: 'jane.doe@test.com'
+    }
+    User.getByBoss.mockResolvedValue(mockUsers);
 
-      const res = await request(app).get('/user/1');
-      expect(res.statusCode).toBe(200);
-      expect(res.body).toHaveProperty('full_name', 'John Doe');
-    });
+    const response = await request(app).post('/user/bossEmail').send(mockValues);
 
-    it('should return 404 if user is not found', async () => {
-      User.getById.mockResolvedValue(null);
-
-      const res = await request(app).get('/user/999');
-      expect(res.statusCode).toBe(404);
-      expect(res.body).toHaveProperty('error', 'The user does not exist');
-    });
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(mockUsers);
   });
 
-  describe('DELETE /user/:id', () => {
-    it('should return 200 and delete the user', async () => {
-      User.delete.mockResolvedValue({ id: 1, full_name: 'Deleted User' });
+  it('should delete a user', async () => {
+    const mockUser = {
+      full_name: 'John Doe',
+      email: 'john.doe@test.com',
+      role: 'user',
+      admin: 'jane.smith@test.com'
+    };
 
-      const res = await request(app).delete('/user/1');
-      expect(res.statusCode).toBe(200);
-      expect(res.body).toHaveProperty('message', 'User deleted');
-    });
+    User.delete.mockResolvedValue(mockUser);
+
+    const response = await request(app).delete('/user/john.doe@test.com');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.user).toEqual(mockUser);
   });
 });

@@ -5,7 +5,7 @@ async function addUser(req, res) {
     const { full_name, email, password, role, admin } = req.body;
   
     if (!full_name || !email || !password || !role || !admin) {
-      return res.status(400).json({ error: 'Vsa polja morajo biti izpolnjena' });
+      return res.status(400).json({ error: 'All fields must be filled' });
     }
   
     try {

@@ -38,8 +38,8 @@ app.use('/question/', questionRouter);
 app.use('/quiz/', quizRouter);
 app.use('/user/', userRouter);
 
-app.listen(process.env.PORT || 9000, () => {
+/*app.listen(process.env.PORT || 9000, () => {
   console.log("Server on port " + 9000);
-});
+});*/
 
 module.exports = app;

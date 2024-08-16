@@ -89,7 +89,6 @@ function SolveQuiz() {
         await api.post(`/quiz/change-result`, { id: newId, userId: user.email, newValue: score });
         
         setLoading(false);
-        //window.location.href = `/quiz/${id}/${domain}?score=${score}`;
         navigate(`/quiz/${id}/${domain}?score=${score}`);
     };
 
@@ -116,7 +115,6 @@ function SolveQuiz() {
                 totalPoints += (correctCount / possibleCorrectCount);
                 maxPoints += 1;    
             } else if (question.type === 'open') {
-                console.log(question.question);
                 await api.post('/quiz/check-answer', { query: question.question, rightAnswer: question.answers[0], answer: userAnswer })
                 .then(res => {
                     if (res.data === true) {
