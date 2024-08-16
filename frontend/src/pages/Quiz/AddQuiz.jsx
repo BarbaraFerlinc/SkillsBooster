@@ -1,36 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import OpenQuestion from './OpenQuestions.jsx';
 import ClosedQuestion from './ClosedQuestions.jsx';
-import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useParams, useNavigate } from "react-router-dom";
 import api from '../../services/api.js';
 
 const initialDomain = {
-    kljucna_znanja: "",
-    kvizi: [],
+    key_skills: "",
+    quizzes: [],
     lastnik: "",
-    naziv: "No Domain",
-    opis: "",
-    rezultati: [],
-    zaposleni: [],
-    gradiva: []
-};
+    name: "No Domain",
+    description: "",
+    results: [],
+    employees: [],
+    learning_materials: []
+}
 
 function AddQuiz() {
     const { domain } = useParams();
-    const navigate = useNavigate(); // Initialize useNavigate for navigation
+    const navigate = useNavigate();
     const [quizName, setQuizName] = useState('');
     const [questions, setQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState({ type: 'open', question: '', answer: '' });
     const [currentDomain, setCurrentDomain] = useState(initialDomain);
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (domain) {
-            const novId = domain.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            api.post('/domena/id', { id: novId })
+            const newId = domain.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post('/domain/id', { id: newId })
                 .then(res => {
-                    const domena = res.data;
-                    setCurrentDomain(domena);
+                    const domainData = res.data;
+                    setCurrentDomain(domainData);
                 })
                 .catch(err => {
                     console.error(err);
@@ -142,44 +143,46 @@ function AddQuiz() {
 
     const handleSubmitQuiz = async () => {
         if (validateQuiz()){
-            const novId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            const vprasanja = dodajVprasanja(novId);
-            const vprasanjaId = [];
+            setLoading(true);
+            const newId = quizName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const questionsData = addQuestions(newId);
+            const questionsId = [];
 
-            for (const q of vprasanja) {
-                vprasanjaId.push(`${novId}_${q.vprasanje.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`);
-                await api.post(`/vprasanje/dodaj`, q);
+            for (const q of questionsData) {
+                questionsId.push(`${newId}_${q.question.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`);
+                await api.post(`/question/add`, q);
             }
 
-            await api.post(`/kviz/dodaj`, { naziv: quizName, vprasanja: vprasanjaId });
-            await api.post(`/domena/dodaj-kviz`, { id: domain, kvizId: novId });
+            await api.post(`/quiz/add`, { name: quizName, questions: questionsId });
+            await api.post(`/domain/add-quiz`, { id: domain, quizId: newId });
 
-            for (const userId of currentDomain.zaposleni) {
-                await api.post(`/kviz/dodaj-rezultat`, { id: novId, uporabnikId: userId, vrednost: '0' });
+            for (const userId of currentDomain.employees) {
+                await api.post(`/quiz/add-result`, { id: newId, userId: userId, value: '0' });
             }
 
-            navigate(`/domain/${domain}`); // Redirect to the domain page after submitting the quiz
+            setLoading(false);
+            navigate(`/domain/${domain}`);
         }
     };
 
     const handleCancel = () => {
-        navigate(`/domain/${domain}`); // Redirect to the domain page when cancel is clicked
+        navigate(`/domain/${domain}`);
     };
 
-    const dodajVprasanja = (kvizId) => {
+    const addQuestions = (quizId) => {
         return questions.map(question => {
-            let odgovori;
+            let answers;
             if (question.type === "open") {
-                odgovori = [question.answer];
+                answers = [question.answer];
             } else {
-                odgovori = question.answer.map(answer => `${answer.text};${answer.isCorrect}`);
+                answers = question.answer.map(answer => `${answer.text};${answer.isCorrect}`);
             }
 
             return {
-                vprasanje: question.question,
-                tip: question.type,
-                kviz: kvizId,
-                odgovori: odgovori
+                question: question.question,
+                type: question.type,
+                quiz: quizId,
+                answers: answers
             };
         });
     };
@@ -266,9 +269,10 @@ function AddQuiz() {
                     </button>
                     <button
                         onClick={handleSubmitQuiz}
-                        className="bg-green-500 text-white py-2 px-5 rounded"
+                        className={`bg-green-500 text-white py-2 px-5 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={loading}
                     >
-                        Submit Quiz
+                        {loading ? 'Submit Quiz' : 'Submit Quiz'}
                     </button>
                     <button
                         onClick={handleCancel}

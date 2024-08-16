@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import Transition from '../utils/Transition';
-
 import UserAvatar from '../images/user-avatar-32.png';
-
 import api from '../services/api';
 import { UserAuth } from '../context/AuthContext';
 
@@ -18,12 +16,12 @@ function DropdownProfile({ align }) {
 
   useEffect(() => {
     if (user) {
-      const uporabnikovEmail = user.email;
+      const userEmail = user.email;
 
-      api.post('/uporabnik/profil', { id: uporabnikovEmail })
+      api.post('/user/id', { id: userEmail })
           .then(res => {
-            const profil = res.data;
-            setCurrentUser(profil);
+            const profile = res.data;
+            setCurrentUser(profile);
           })
           .catch(err => {
             console.error(err);
@@ -68,7 +66,7 @@ function DropdownProfile({ align }) {
           <img className="w-8 h-8 rounded-full" src={UserAvatar} width="32" height="32" alt="User" />
           <div className="flex items-center truncate">
           <span className="truncate ml-2 text-sm font-medium dark:text-slate-300 group-hover:text-slate-800 dark:group-hover:text-slate-200">
-            {currentUser?.ime_priimek}
+            {currentUser?.full_name}
           </span>
           </div>
         </button>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, NavLink } from 'react-router-dom';
 import Sidebar from "../../partials/Sidebar.jsx";
 import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
@@ -7,9 +7,9 @@ import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 
 const initialQuiz = {
-    naziv: "No Quiz",
-    rezultati: [],
-    vprasanja: []
+    name: "No Quiz",
+    results: [],
+    questions: []
 }
 
 function Quiz() {
@@ -22,11 +22,11 @@ function Quiz() {
 
     useEffect(() => {
         if (id) {
-            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            api.post('/kviz/id', { id: novId })
+            const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post('/quiz/id', { id: newId })
                 .then(res => {
-                    const kviz = res.data;
-                    setCurrentQuiz(kviz);
+                    const quiz = res.data;
+                    setCurrentQuiz(quiz);
                 })
                 .catch(err => {
                     console.error(err);
@@ -36,9 +36,9 @@ function Quiz() {
 
     const fetchQuizResult = async () => {
         if (id && user) {
-            const novId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             try {
-                const result = await api.post('/kviz/najdi-rezultat', { id: novId, uporabnikId: user.email });
+                const result = await api.post('/quiz/find-result', { id: newId, userId: user.email });
                 setQuizResult(result.data);
             } catch (err) {
                 console.error(err);
@@ -67,13 +67,13 @@ function Quiz() {
                         <DynamicHeader domainName={currentQuiz?.naziv}/>
 
                         {/* Conditionally render Solve Quiz link only if quizResult is null */}
-                        {<a
-                            href={`/solveQuiz/${id}/${domain}`}
+                        <NavLink
+                            to={`/solveQuiz/${id}/${domain}`}
                             className="block py-2 px-4 text-lg text-blue-700 hover:text-gray-900 mb-4"
                             style={{ textDecoration: 'none' }}
                         >
                             Solve Quiz
-                        </a>}
+                        </NavLink>
 
                         {/* Display quiz result percentage */}
                         {quizResult !== null && (

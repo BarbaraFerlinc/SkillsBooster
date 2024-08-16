@@ -6,14 +6,14 @@ import domene from "../../images/domains.png";
 import stat from "../../images/statistics-svgrepo-com.png";
 
 const initialDomain = {
-    kljucna_znanja: "",
-    kvizi: [],
-    lastnik: "",
-    naziv: "No Domain",
-    opis: "",
-    rezultati: [],
-    zaposleni: [],
-    gradiva: []
+    key_skills: "",
+    quizzes: [],
+    owner: "",
+    name: "No Domain",
+    description: "",
+    results: [],
+    employees: [],
+    learning_materials: []
 }
 
 function BossProfile() {
@@ -33,8 +33,8 @@ function BossProfile() {
     useEffect(() => {
         const fetchDomains = async () => {
             try {
-                const response = await api.post('/domena/lastnik', { id: user.email });
-                const names = response.data.map(domain => domain.naziv);
+                const response = await api.post('/domain/owner', { id: user.email });
+                const names = response.data.map(domain => domain.name);
                 setDomains(names);
                 setActiveTab(names[0] || '');
             } catch (err) {
@@ -49,7 +49,7 @@ function BossProfile() {
         if (user) {
             const userEmail = user.email;
 
-            api.post('/uporabnik/profil', { id: userEmail })
+            api.post('/user/id', { id: userEmail })
                 .then(res => {
                     const profile = res.data;
                     setCurrentUser(profile);
@@ -64,7 +64,7 @@ function BossProfile() {
         if (currentUser) {
             const fetchUsers = async () => {
                 try {
-                    const response = await api.post('/uporabnik/bossEmail', { bossEmail: user.email, adminEmail: currentUser.admin });
+                    const response = await api.post('/user/bossEmail', { bossEmail: user.email, adminEmail: currentUser.admin });
                     setAllUsers(response.data);
                     response.data.forEach(fetchDomainsForUser);
                 } catch (err) {
@@ -95,10 +95,10 @@ function BossProfile() {
 
     const fetchDomainsForUser = async (user) => {
         try {
-            const response = await api.post('/domena/uporabnik', { id: user.email });
-            const domainNames = response.data.map(domena => domena.naziv);
+            const response = await api.post('/domain/user', { id: user.email });
+            const domainNames = response.data.map(domain => domain.name);
 
-            if (selectedDomain.naziv && domainNames.includes(selectedDomain.naziv)) {
+            if (selectedDomain.name && domainNames.includes(selectedDomain.name)) {
                 setFilteredUsers(prevFilteredUsers => 
                     [...prevFilteredUsers, user]
                 );
@@ -110,9 +110,9 @@ function BossProfile() {
     };
 
     const fetchUsersForDomain = async (domain) => {
-        const novId = domain.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const newId = domain.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         try {
-            const response = await api.post('/domena/uporabniki', { id: novId });
+            const response = await api.post('/domain/users', { id: newId });
             const domainUsers = response.data;
             setFilteredUsers(domainUsers);
         } catch (err) {
@@ -135,9 +135,9 @@ function BossProfile() {
 
     const fetchUserResult = async (email, domain) => {
         if (domain && email && domain != undefined) {
-            const novId = domain.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const newId = domain.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             try {
-                const result = await api.post('/domena/najdi-rezultat', { id: novId, uporabnikId: email });
+                const result = await api.post('/domain/find-result', { id: newId, userId: email });
                 return result.data || '/';
             } catch (err) {
                 console.error(err);
@@ -148,13 +148,13 @@ function BossProfile() {
 
     const handleTabClick = (domainValue) => {
         setActiveTab(domainValue);
-        const novId = domainValue.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post('/domena/id', { id: novId })
+        const newId = domainValue.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post('/domain/id', { id: newId })
             .then(res => {
                 const domain = res.data;
                 setSelectedDomain(domain);
                 if (domain) {
-                    fetchUsersForDomain(domain.naziv);
+                    fetchUsersForDomain(domain.name);
                 }
             })
             .catch(err => {
@@ -174,13 +174,13 @@ function BossProfile() {
 
     const handleDomainSelection = async (e) => {
         const domainValue = e.target.value;
-        const novId = domainValue.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post('/domena/id', { id: novId })
+        const newId = domainValue.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post('/domain/id', { id: newId })
             .then(res => {
                 const domain = res.data;
                 setSelectedDomain(domain);
                 if (domain) {
-                    fetchUsersForDomain(domain.naziv);
+                    fetchUsersForDomain(domain.name);
                 }
             })
             .catch(err => {
@@ -190,11 +190,11 @@ function BossProfile() {
 
     const handleSubmit = async () => {
         try {
-            const novId = selectedDomain.naziv.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const newId = selectedDomain.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             for (const userId of selectedUsers) {
-                await api.put(`/domena/uporabnik/${novId}`, { uporabnikId: userId });
-                for (const quiz of selectedDomain.kvizi) {
-                    await api.post(`/kviz/dodaj-rezultat`, { id: quiz, uporabnikId: userId, vrednost: '0' });
+                await api.put(`/domain/user/${newId}`, { userId: userId });
+                for (const quiz of selectedDomain.quizzes) {
+                    await api.post(`/quiz/add-result`, { id: quiz, userId: userId, value: '0' });
                 }
             }
             console.log(selectedUsers);
@@ -232,7 +232,7 @@ function BossProfile() {
                         <div className="mb-4">
                             <label className="block text-sm md:text-base mb-2">Select Domain:</label>
                             <select
-                                value={selectedDomain.naziv}
+                                value={selectedDomain.name}
                                 onChange={handleDomainSelection}
                                 className="w-full p-2 border rounded-md"
                             >
@@ -252,7 +252,7 @@ function BossProfile() {
                                         onChange={() => handleUserSelection(user.email)}
                                         className="mr-2"
                                     />
-                                    <span className="text-sm md:text-base">{user.ime_priimek} ({user.email})</span>
+                                    <span className="text-sm md:text-base">{user.full_name} ({user.email})</span>
                                 </div>
                             ))}
                         </div>
@@ -309,7 +309,7 @@ function BossProfile() {
                                             {filteredUsers.length > 0 ? (
                                                 allUsers.filter(user => filteredUsers.includes(user.email)).map(user => (
                                                     <tr key={user.email}>
-                                                        <td className="py-2 px-4 border-b">{user.ime_priimek}</td>
+                                                        <td className="py-2 px-4 border-b">{user.full_name}</td>
                                                         <td className="py-2 px-4 border-b">{user.email}</td>
                                                     </tr>
                                                 ))
@@ -348,7 +348,7 @@ function BossProfile() {
                             <tbody>
                             {allUsers.map((user, userIndex) => (
                                 <tr key={userIndex}>
-                                    <td className="border px-4 py-2">{user.ime_priimek}</td>
+                                    <td className="border px-4 py-2">{user.full_name}</td>
                                     {domains.map((domain, domainIndex) => (
                                         <td key={domainIndex} className="border px-4 py-2 text-center">
                                         {userResults[user.email] && userResults[user.email][domain] !== undefined ? userResults[user.email][domain] : '/'}

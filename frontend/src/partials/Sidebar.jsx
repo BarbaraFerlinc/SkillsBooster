@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import space from "../images/space-svgrepo-com.png";
 import { UserAuth } from '../context/AuthContext.jsx';
 import api from '../services/api.js';
-
 import DomainList from "../pages/Domain/DomainList.jsx";
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
@@ -14,6 +13,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const [showAddDomainCard, setShowAddDomainCard] = useState(false);
   const [newDomain, setNewDomain] = useState({ naziv: '', opis: '', kljucna_znanja: '' });
   const [errors, setErrors] = useState({});
+  const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
+  const [sidebarExpanded, setSidebarExpanded] = useState(storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true');
 
   const { user } = UserAuth();
 
@@ -21,14 +22,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const sidebar = useRef(null);
   const addDomainCardRef = useRef(null);
 
-  const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
-  const [sidebarExpanded, setSidebarExpanded] = useState(storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true');
-
   useEffect(() => {
     if (user) {
       const userEmail = user.email;
 
-      api.post('/uporabnik/profil', { id: userEmail })
+      api.post('/user/id', { id: userEmail })
           .then(res => {
             const profile = res.data;
             setCurrentUser(profile);
@@ -41,12 +39,12 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   useEffect(() => {
     if (currentUser) {
-      switch (currentUser.vloga) {
+      switch (currentUser.role) {
         case "boss":
-          fetchDomeneForOwner(currentUser);
+          fetchDomainsForOwner(currentUser);
           break;
         case "user":
-          fetchDomeneForUser(currentUser);
+          fetchDomainsForUser(currentUser);
           break;
         case "admin":
           setDomains(null);
@@ -57,21 +55,21 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     }
   }, [currentUser, showAddDomainCard]);
 
-  const fetchDomeneForUser = async (user) => {
+  const fetchDomainsForUser = async (user) => {
     try {
-      const response = await api.post('/domena/uporabnik', { id: user.email });
+      const response = await api.post('/domain/user', { id: user.email });
       setDomains(response.data);
     } catch (er) {
-      console.log("Napaka pri pridobivanju domen", er);
+      console.log("Error retrieving domains", er);
     }
   };
 
-  const fetchDomeneForOwner = async (user) => {
+  const fetchDomainsForOwner = async (user) => {
     try {
-      const response = await api.post('/domena/lastnik', { id: user.email });
+      const response = await api.post('/domain/owner', { id: user.email });
       setDomains(response.data);
     } catch (er) {
-      console.log("Napaka pri pridobivanju domen", er);
+      console.log("Error retrieving domains", er);
     }
   };
 
@@ -82,8 +80,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const handleSubmitDomain = async () => {
     try {
       if (validateForm()){
-        newDomain.lastnik = currentUser.email;
-        const response = await api.post('/domena/dodaj', newDomain, {
+        newDomain.owner = currentUser.email;
+        const response = await api.post('/domain/add', newDomain, {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -93,7 +91,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
       }
       
     } catch (er) {
-      console.log("Napaka pri dodajanju domene", er);
+      console.log("Error adding domain", er);
     }
   };
 
@@ -147,19 +145,19 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     let formErrors = {};
     let formIsValid = true;
 
-    if (!newDomain.naziv) {
+    if (!newDomain.name) {
         formIsValid = false;
-        formErrors["naziv"] = "Please add domain's name";
+        formErrors["name"] = "Please add domain's name";
     }
 
-    if (!newDomain.opis) {
+    if (!newDomain.description) {
         formIsValid = false;
-        formErrors["opis"] = "Please add description";
+        formErrors["description"] = "Please add description";
     }
     
-    if (!newDomain.kljucna_znanja) {
+    if (!newDomain.key_skills) {
         formIsValid = false;
-        formErrors["kljucna_znanja"] = "Please add key skills";
+        formErrors["key_skills"] = "Please add key skills";
     }
 
     setErrors(formErrors);
@@ -210,9 +208,9 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
           <div className="space-y-8">
             <div>
               <h3 className="text-sm uppercase text-slate-500 font-semibold pl-3">
-              <span className="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">
-                •••
-              </span>
+                <span className="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">
+                  •••
+                </span>
                 <span className="lg:hidden lg:sidebar-expanded:block 2xl:block">Domains</span>
               </h3>
               <ul className="mt-3">
@@ -220,7 +218,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                   <DomainList domains={domains} />
                 </li>
               </ul>
-              {currentUser && currentUser.vloga === "boss" && (
+              {currentUser && currentUser.role === "boss" && (
                   <div className="flex items-center justify-between mt-4">
                     <button
                         onClick={handleAddDomain}
@@ -238,30 +236,30 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                       <input
                           type="text"
                           className="border rounded p-2 w-full"
-                          value={newDomain.naziv}
-                          onChange={(e) => setNewDomain({ ...newDomain, naziv: e.target.value })}
+                          value={newDomain.name}
+                          onChange={(e) => setNewDomain({ ...newDomain, name: e.target.value })}
                       />
-                      <small className="text-red-500">{errors.naziv}</small>
+                      <small className="text-red-500">{errors.name}</small>
                     </div>
                     <div className="mb-2">
                       <label className="block text-sm font-medium mb-1">Description</label>
                       <input
                           type="text"
                           className="border rounded p-2 w-full"
-                          value={newDomain.opis}
-                          onChange={(e) => setNewDomain({ ...newDomain, opis: e.target.value })}
+                          value={newDomain.description}
+                          onChange={(e) => setNewDomain({ ...newDomain, description: e.target.value })}
                       />
-                      <small className="text-red-500">{errors.opis}</small>
+                      <small className="text-red-500">{errors.description}</small>
                     </div>
                     <div className="mb-2">
                       <label className="block text-sm font-medium mb-1">Key Skills</label>
                       <input
                           type="text"
                           className="border rounded p-2 w-full"
-                          value={newDomain.kljucna_znanja}
-                          onChange={(e) => setNewDomain({ ...newDomain, kljucna_znanja: e.target.value })}
+                          value={newDomain.key_skills}
+                          onChange={(e) => setNewDomain({ ...newDomain, key_skills: e.target.value })}
                       />
-                      <small className="text-red-500">{errors.kljucna_znanja}</small>
+                      <small className="text-red-500">{errors.key_skills}</small>
                     </div>
                     <div className="flex justify-end">
                       <button

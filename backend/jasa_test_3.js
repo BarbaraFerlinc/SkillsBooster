@@ -36,7 +36,7 @@ class Kviz {
 
             const prompt = `Given the expected response: '${rightAnswer}', and the generated response: '${answer}' to the question '${vprasanje.vprasanje}', does the generated response accurately capture the key information? Yes or No.`;
 
-            const responseGPT = await fetch('https://api.openai.com/v1/chat/completions', {
+            const responseGPT = await fetch(process.env.OPENAI_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ class Kviz {
             const data = await responseGPT.json();
 
             // Log the entire response for debugging
-            console.log('OpenAI API response:', JSON.stringify(data, null, 2));
+            //console.log('OpenAI API response:', JSON.stringify(data, null, 2));
 
             if (!data.choices || data.choices.length === 0) {
                 throw new Error('No choices returned by the API');

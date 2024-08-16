@@ -4,34 +4,31 @@ import { UserAuth } from '../context/AuthContext.jsx';
 import api from "../services/api.js";
 
 const initialCompany = {
-    naslov: "",
-    naziv: "",
-    postna_stevilka: 0,
+    address: "",
+    name: "",
+    postal_code: 0,
     admin_email: ""
 }
 
 const initialUser = {
-    ime_priimek: "Administrator",
+    full_name: "Administrator",
     email: "",
-    geslo: "",
-    vloga: "admin",
+    password: "",
+    role: "admin",
     admin: ""
 }
 
 function Registration() {    
     const [confirmPassword, setConfirmPassword] = useState('');
     const [agreed, setAgreed] = useState(false);
-    
     const [company, setCompany] = useState(initialCompany);
     const [user, setUser] = useState(initialUser);
     const [errors, setErrors] = useState({});
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
     const [companies, setCompanies] = useState([]);
     const [users, setUsers] = useState([]);
 
@@ -40,45 +37,45 @@ function Registration() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchPodjetja = async () => {
+        const fetchCompanies = async () => {
             try {
-                const response = await api.get('/podjetje/vsa');
+                const response = await api.get('/company/all');
                 setCompanies(response.data);
             } catch (er) {
-                console.log("Napaka pri pridobivanju podjetij", er);
+                console.log("Error getting companies", er);
             }
         }
         
-        const fetchUporabniki = async () => {
+        const fetchUsers = async () => {
             try {
-                const response = await api.get('/uporabnik/vsi');
+                const response = await api.get('/user/all');
                 setUsers(response.data);
             } catch (er) {
-                console.log("Napaka pri pridobivanju uporabnikov", er);
+                console.log("Error retrieving users", er);
             }
         }
     
-        fetchPodjetja();
-        fetchUporabniki();
+        fetchCompanies();
+        fetchUsers();
     }, [])
 
     const validateForm = () => {
         let formErrors = {};
         let formIsValid = true;
     
-        if (!company.naziv) {
+        if (!company.name) {
             formIsValid = false;
-            formErrors["naziv"] = "Please add your company name";
+            formErrors["name"] = "Please add your company name";
         }
 
-        if (!company.naslov) {
+        if (!company.address) {
             formIsValid = false;
-            formErrors["naslov"] = "Please add your address";
+            formErrors["address"] = "Please add your address";
         }
         
-        if (!company.postna_stevilka) {
+        if (!company.postal_code) {
             formIsValid = false;
-            formErrors["postna_stevilka"] = "Please add your post code";
+            formErrors["postal_code"] = "Please add your post code";
         }
     
         if (!email) {
@@ -95,17 +92,17 @@ function Registration() {
     
         if (!password) {
             formIsValid = false;
-            formErrors["geslo"] = "Please add your password";
+            formErrors["password"] = "Please add your password";
         }
     
         if (password && password.length < 6) {
             formIsValid = false;
-            formErrors["geslo"] = "The password should have at least 6 characters";
+            formErrors["password"] = "The password should have at least 6 characters";
         }
 
         if (password !== confirmPassword) {
             formIsValid = false;
-            formErrors["geslo_enako"] = "Please, add your password";
+            formErrors["same_password"] = "Please, add your password";
         }
 
         if (!agreed) {
@@ -127,29 +124,28 @@ function Registration() {
             try {
                 user.email = email;
                 user.admin = email;
-                user.geslo = password;
+                user.password = password;
                 company.admin_email = email;
 
-                console.log('Sending user data:', user);
-                const response1 = await api.post("/uporabnik/dodaj", user, {
+                //console.log('Sending user data:', user);
+                const response1 = await api.post("/user/add", user, {
                     headers: {
                         "Content-Type": "application/json",
                         Accept: "application/json",
                     },
                 });
-                console.log('User response:', response1.data);
+                //console.log('User response:', response1.data);
 
-                console.log('Sending company data:', company);
-                const response2 = await api.post("/podjetje/dodaj", company, {
+                //console.log('Sending company data:', company);
+                const response2 = await api.post("/company/add", company, {
                     headers: {
                         "Content-Type": "application/json",
                         Accept: "application/json",
                     },
                 });
-                console.log('Company response:', response2.data);
+                //console.log('Company response:', response2.data);
 
                 if (response1.status === 200 && response2.status === 200) {
-                    // pokaže se okno in piše 'Uspešno ste registrirali podjetje.'
                     console.log('Both requests successful');
                 }
                 
@@ -185,40 +181,40 @@ function Registration() {
                 <h1 className="text-2xl font-bold mb-6">Company registration</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label htmlFor="naziv" className="block text-sm font-medium text-gray-700">Company name</label>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Company name</label>
                         <input
                             type="text"
-                            id="naziv"
-                            name='naziv'
+                            id="name"
+                            name='name'
                             onChange={handleChange}
                             disabled={isSubmitting}
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
-                        <small className="text-red-500">{errors.naziv}</small>
+                        <small className="text-red-500">{errors.name}</small>
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="naslov" className="block text-sm font-medium text-gray-700">Address</label>
+                        <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
                         <input
                             type="text"
-                            id="naslov"
-                            name='naslov'
+                            id="address"
+                            name='address'
                             onChange={handleChange}
                             disabled={isSubmitting}
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
-                        <small className="text-red-500">{errors.naslov}</small>
+                        <small className="text-red-500">{errors.address}</small>
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="postna_stevilka" className="block text-sm font-medium text-gray-700"> Post code</label>
+                        <label htmlFor="postal_code" className="block text-sm font-medium text-gray-700">Postal code</label>
                         <input
                             type="text"
-                            id="postna_stevilka"
-                            name='postna_stevilka'
+                            id="postal_code"
+                            name='postal_code'
                             onChange={handleChange}
                             disabled={isSubmitting}
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
-                        <small className="text-red-500">{errors.postna_stevilka}</small>
+                        <small className="text-red-500">{errors.postal_code}</small>
                     </div>
 
                     <h1 className="text-2xl font-bold mb-6">Admin registration</h1>
@@ -256,7 +252,7 @@ function Registration() {
                             disabled={isSubmitting}
                             className="mt-1 p-2 border border-gray-300 rounded w-full"
                         />
-                        <small className="text-red-500">{errors.geslo_enako}</small>
+                        <small className="text-red-500">{errors.same_password}</small>
                     </div>
 
                     <div className="mb-6">
@@ -269,7 +265,7 @@ function Registration() {
                                 className="form-checkbox"
                             />
                             <span className="ml-2">I agree to the <NavLink to="/terms"
-                                                                           className="text-blue-500 hover:underline">terms and conditions</NavLink></span>
+                                className="text-blue-500 hover:underline">terms and conditions</NavLink></span>
                         </label>
                         <br/>
                         <small className="text-red-500">{errors.agreed}</small>

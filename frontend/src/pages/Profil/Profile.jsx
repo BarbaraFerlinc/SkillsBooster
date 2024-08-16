@@ -17,12 +17,12 @@ function Profile() {
 
     useEffect(() => {
         if (user) {
-          const uporabnikovEmail = user.email;
+          const userEmail = user.email;
     
-          api.post('/uporabnik/profil', { id: uporabnikovEmail })
+          api.post('/user/id', { id: userEmail })
             .then(res => {
-              const profil = res.data;
-              setCurrentUser(profil);
+              const profile = res.data;
+              setCurrentUser(profile);
             })
             .catch(err => {
               console.error(err);
@@ -37,14 +37,14 @@ function Profile() {
                 <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-                        <DynamicHeader domainName={`${currentUser?.ime_priimek} Profile`} />
+                        <DynamicHeader domainName={`${currentUser?.full_name} Profile`} />
 
                         {/* Profile Info Card */}
                         <ProfileInfo user={currentUser} />
 
-                        {currentUser?.vloga === 'admin' && <AdminProfile />}
-                        {currentUser?.vloga === 'boss' && <BossProfile />}
-                        {currentUser?.vloga === 'user' && <EmployeeProfile />}
+                        {currentUser?.role === 'admin' && <AdminProfile />}
+                        {currentUser?.role === 'boss' && <BossProfile />}
+                        {currentUser?.role === 'user' && <EmployeeProfile />}
                     </div>
                 </main>
             </div>

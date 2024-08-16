@@ -1,7 +1,9 @@
 {
   "scripts": {
     "start": "node app.js",
-    "devStart": "nodemon app.js"
+    "devStart": "nodemon app.js",
+    "vercel-build": "echo hello",
+    "test": "jest"
   },
   "dependencies": {
     "axios": "^1.7.2",
@@ -18,8 +20,13 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.14",
     "nodemon": "^3.1.0",
+    "openai": "^4.56.0",
     "path": "^0.12.7",
     "stream": "^0.0.3",
     "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   }
 }
