@@ -193,13 +193,13 @@ function Domain() {
 
     const handleUpdateModel = () => {
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        /*api.post(`/domain/update-model`, { id: newId })
+        api.post(`/domain/update-model`, { id: newId })
             .then(res => {
                 console.log(res.data);
             })
             .catch(err => {
                 console.error(err);
-            });*/
+            });
     };
     
     const handleAddLinkClick = () => {

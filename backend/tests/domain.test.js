@@ -4,10 +4,6 @@ const Domain = require('../models/domain');
 
 jest.mock('../models/domain');
 
-beforeEach(() => {
-  jest.clearAllMocks();
-});
-
 describe('Domain Controller', () => {
   it('should add a new domain', async () => {
       const mockDomain = {

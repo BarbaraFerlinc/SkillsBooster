@@ -72,26 +72,6 @@ async function findUsersBoss(req, res) {
     }
 }
 
-async function changeUser(req, res) {
-    const { id } = req.params;
-    const { full_name, email, password, role, admin } = req.body;
-
-    if (!full_name || !email || !password || !role || !admin) {
-        return res.status(400).json({ error: 'All fields must be filled' });
-    }
-
-    try {
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        const updatedUser = await User.change(id, full_name, email, hashedPassword, role, admin);
-        
-        res.status(200).json({ message: 'Successfully updated user', user: updatedUser });
-    } catch (error) {
-        res.status(500).json({ error: 'Error updating user in database', details: error.message });
-    }
-}
-
 async function deleteUser(req, res) {
     const { id } = req.params;
     try {
@@ -111,6 +91,5 @@ module.exports = {
     findUser,
     findUsersAdmin,
     findUsersBoss,
-    changeUser,
     deleteUser
 };

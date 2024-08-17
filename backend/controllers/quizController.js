@@ -16,15 +16,6 @@ async function addQuiz(req, res) {
     }
 }
 
-async function allQuizzes(req, res) {
-    try {
-        const quizzes = await Quiz.all();
-        res.status(200).json(quizzes);
-    } catch (error) {
-        res.status(500).json({ error: 'Error retrieving quizzes from database', details: error.message });
-    }
-}
-
 async function findQuiz(req, res) {
     const { id } = req.body;
     if (!id) {
@@ -52,57 +43,6 @@ async function findQuizzes(req, res) {
         res.status(200).json(quizzes);
     } catch (error) {
         res.status(500).json({ error: 'Error retrieving quizzes from database', details: error.message });
-    }
-}
-
-async function changeQuiz(req, res) {
-    const { id } = req.params;
-    const { name } = req.body;
-
-    if (!name) {
-        return res.status(400).json({ error: 'All fields must be filled' });
-    }
-
-    try {
-        const updatedQuiz = await Quiz.change(id, name);
-        
-        res.status(200).json({ message: 'Successfully updated quiz', quiz: updatedQuiz });
-    } catch (error) {
-        res.status(500).json({ error: 'Error updating quiz in database', details: error.message });
-    }
-}
-
-async function addQuestionQuiz(req, res) {
-    const { id } = req.params;
-    const { questionId } = req.body;
-
-    if (!questionId ) {
-        return res.status(400).json({ error: 'A question must be selected' });
-    }
-
-    try {
-        const updatedQuiz = await Quiz.addQuestion(id, questionId);
-        
-        res.status(200).json({ message: 'Successfully updated quiz', quiz: updatedQuiz });
-    } catch (error) {
-        res.status(500).json({ error: 'Error updating quiz in database', details: error.message });
-    }
-}
-
-async function deleteQuestionQuiz(req, res) {
-    const { id } = req.params;
-    const { questionId } = req.body;
-
-    if (!questionId ) {
-        return res.status(400).json({ error: 'A question must be selected' });
-    }
-
-    try {
-        const updatedQuiz = await Quiz.deleteQuestion(id, questionId);
-        
-        res.status(200).json({ message: 'Successfully updated quiz', quiz: updatedQuiz });
-    } catch (error) {
-        res.status(500).json({ error: 'Error updating quiz in database', details: error.message });
     }
 }
 
@@ -156,22 +96,6 @@ async function changeResultQuiz(req, res) {
     }
 }
 
-async function deleteResultQuiz(req, res) {
-    const { id } = req.params;
-    const { userId } = req.body;
-
-    if (!userId ) {
-        return res.status(400).json({ error: 'A user must be selected' });
-    }
-
-    try {
-        const updatedQuiz = await Quiz.deleteResult(id, userId);
-        res.status(200).json({ message: 'Successfully updated quiz', quiz: updatedQuiz });
-    } catch (error) {
-        res.status(500).json({ error: 'Error updating quiz in database', details: error.message });
-    }
-}
-
 async function checkAnswerQuiz(req, res) {
     const { query, rightAnswer, answer } = req.body;
     try {
@@ -197,16 +121,11 @@ async function deleteQuiz(req, res) {
 
 module.exports = {
     addQuiz,
-    allQuizzes,
     findQuiz,
     findQuizzes,
-    changeQuiz,
-    addQuestionQuiz,
-    deleteQuestionQuiz,
     addResultQuiz,
     findResultQuiz,
     changeResultQuiz,
-    deleteResultQuiz,
     checkAnswerQuiz,
     deleteQuiz
 };

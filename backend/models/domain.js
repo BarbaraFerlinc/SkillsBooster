@@ -40,21 +40,6 @@ class Domain {
         }
     }
 
-    static async all() {
-        try {
-            const domainsRef = db.collection("Knowledge_domains");
-            const response = await domainsRef.get();
-            const domains = [];
-            response.forEach(doc => {
-                domains.push(doc.data());
-            });
-
-            return domains;
-        } catch (error) {
-            throw new Error('Error retrieving domains from the database: ' + error.message);
-        }
-    }
-
     static async getById(id) {
         try {
             const domainRef = db.collection("Knowledge_domains").doc(id);
@@ -97,25 +82,6 @@ class Domain {
         }
     }
 
-    static async change(id, name, description, key_skills) {
-        try {
-            if (this.getById(id) != undefined) {
-                const domain = {
-                    name: name,
-                    description: description,
-                    key_skills: key_skills
-                };
-
-                db.collection("Knowledge_domains").doc(id).update(domain);
-                return { message: 'Domain update successful', domain: domain };
-            } else {
-                return { message: 'Domain update failed', domain: undefined };
-            }
-        } catch (error) {
-            throw new Error('Error updating domain in database: ' + error.message);
-        }
-    }
-
     static async addUser(id, userId) {
         try {
             const domainRef = db.collection("Knowledge_domains").doc(id);
@@ -149,25 +115,6 @@ class Domain {
             return users;
         } catch (error) {
             throw new Error('Error retrieving users from database: ' + error.message);
-        }
-    }
-
-    static async deleteUser(id, userId) {
-        try {
-            const domainRef = db.collection("Knowledge_domains").doc(id);
-            const response = await domainRef.get();
-            const domain = response.data();
-
-            if (domain.employees && domain.employees.includes(userId)) {
-                const updatedEmployees = domain.employees.filter(employeeId => employeeId !== userId);
-
-                await db.collection("Knowledge_domains").doc(id).update({ employees: updatedEmployees });
-                return { message: 'User successfully removed from domain', domain: domain };
-            } else {
-                return { message: 'The user is not part of this domain', domain: domain };
-            }
-        } catch (error) {
-            throw new Error('Error retrieving domain from database: ' + error.message);
         }
     }
 
@@ -306,110 +253,70 @@ class Domain {
         }
     }
 
-    static async deleteResult(id, userId) {
+    static async getModelId(domain) {
         try {
-            const domainRef = db.collection("Knowledge_domains").doc(id);
-            const response = await domainRef.get();
-            const domain = response.data();
-
-            if (domain.results && domain.results.some(r => {
-                const [user] = r.split(';');
-                return user === `${userId}`;
-            })) {
-                const updatedResults = domain.results.filter(r => {
-                    const [user] = r.split(';');
-                    return user !== `${userId}`;
-                });
-
-                await db.collection("Knowledge_domains").doc(id).update({ results: updatedResults });
-                return { message: 'Result successfully removed from domain', domain: domain };
+            const responseModel = await axios.get('https://api.openai.com/v1/models', {
+                headers: {
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                },
+            });
+            const models = responseModel.data.data;
+    
+            const filteredModels = domain
+                ? models.filter(model => model.id.includes(domain))
+                : models;
+            const filteredWithoutStep = filteredModels.filter(model => !model.id.includes('ckpt-step'));
+    
+            const lastModel = filteredWithoutStep.reduce((latest, model) => {
+                return new Date(model.created * 1000) > new Date(latest.created * 1000) ? model : latest;
+            }, filteredWithoutStep[0]);
+    
+            const outputFilePath = './filtered_model_ids.json';
+            fs.writeFileSync(outputFilePath, JSON.stringify(filteredWithoutStep.map(model => model.id), null, 2));
+    
+            let modelId = '';
+            if (!lastModel) {
+                modelId = 'gpt-4-turbo';
             } else {
-                return { message: 'The result is not part of this domain', domain: domain };
+                modelId = lastModel.id;
             }
+            return modelId;
         } catch (error) {
-            throw new Error('Error retrieving domain from database: ' + error.message);
+            console.error(error.response);
         }
     }
 
-    static async chatBox(id, query) {
+    static async chatBox(modelId, query) {
         try {
-            /*const data = await fs.promises.readFile('model_info.json', 'utf8');
-            const folderDetails = JSON.parse(data);
-
-            let model = null;
-            const folder = folderDetails.find(folder => folder.name === id);
-            if (!folder) {
-                console.log(`Model for domain "${id}" not found.`);
-                model = process.env.GRADIENT_BACKUP_MODEL;
-            } else {
-                model = folder.model;
-                if (!model) {
-                    console.log(`Model is empty for domain "${id}".`);
-                    model = process.env.GRADIENT_BACKUP_MODEL;
-                }
-            }
-
-            const url = `https://api.gradient.ai/api/models/${model}/complete`;
-            const payload = {
-                autoTemplate: true,
-                query: query,
-                maxGeneratedTokenCount: 200
-            };
-            const headers = {
-                accept: "application/json",
-                "x-gradient-workspace-id": process.env.GRADIENT_WORKSPACE_ID,
-                "content-type": "application/json",
-                authorization: `Bearer ${process.env.GRADIENT_ACCESS_TOKEN}`
-            };
-
-            const response = await axios.post(url, payload, { headers });
-            console.log("model, ", response);
-            if (response) {
-                console.log("Status Code:", response.status);
-                console.log("Response Headers:", response.headers);
-                console.log("Response Body:", response.data);
-                return response.data.generatedOutput;
-            } else {*/
-                const responseGPT = await fetch(process.env.OPENAI_URL, {
-                    method: 'POST',
+            const response = await axios.post(
+                'https://api.openai.com/v1/chat/completions',
+                {
+                    model: modelId,
+                    messages: [
+                        { role: 'system', content: 'You are a teacher whose primary purpose is to explain every concept in meticulous detail, ensuring clarity and understanding for the student. Your explanations should be thorough, step-by-step, and consider that the student may have no prior knowledge of the subject. Please use clear language, provide examples, and make complex ideas as simple as possible.' },
+                        { role: 'user', content: query },
+                    ],
+                    max_tokens: 150,
+                    temperature: 0.7,
+                },
+                {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+                        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
                     },
-                    body: JSON.stringify({
-                        model: 'gpt-3.5-turbo',
-                        messages: [
-                            { role: 'system', content: 'You are a teacher whose primary purpose is to explain every concept in meticulous detail, ensuring clarity and understanding for the student. Your explanations should be thorough, step-by-step, and consider that the student may have no prior knowledge of the subject. Please use clear language, provide examples, and make complex ideas as simple as possible.' },
-                            { role: 'user', content: query }
-                        ],
-                        max_tokens: 150,
-                        temperature: 0,
-                        top_p: 1,
-                        n: 1,
-                        stop: ["\n"]
-                    })
-                });
-                const data = await responseGPT.json();
-                const evaluationResult = data.choices[0].message.content.trim();
-
-                /*const completion = await openai.chat.completions.create({
-                    messages: [{ role: "system", content: "You are a teacher whose primary purpose is to explain every concept in meticulous detail, ensuring clarity and understanding for the student. Your explanations should be thorough, step-by-step, and consider that the student may have no prior knowledge of the subject. Please use clear language, provide examples, and make complex ideas as simple as possible." }],
-                    model: "ft:gpt-4o-mini-2024-07-18:personal::9wcAcylo",
-                  });
-                console.log(completion.choices[0]);*/
-
-                
-                return evaluationResult;
-            //}
+                }
+            );
+            console.log(response);
+            return response.data.choices[0].message.content.trim();
         } catch (error) {
-            console.error("Error:", error.response ? error.response.data : error.message);
+            console.error("Error communicating with OpenAI API: ", error.response ? error.response.data : error.message);
         }
     }
 
     static async updateModel(id) {
         try {
             const tempDataFilePath = path.join(__dirname, 'temp_data.json');
-            const folderDetailsPath = path.join(__dirname, 'model_info.json');
+            const folderDetailsPath = path.join(__dirname, 'folder_details.json');
 
             const folderRef = ref(storage, id);
             const list = await listAll(folderRef);
@@ -422,32 +329,39 @@ class Domain {
             fs.writeFileSync(tempDataFilePath, JSON.stringify(files, null, 2));
             console.log('temp_data.json has been updated.');
 
-            const apiUrl = process.env.API_URL;
-            console.log(apiUrl);
-            const response = await axios.post(apiUrl, {
-                files: files
-            }, {
+            const formData = new FormData();
+            formData.append('temp_file', fs.createReadStream(tempDataFilePath));
+
+            const apiUrl = process.env.OPENAI_FINETUNE_URL;
+            const response = await axios.post(apiUrl, formData, {
+                headers: formData.getHeaders(),
                 timeout: 30 * 60 * 1000 // 30 minutes
             });
     
             console.log('Response from the server:', JSON.stringify(response.data, null, 2));
     
-            if (response.data && response.data.modelAdapterId) {
-                const modelAdapterId = response.data.modelAdapterId;
-                const folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
+            if (response.data && response.data.model_id) {
+                const modelId = response.data.model_id;
+                let folderDetails = [];
+
+                if (fs.existsSync(folderDetailsPath)) {
+                    folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
+                }
+
                 const folderDetail = folderDetails.find(detail => detail.name === id);
 
                 if (folderDetail) {
-                    folderDetail.model = modelAdapterId;
+                    folderDetail.model = modelId;
                     folderDetail.modelCreationTime = new Date().toISOString();
                 } else {
                     folderDetails.push({
                         name: id,
-                        url: `gs://${firebaseConfig.storageBucket}/${id}`,
-                        model: modelAdapterId,
+                        url: `gs://${process.env.EXPRESS_APP_STORAGE_BUCKET}/${id}`,
+                        model: modelId,
                         modelCreationTime: new Date().toISOString()
                     });
                 }
+
                 fs.writeFileSync(folderDetailsPath, JSON.stringify(folderDetails, null, 2));
                 console.log(`Folder details for ${id} updated.`);
             }

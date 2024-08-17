@@ -22,21 +22,6 @@ class Quiz {
         }
     }
 
-    static async all() {
-        try {
-            const quizzesRef = db.collection("Quizzes");
-            const response = await quizzesRef.get();
-            const quizzes = [];
-            response.forEach(doc => {
-                quizzes.push(doc.data());
-            });
-
-            return quizzes;
-        } catch (error) {
-            throw new Error('Error retrieving quizzes from database: ' + error.message);
-        }
-    }
-
     static async getById(id) {
         try {
             const quizRef = db.collection("Quizzes").doc(id);
@@ -57,56 +42,6 @@ class Quiz {
             const quizzes = responses.map(response => response.data());
 
             return quizzes;
-        } catch (error) {
-            throw new Error('Error retrieving quiz from database: ' + error.message);
-        }
-    }
-
-    static async change(id, name) {
-        try {
-            const quiz = {
-                name: name
-            };
-
-            db.collection("Quizzes").doc(id).update(quiz);
-            return { message: 'Quiz update successful', quiz: quiz };
-        } catch (error) {
-            throw new Error('Error updating quiz in database: ' + error.message);
-        }
-    }
-
-    static async addQuestion(id, questionId) {
-        try {
-            const quizRef = db.collection("Quizzes").doc(id);
-            const response = await quizRef.get();
-            const quiz = response.data();
-
-            if (quiz.questions && quiz.questions.includes(questionId)) {
-                return { message: 'Vprašanje je že vključeno v ta kviz', quiz: quiz };
-            }
-            const updatedQuestions = quiz.questions ? [...quiz.questions, questionId] : [questionId];
-
-            db.collection("Quizzes").doc(id).update({questions: updatedQuestions});
-            return { message: 'Quiz update successful', quiz: quiz };
-        } catch (error) {
-            throw new Error('Error updating quiz in database: ' + error.message);
-        }
-    }
-
-    static async deleteQuestion(id, questionId) {
-        try {
-            const quizRef = db.collection("Quizzes").doc(id);
-            const response = await quizRef.get();
-            const quiz = response.data();
-
-            if (quiz.questions && quiz.questions.includes(questionId)) {
-                const updatedQuestions = quiz.questions.filter(existingQuestionId => existingQuestionId !== questionId);
-
-                await db.collection("Quizzes").doc(id).update({ questions: updatedQuestions });
-                return { message: 'Question successfully removed from quiz', quiz: quiz };
-            } else {
-                return { message: 'The question is not part of this quiz', quiz: quiz };
-            }
         } catch (error) {
             throw new Error('Error retrieving quiz from database: ' + error.message);
         }
@@ -194,31 +129,6 @@ class Quiz {
             }
         } catch (error) {
             throw new Error('Error updating result: ' + error.message);
-        }
-    }
-
-    static async deleteResult(id, userId) {
-        try {
-            const quizRef = db.collection("Quizzes").doc(id);
-            const response = await quizRef.get();
-            const quiz = response.data();
-
-            if (quiz.results && quiz.results.some(r => {
-                const [user] = r.split(';');
-                return user === `${userId}`;
-            })) {
-                const updatedResults = quiz.results.filter(r => {
-                    const [user] = r.split(';');
-                    return user !== `${userId}`;
-                });
-
-                await db.collection("Quizzes").doc(id).update({ results: updatedResults });
-                return { message: 'Result successfully removed from quiz', quiz: quiz };
-            } else {
-                return { message: 'The score is not part of this quiz', quiz: quiz };
-            }
-        } catch (error) {
-            throw new Error('Error retrieving quiz from database: ' + error.message);
         }
     }
 

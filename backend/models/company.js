@@ -33,33 +33,6 @@ class Company {
         }
     }
 
-    static async getById(id) {
-        try {
-            const companyRef = db.collection("Companies").doc(id);
-            const response = await companyRef.get();
-            const company = response.data();
-
-            return company;
-        } catch (error) {
-            throw new Error('Error retrieving company from database: ' + error.message);
-        }
-    }
-
-    static async change(id, name, address, postal_code) {
-        try {
-            const company = {
-                name: name,
-                address: address,
-                postal_code: postal_code
-            };
-
-            db.collection("Companies").doc(id).update(company);
-            return { message: 'Company update successful', company: company };
-        } catch (error) {
-            throw new Error('Error updating the company in the database: ' + error.message);
-        }
-    }
-
     static async delete(id) {
         try {
             const companyRef = db.collection("Companies").doc(id);

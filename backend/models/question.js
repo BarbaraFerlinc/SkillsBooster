@@ -19,33 +19,6 @@ class Question {
         }
     }
 
-    static async all() {
-        try {
-            const questionsRef = db.collection("Questions");
-            const response = await questionsRef.get();
-            const questions = [];
-            response.forEach(doc => {
-                questions.push(doc.data());
-            });
-
-            return questions;
-        } catch (error) {
-            throw new Error('Error retrieving questions from database: ' + error.message);
-        }
-    }
-
-    static async getById(id) {
-        try {
-            const questionRef = db.collection("Questions").doc(id);
-            const response = await questionRef.get();
-            const question = response.data();
-
-            return question;
-        } catch (error) {
-            throw new Error('Error retrieving question from database: ' + error.message);
-        }
-    }
-
     static async getByIds(ids) {
         try {
             const questionsRef = db.collection("Questions");
@@ -56,57 +29,6 @@ class Question {
             return questions;
         } catch (error) {
             throw new Error('Error retrieving questions from database: ' + error.message);
-        }
-    }
-
-    static async change(id, question, type) {
-        try {
-            const updatedQuestion = {
-                question: question,
-                type: type
-            };
-
-            db.collection("Questions").doc(id).update(updatedQuestion);
-            return { message: 'Question update successful', question: updatedQuestion };
-        } catch (error) {
-            throw new Error('Error updating question in database: ' + error.message);
-        }
-    }
-
-    static async addAnswer(id, answer) {
-        try {
-            const questionRef = db.collection("Questions").doc(id);
-            const response = await questionRef.get();
-            const question = response.data();
-
-            if (question.answers && question.answers.includes(answer)) {
-                return { message: 'Odgovor je že vključen v to vprašanje', question: question };
-            }
-            const updatedAnswers = question.answers ? [...question.answers, answer] : [answer];
-
-            db.collection("Questions").doc(id).update({answers: updatedAnswers});
-            return { message: 'Question update successful', question: question };
-        } catch (error) {
-            throw new Error('Error retrieving question from database: ' + error.message);
-        }
-    }
-
-    static async deleteAnswer(id, answer) {
-        try {
-            const questionRef = db.collection("Questions").doc(id);
-            const response = await questionRef.get();
-            const question = response.data();
-
-            if (question.answers && question.answers.includes(answer)) {
-                const updatedAnswers = question.answers.filter(existingAnswer => existingAnswer !== answer);
-
-                await db.collection("Questions").doc(id).update({ answers: updatedAnswers });
-                return { message: 'Answer successfully removed from question', question: question };
-            } else {
-                return { message: 'The answer is not part of this question', question: question };
-            }
-        } catch (error) {
-            throw new Error('Error retrieving question from database: ' + error.message);
         }
     }
 

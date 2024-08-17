@@ -1,7 +1,6 @@
 [
   {
     "ime": ".placeholder",
-<<<<<<< HEAD
     "url": "https://firebasestorage.googleapis.com/v0/b/skillsbooster-a4155.appspot.com/o/datascience%2F.placeholder?alt=media&token=fd57052c-862d-40de-a300-05e6485378d4"
   },
   {
@@ -19,20 +18,5 @@
   {
     "ime": "predavanje_vaje.tex",
     "url": "https://firebasestorage.googleapis.com/v0/b/skillsbooster-a4155.appspot.com/o/datascience%2Fpredavanje_vaje.tex?alt=media&token=f9f4d143-eaa6-48a5-ba6a-70e51d89bca0"
-=======
-    "url": "https://firebasestorage.googleapis.com/v0/b/skillsbooster-a4155.appspot.com/o/novadomena%2F.placeholder?alt=media&token=7c261bd0-0481-4b6d-9415-74c441647a8a"
-  },
-  {
-    "ime": "SkillsBooster_dpu.png",
-    "url": "https://firebasestorage.googleapis.com/v0/b/skillsbooster-a4155.appspot.com/o/novadomena%2FSkillsBooster_dpu.png?alt=media&token=36115bee-9773-4fc9-9c34-9e97451cc178"
-  },
-  {
-    "ime": "martin_martin_martin.txt",
-    "url": "https://firebasestorage.googleapis.com/v0/b/skillsbooster-a4155.appspot.com/o/novadomena%2Fmartin_martin_martin.txt?alt=media&token=f4ff5f47-624c-41c4-a746-66af3dac473e"
-  },
-  {
-    "ime": "oogway.jpg",
-    "url": "https://firebasestorage.googleapis.com/v0/b/skillsbooster-a4155.appspot.com/o/novadomena%2Foogway.jpg?alt=media&token=d71e32d6-166c-4ff4-80d0-5ba205fcb306"
->>>>>>> 4b59679b0f979326d2029d39de17d1d500f73e36
   }
 ]

@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Routes,
   Route,
-  useLocation,
   Navigate
 } from 'react-router-dom';
 import './css/style.css';

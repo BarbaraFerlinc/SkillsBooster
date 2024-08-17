@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "start": "node app.js",
-    "devStart": "nodemon app.js",
+    "start": "node server.js",
+    "devStart": "nodemon server.js",
     "vercel-build": "echo hello",
     "test": "jest"
   },
