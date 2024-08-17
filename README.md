@@ -105,3 +105,11 @@ To create a production build of the application, run:
 ```bash
 npm run build
 ```
+
+## Documentation
+If you want more detailed look at our work process or more information on how the app works, visit [SkillsBooster Documentation](https://github.com/BarbaraFerlinc/SkillsBooster/tree/main/documentation).
+
+## Authors
+* Barbara Ferlinc
+* Klara Kirbiš
+* Jaša Jernej Rakun Kokalj
