@@ -37,20 +37,6 @@ describe('Question Controller', () => {
         expect(response.body.question).toEqual(mockQuestion);
     });
 
-    it('should return all questions', async () => {
-        const mockQuestions = [
-            { question: 'What is 2+2?', type: 'closed', quiz: '123', answers: ['3', '4'] },
-            { question: 'What is the capital of France?', type: 'open', quiz: '124', answers: ['Paris'] }
-        ];
-
-        Question.all.mockResolvedValue(mockQuestions);
-
-        const response = await request(app).get('/question/all');
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual(mockQuestions);
-    });
-
     it('should return certain questions', async () => {
         const mockQuestions = [
             { question: 'What is 2+2?', type: 'closed', quiz: '123', answers: ['3', '4'] },

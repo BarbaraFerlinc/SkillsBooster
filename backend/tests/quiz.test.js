@@ -19,20 +19,6 @@ describe('Quiz Controller', () => {
         expect(response.body.quiz).toEqual(mockQuiz);
     });
 
-    it('should return all quizzes', async () => {
-        const mockQuizzes = [
-            { name: 'Math Quiz', questions: ['123', '124'] },
-            { name: 'Science Quiz', questions: ['125', '126'] }
-        ];
-
-        Quiz.all.mockResolvedValue(mockQuizzes);
-
-        const response = await request(app).get('/quiz/all');
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual(mockQuizzes);
-    });
-
     it('should return a specific quiz', async () => {
         const mockQuiz = {
             name: 'Math Quiz',

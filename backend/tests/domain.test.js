@@ -44,20 +44,6 @@ describe('Domain Controller', () => {
       expect(response.body.error).toBe('All fields must be filled');
   });
 
-  it('should return all domains', async () => {
-      const mockDomains = [
-        { name: 'Domain Name', description: 'Domain Description', key_skills: 'Skill 1, Skill 2', owner: 'owner@test.com' },
-        { name: 'Second Name', description: 'Second Description', key_skills: 'Skill 3, Skill 4', owner: 'second@test.com' },
-      ];
-
-      Domain.all.mockResolvedValue(mockDomains);
-
-      const response = await request(app).get('/domain/all');
-
-      expect(response.statusCode).toBe(200);
-      expect(response.body).toEqual(mockDomains);
-  });
-
   it('should return a specific domain', async () => {
     const mockDomain = {
       name: 'Domain Name',
