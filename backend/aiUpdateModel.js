@@ -37,7 +37,7 @@ async function fetchFileUrls(folderName) {
 }
 
 // Function to process the folder
-async function processFolder(folderName) {
+async function processFolder(folderName, imePodrocja) {
     try {
         const datoteke = await fetchFileUrls(folderName);
         console.log('Pridobljene datoteke:', datoteke);
@@ -49,7 +49,7 @@ async function processFolder(folderName) {
         // Prepare the FormData object for the file upload
         const formData = new FormData();
         formData.append('temp_file', fs.createReadStream(tempDataFilePath));
-        formData.append('ime_podrocja', folderName);  // Append the string as another form field
+        formData.append('ime_podrocja', imePodrocja);  // Append the string as another form field
 
         // Send a POST request to the FastAPI endpoint
         const apiUrl = 'https://skillsbooster.onrender.com/fine-tune'; // Replace with your actual deployed URL
@@ -109,4 +109,4 @@ function updateFolderDetails(folderName, modelId) {
 }
 
 // Run the function for a specific folder with the string
-processFolder('daj_bog_da_dela'); // Replace with the desired folder name and string
+processFolder('daj_bog_da_dela', 'ime_podrocja_test'); // Replace with the desired folder name and string

@@ -171,4 +171,4 @@ if __name__ == "__main__":
     # Use a relative path to the temp.json file
     script_dir = os.path.dirname(os.path.realpath(__file__))
     temp_file_path = os.path.join(script_dir, 'temp.json')
-    main(temp_file_path,ime_podrocja="test")
+    main(temp_file_path,ime_podrocja="martin")
