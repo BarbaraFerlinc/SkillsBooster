@@ -49,6 +49,7 @@ async function processFolder(folderName) {
         // Prepare the FormData object for the file upload
         const formData = new FormData();
         formData.append('temp_file', fs.createReadStream(tempDataFilePath));
+        formData.append('ime_podrocja', folderName);  // Append the string as another form field
 
         // Send a POST request to the FastAPI endpoint
         const apiUrl = 'https://skillsbooster.onrender.com/fine-tune'; // Replace with your actual deployed URL
@@ -107,5 +108,5 @@ function updateFolderDetails(folderName, modelId) {
     console.log(`Folder details for ${folderName} updated.`);
 }
 
-// Run the function for a specific folder
-processFolder('daj_bog_da_dela'); // Replace 'daj_bog_da_dela' with the desired folder name
+// Run the function for a specific folder with the string
+processFolder('daj_bog_da_dela'); // Replace with the desired folder name and string

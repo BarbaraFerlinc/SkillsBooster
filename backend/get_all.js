@@ -5,7 +5,7 @@ const fs = require('fs');
 const apiKey = process.env.OPENAI_API_KEY;
 
 // Funkcija za pridobivanje vseh modelov
-async function fetchModels() {
+async function fetchModels(suffix = '') {
     try {
         const response = await axios.get('https://api.openai.com/v1/models', {
             headers: {
@@ -13,23 +13,35 @@ async function fetchModels() {
             },
         });
 
-        // Preveri strukturo podatkov, ki jih vrne API
-        console.log('API Response Data:', response.data);
+        const models = response.data.data;
 
-        // Izpis vseh ID-jev modelov
-        const modelIds = response.data.data.map(model => model.id);  // Preveri strukturo in pridobi ID-je
-        console.log('Model IDs:', modelIds);
+        // Filtriraj modele po sufiksu, če je določen
+        const filteredModels = suffix
+            ? models.filter(model => model.id.includes(suffix))
+            : models;
+
+        // Izključi modele, ki vsebujejo "ckpt-step" v ID-ju
+        const filteredWithoutStep = filteredModels.filter(model => !model.id.includes('ckpt-step'));
+
+        // Pridobi zadnji model glede na čas ustvarjanja
+        const lastModel = filteredWithoutStep.reduce((latest, model) => {
+            return new Date(model.created * 1000) > new Date(latest.created * 1000) ? model : latest;
+        }, filteredWithoutStep[0]);
+
+        console.log('Filtered Models:', filteredWithoutStep.map(model => model.id));
+        console.log('Last Model:', lastModel.id);
 
         // Shranjevanje ID-jev v JSON datoteko
-        const outputFilePath = './model_ids.json';
-        fs.writeFileSync(outputFilePath, JSON.stringify(modelIds, null, 2));
-        console.log(`Model IDs saved to ${outputFilePath}`);
+        const outputFilePath = './filtered_model_ids.json';
+        fs.writeFileSync(outputFilePath, JSON.stringify(filteredWithoutStep.map(model => model.id), null, 2));
+        console.log(`Filtered Model IDs saved to ${outputFilePath}`);
 
-        return modelIds;
+        return lastModel.id;
     } catch (error) {
         console.error('Error fetching models:', error.response ? error.response.data : error.message);
     }
 }
 
-// Klic funkcije za pridobivanje modelov
-fetchModels();
+// Klic funkcije za pridobivanje modelov, lahko podaš sufiks za iskanje
+const suffix = 'personal'; // Zamenjaj z iskalnim nizom ali pusti prazno za vse modele
+fetchModels(suffix);
