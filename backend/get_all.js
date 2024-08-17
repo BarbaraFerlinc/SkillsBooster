@@ -43,5 +43,5 @@ async function fetchModels(suffix = '') {
 }
 
 // Klic funkcije za pridobivanje modelov, lahko podaš sufiks za iskanje
-const suffix = 'personal'; // Zamenjaj z iskalnim nizom ali pusti prazno za vse modele
+const suffix = 'daj'; // Zamenjaj z iskalnim nizom ali pusti prazno za vse modele
 fetchModels(suffix);
