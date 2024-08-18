@@ -37,7 +37,7 @@ The solution aids management in ensuring the continuous growth of their team's s
 
 ## AI
 ### Installation & development
-In `ai` directory first install all necessary requirements with code:
+In `backend/ai` directory first install all necessary requirements with code:
 ```bash
 pip install requirements.txt
 ```
