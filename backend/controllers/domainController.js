@@ -276,14 +276,14 @@ async function chatBoxDomain(req, res) {
 }
 
 async function updateModelDomain(req, res) {
-    const { id } = req.body;
+    const { id, nameDomain } = req.body;
 
     if (!id) {
         return res.status(400).json({ error: 'Id is required' });
     }
 
     try {
-        const response = await Domain.updateModel(id);
+        const response = await Domain.updateModel(id, nameDomain);
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ error: 'Error accessing the model', details: error.message });

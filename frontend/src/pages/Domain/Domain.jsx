@@ -193,14 +193,20 @@ function Domain() {
 
     const handleUpdateModel = () => {
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post(`/domain/update-model`, { id: newId })
+        const payload = {
+            id: newId,
+            nameDomain: newId
+        };
+    
+        api.post(`/domain/update-model`, payload)
             .then(res => {
                 console.log(res.data);
             })
             .catch(err => {
-                console.error(err);
+                console.error('Error:', err);
             });
     };
+    
     
     const handleAddLinkClick = () => {
         setShowInput(true);

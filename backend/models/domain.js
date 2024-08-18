@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const dotenv = require('dotenv');
+const FormData = require('form-data');
 
 dotenv.config();
 
@@ -342,12 +343,10 @@ static async getModelId(domain) {
         });
         const models = responseModel.data.data;
 
-        // Filter models based on the domain
         const filteredModels = domain
             ? models.filter(model => model.id.includes(domain))
             : models;
 
-        // Further filter out models containing 'ckpt-step'
         const filteredWithoutStep = filteredModels.filter(model => !model.id.includes('ckpt-step'));
 
         if (filteredWithoutStep.length === 0) {
@@ -355,21 +354,17 @@ static async getModelId(domain) {
             return 'gpt-4-turbo';
         }
 
-        // Find the most recent model
         const lastModel = filteredWithoutStep.reduce((latest, model) => {
             return new Date(model.created * 1000) > new Date(latest.created * 1000) ? model : latest;
         }, filteredWithoutStep[0]);
 
-        // Save filtered model IDs to a file (for debugging or auditing)
         const outputFilePath = './filtered_model_ids.json';
         fs.writeFileSync(outputFilePath, JSON.stringify(filteredWithoutStep.map(model => model.id), null, 2));
 
-        // Return the ID of the last (most recent) model or default model if not found
         return lastModel ? lastModel.id : 'gpt-4-turbo';
-
     } catch (error) {
         console.error("Error fetching model IDs from OpenAI API: ", error.response ? error.response.data : error.message);
-        return 'gpt-4-turbo'; // Fallback to a default model ID
+        return 'gpt-4-turbo';
     }
 }
 
@@ -400,7 +395,6 @@ static async chatBox(modelId, query) {
             console.error("Error communicating with OpenAI API: ", errorMsg);
 
             if (errorMsg.includes('model')) {
-                // If the error is related to the model, log it and fallback to a default model
                 console.warn('Falling back to default model: gpt-4-turbo');
                 return await this.chatBox('gpt-4-turbo', query);
             }
@@ -409,64 +403,100 @@ static async chatBox(modelId, query) {
     }
 }
 
-    static async updateModel(id) {
-        try {
-            const tempDataFilePath = path.join(__dirname, 'temp_data.json');
-            const folderDetailsPath = path.join(__dirname, 'model_info.json');
+static async updateModel(folderName, domainName) {
+    try {
+        const files = await this.fetchFileUrls(folderName);
 
-            const folderRef = ref(storage, id);
-            const list = await listAll(folderRef);
-            const files = await Promise.all(list.items.map(async (itemRef) => {
-                const url = await getDownloadURL(itemRef);
-                return { name: itemRef.name, url: url };
-            }));
-            console.log('Retrieved files: ', files);
-
-            fs.writeFileSync(tempDataFilePath, JSON.stringify(files, null, 2));
-            console.log('temp_data.json has been updated.');
-
-            const apiUrl = process.env.API_URL;
-            console.log(apiUrl);
-            const response = await axios.post(apiUrl, {
-                files: files
-            }, {
-                timeout: 30 * 60 * 1000 // 30 minutes
-            });
-    
-            console.log('Response from the server:', JSON.stringify(response.data, null, 2));
-    
-            if (response.data && response.data.modelAdapterId) {
-                const modelAdapterId = response.data.modelAdapterId;
-                const folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
-                const folderDetail = folderDetails.find(detail => detail.name === id);
-
-                if (folderDetail) {
-                    folderDetail.model = modelAdapterId;
-                    folderDetail.modelCreationTime = new Date().toISOString();
-                } else {
-                    folderDetails.push({
-                        name: id,
-                        url: `gs://${firebaseConfig.storageBucket}/${id}`,
-                        model: modelAdapterId,
-                        modelCreationTime: new Date().toISOString()
-                    });
-                }
-                fs.writeFileSync(folderDetailsPath, JSON.stringify(folderDetails, null, 2));
-                console.log(`Folder details for ${id} updated.`);
-            }
-            return { message: 'Model update successful.' };
-        } catch (error) {
-            if (error.response) {
-                console.error('Error status: ' + error.response.status);
-                console.error('Error data: ' + JSON.stringify(error.response.data, null, 2));
-            } else if (error.request) {
-                console.error('No response received: ' + error.request);
-            } else {
-                console.error('Error in setup:: ' + error.message);
-            }
-            console.error('Error retrieving files or sending request:', error.config);
+        if (!Array.isArray(files) || files.length === 0) {
+            throw new Error('No files retrieved or files is not an array.');
         }
+
+        const tempDataFilePath = path.join(__dirname, 'temp_data.json');
+
+        fs.writeFileSync(tempDataFilePath, JSON.stringify(files, null, 2));
+        console.log('temp_data.json has been updated.');
+
+        const formData = new FormData();
+        formData.append('temp_file', fs.createReadStream(tempDataFilePath));
+        formData.append('domain_name', domainName);
+
+        const apiUrl = process.env.OPENAI_FINETUNE_URL;
+        const response = await axios.post(apiUrl, formData, {
+            headers: formData.getHeaders(),
+            timeout: 5 * 60 * 1000 // 5 minutes
+        });
+
+        console.log('Response from the server:', JSON.stringify(response.data, null, 2));
+        if (response.data && response.data.model_id) {
+            await this.updateFolderDetails(folderName, response.data.model_id);
+        }
+
+    } catch (error) {
+        if (error.response) {
+            console.error(`Error Status: ${error.response.status}`);
+            console.error(`Error Data: ${JSON.stringify(error.response.data, null, 2)}`);
+        } else if (error.request) {
+            console.error('No response received:', error.request);
+        } else {
+            console.error('Error in setup:', error.message);
+        }
+        console.error('Error during file retrieval or request submission:', error.config);
     }
+}
+
+static async fetchFileUrls(folderName) {
+    try {
+        const folderRef = ref(storage, folderName);
+        const list = await listAll(folderRef);
+
+        if (list.items.length === 0) {
+            console.log('No files found in the folder.');
+            return [];
+        }
+
+        const fileUrls = await Promise.all(list.items.map(async (itemRef) => {
+            const url = await getDownloadURL(itemRef);
+            const name = itemRef?.name || 'Unnamed File';
+            return { name: name, url: url };
+        }));
+
+        return fileUrls;
+    } catch (error) {
+        console.error('Error fetching file URLs:', error.message);
+        throw error;
+    }
+}
+
+static async updateFolderDetails(folderName, modelId) {
+    try {
+        const folderDetailsPath = path.join(__dirname, 'folder_details.json');
+        let folderDetails = [];
+
+        if (fs.existsSync(folderDetailsPath)) {
+            folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
+        }
+
+        const folderDetail = folderDetails.find(detail => detail.name === folderName);
+
+        if (folderDetail) {
+            folderDetail.model = modelId;
+            folderDetail.modelCreationTime = new Date().toISOString();
+        } else {
+            folderDetails.push({
+                name: folderName,
+                url: `gs://${firebaseConfig.storageBucket}/${folderName}`,
+                model: modelId,
+                modelCreationTime: new Date().toISOString()
+            });
+        }
+
+        fs.writeFileSync(folderDetailsPath, JSON.stringify(folderDetails, null, 2));
+        console.log(`Folder details for ${folderName} updated.`);
+    } catch (error) {
+        console.error('Error updating folder details:', error.message);
+        throw error;
+    }
+}
 
     static async addLink(id, link) {
         try {
