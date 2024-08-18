@@ -118,8 +118,10 @@ function AdminProfile() {
                 setNewUserName('');
                 setNewUserEmail('');
                 setNewUserRole('user');
+                setLoading(false);
             } catch (error) {
                 console.error("Error adding new user:", error);
+                setLoading(false);
             } finally {
                 if (secondaryApp) {
                     secondaryApp.delete();
