@@ -42,20 +42,15 @@ function AIAssistant({ domain }) {
             setWaitingForResponse(true);
 
             try {
-                const modelId = await api.post('/domain/modelId', { domain: domain });
-                console.log(modelId.data);
-                if (modelId) {
-                    const response2 = await api.post('/domain/chat-box', { modelId: modelId, query: input });
-                    console.log(response2.data);
-                    let assistantResponse = {};
-                    if (response2.data == '' || !response2) {
-                        assistantResponse = { text: 'Something went wrong.', fromUser: false };
-                    } else {
-                        assistantResponse = { text: response2.data, fromUser: false };
-                    }
-                    
-                    setMessages(prevMessages => [...prevMessages, assistantResponse]);
+                const response = await api.post('/domain/chat-box', { id: domain, query: input });
+                let assistantResponse = {};
+                if (response.data == '' || !response) {
+                    assistantResponse = { text: 'Something went wrong.', fromUser: false };
+                } else {
+                    assistantResponse = { text: response.data, fromUser: false };
                 }
+                
+                setMessages(prevMessages => [...prevMessages, assistantResponse]);
             } catch (error) {
                 console.error("Error:", error.response ? error.response.data : error.message);
                 const errorMessage = { text: 'Sorry, something went wrong.', fromUser: false };

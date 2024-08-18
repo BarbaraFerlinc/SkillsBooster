@@ -17,6 +17,15 @@ async function addDomain(req, res) {
       res.status(500).json({ error: 'Error inserting domain into database', details: error.message });
     }
 }
+  
+async function allDomains(req, res) {
+    try {
+        const domains = await Domain.all();
+        res.status(200).json(domains);
+    } catch (error) {
+        res.status(500).json({ error: 'Error retrieving domains from database', details: error.message });
+    }
+}
 
 async function findDomain(req, res) {
     const id = req.body.id;
@@ -61,6 +70,23 @@ async function findDomainOwner(req, res) {
     }
 }
 
+async function changeDomain(req, res) {
+    const { id } = req.params;
+    const { name, description, key_skills } = req.body;
+
+    if (!name || !description || !key_skills ) {
+        return res.status(400).json({ error: 'All fields must be filled' });
+    }
+
+    try {
+        const updatedDomain = await Domain.change(id, name, description, key_skills);
+        
+        res.status(200).json({ message: 'Domain successfully updated', domain: updatedDomain });
+    } catch (error) {
+        res.status(500).json({ error: 'Error updating domain in database', details: error.message });
+    }
+}
+
 async function addUserDomain(req, res) {
     const { id } = req.params;
     const { userId } = req.body;
@@ -88,6 +114,23 @@ async function findUsersDomain(req, res) {
         res.status(200).json(domain);
     } catch (error) {
         res.status(500).json({ error: 'Error retrieving domain from database', details: error.message });
+    }
+}
+
+async function deleteUserDomain(req, res) {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    if (!userId ) {
+        return res.status(400).json({ error: 'A user must be selected' });
+    }
+
+    try {
+        const updatedDomain = await Domain.deleteUser(id, userId);
+        
+        res.status(200).json({ message: 'Domain successfully updated', domain: updatedDomain });
+    } catch (error) {
+        res.status(500).json({ error: 'Error updating domain in database', details: error.message });
     }
 }
 
@@ -186,6 +229,22 @@ async function changeResultDomain(req, res) {
     }
 }
 
+async function deleteResultDomain(req, res) {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    if (!userId ) {
+        return res.status(400).json({ error: 'A user must be selected' });
+    }
+
+    try {
+        const updatedDomain = await Domain.deleteResult(id, userId);
+        res.status(200).json({ message: 'Domain successfully updated', domain: updatedDomain });
+    } catch (error) {
+        res.status(500).json({ error: 'Error updating domain in database', details: error.message });
+    }
+}
+
 async function modelIdDomain(req, res) {
     const { domain } = req.body;
 
@@ -202,14 +261,14 @@ async function modelIdDomain(req, res) {
 }
 
 async function chatBoxDomain(req, res) {
-    const { modelId, query } = req.body;
+    const { id, query } = req.body;
 
     if (!query) {
         return res.status(400).json({ error: 'Query is required' });
     }
 
     try {
-        const response = await Domain.chatBox(modelId, query);
+        const response = await Domain.chatBox(id, query);
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ error: 'Error accessing the model', details: error.message });
@@ -356,18 +415,21 @@ async function deleteDomain(req, res) {
 
 module.exports = {
     addDomain,
+    allDomains,
     findDomain,
     findDomainUser,
     findDomainOwner,
+    changeDomain,
     addUserDomain,
     findUsersDomain,
+    deleteUserDomain,
     addQuizDomain,
     findQuizzesDomain,
     deleteQuizDomain,
     addResultDomain,
     findResultDomain,
     changeResultDomain,
-    modelIdDomain,
+    deleteResultDomain,
     chatBoxDomain,
     updateModelDomain,
     addLinkDomain,
@@ -377,5 +439,6 @@ module.exports = {
     findLearningMaterialsDomain,
     readLearningMaterialDomain,
     deleteLearningMaterialDomain,
-    deleteDomain
+    deleteDomain,
+    modelIdDomain
 };
