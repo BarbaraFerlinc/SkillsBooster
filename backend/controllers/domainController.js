@@ -245,6 +245,21 @@ async function deleteResultDomain(req, res) {
     }
 }
 
+async function modelIdDomain(req, res) {
+    const { domain } = req.body;
+
+    if (!domain) {
+        return res.status(400).json({ error: 'Domain is required' });
+    }
+
+    try {
+        const response = await Domain.getModelId(domain);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ error: 'Error accessing the model', details: error.message });
+    }
+}
+
 async function chatBoxDomain(req, res) {
     const { id, query } = req.body;
 
@@ -424,5 +439,6 @@ module.exports = {
     findLearningMaterialsDomain,
     readLearningMaterialDomain,
     deleteLearningMaterialDomain,
-    deleteDomain
+    deleteDomain,
+    modelIdDomain
 };

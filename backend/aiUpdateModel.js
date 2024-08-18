@@ -2,6 +2,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const FormData = require('form-data');
 const { initializeApp } = require('firebase/app');
 const { getStorage, ref, listAll, getDownloadURL } = require('firebase/storage');
 
@@ -20,7 +21,7 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
 const tempDataFilePath = path.join(__dirname, 'temp_data.json');
-const folderDetailsPath = path.join(__dirname, 'model_info.json');
+const folderDetailsPath = path.join(__dirname, 'folder_details.json');
 
 // Function to fetch URLs from Firebase
 async function fetchFileUrls(folderName) {
@@ -36,7 +37,7 @@ async function fetchFileUrls(folderName) {
 }
 
 // Function to process the folder
-async function processFolder(folderName) {
+async function processFolder(folderName, imePodrocja) {
     try {
         const datoteke = await fetchFileUrls(folderName);
         console.log('Pridobljene datoteke:', datoteke);
@@ -45,22 +46,26 @@ async function processFolder(folderName) {
         fs.writeFileSync(tempDataFilePath, JSON.stringify(datoteke, null, 2));
         console.log('temp_data.json je bil posodobljen.');
 
-        // Send a POST request to the deployed FastAPI endpoint
-        const apiUrl = 'https://ai-1-r4zl.onrender.com/process_files'; // Replace with your actual deployed URL
+        // Prepare the FormData object for the file upload
+        const formData = new FormData();
+        formData.append('temp_file', fs.createReadStream(tempDataFilePath));
+        formData.append('ime_podrocja', imePodrocja);  // Append the string as another form field
 
-        // Axios request with extended timeout
-        const response = await axios.post(apiUrl, {
-            datoteke: datoteke
-        }, {
+        // Send a POST request to the FastAPI endpoint
+        const apiUrl = 'https://skillsbooster.onrender.com/fine-tune'; // Replace with your actual deployed URL
+
+        // Axios request with extended timeout (30 minutes)
+        const response = await axios.post(apiUrl, formData, {
+            headers: formData.getHeaders(),
             timeout: 30 * 60 * 1000 // 30 minutes
         });
 
         // Log the full server response
         console.log('Response from the server:', JSON.stringify(response.data, null, 2));
 
-        // If the response contains a modelAdapterId, update the folder details
-        if (response.data && response.data.modelAdapterId) {
-            updateFolderDetails(folderName, response.data.modelAdapterId);
+        // If the response contains a model ID, update the folder details
+        if (response.data && response.data.model_id) {
+            updateFolderDetails(folderName, response.data.model_id);
         }
 
     } catch (error) {
@@ -78,18 +83,23 @@ async function processFolder(folderName) {
 }
 
 // Function to update the folder details JSON file
-function updateFolderDetails(folderName, modelAdapterId) {
-    const folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
+function updateFolderDetails(folderName, modelId) {
+    let folderDetails = [];
+
+    if (fs.existsSync(folderDetailsPath)) {
+        folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
+    }
+
     const folderDetail = folderDetails.find(detail => detail.name === folderName);
 
     if (folderDetail) {
-        folderDetail.model = modelAdapterId;
+        folderDetail.model = modelId;
         folderDetail.modelCreationTime = new Date().toISOString();
     } else {
         folderDetails.push({
             name: folderName,
             url: `gs://${firebaseConfig.storageBucket}/${folderName}`,
-            model: modelAdapterId,
+            model: modelId,
             modelCreationTime: new Date().toISOString()
         });
     }
@@ -98,5 +108,5 @@ function updateFolderDetails(folderName, modelAdapterId) {
     console.log(`Folder details for ${folderName} updated.`);
 }
 
-// Run the function for a specific folder
-processFolder('novadomena'); // Replace 'daj_bog_da_dela' with the desired folder name
+// Run the function for a specific folder with the string
+processFolder('daj_bog_da_dela', 'ime_podrocja_test'); // Replace with the desired folder name and string

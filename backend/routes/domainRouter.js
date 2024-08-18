@@ -32,5 +32,6 @@ router.post('/materials', domainController.findLearningMaterialsDomain);
 router.post('/read-material', domainController.readLearningMaterialDomain);
 router.post('/delete-material', domainController.deleteLearningMaterialDomain);
 router.delete('/:id', domainController.deleteDomain);
+router.post('/modelId',domainController.modelIdDomain);
 
 module.exports = router;

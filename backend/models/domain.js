@@ -331,80 +331,83 @@ class Domain {
         }
     }
 
-    static async chatBox(id, query) {
-        try {
-            /*const data = await fs.promises.readFile('model_info.json', 'utf8');
-            const folderDetails = JSON.parse(data);
 
-            let model = null;
-            const folder = folderDetails.find(folder => folder.name === id);
-            if (!folder) {
-                console.log(`Model for domain "${id}" not found.`);
-                model = process.env.GRADIENT_BACKUP_MODEL;
-            } else {
-                model = folder.model;
-                if (!model) {
-                    console.log(`Model is empty for domain "${id}".`);
-                    model = process.env.GRADIENT_BACKUP_MODEL;
-                }
-            }
+    
+static async getModelId(domain) {
+    try {
+        const responseModel = await axios.get('https://api.openai.com/v1/models', {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            },
+        });
+        const models = responseModel.data.data;
 
-            const url = `https://api.gradient.ai/api/models/${model}/complete`;
-            const payload = {
-                autoTemplate: true,
-                query: query,
-                maxGeneratedTokenCount: 200
-            };
-            const headers = {
-                accept: "application/json",
-                "x-gradient-workspace-id": process.env.GRADIENT_WORKSPACE_ID,
-                "content-type": "application/json",
-                authorization: `Bearer ${process.env.GRADIENT_ACCESS_TOKEN}`
-            };
+        // Filter models based on the domain
+        const filteredModels = domain
+            ? models.filter(model => model.id.includes(domain))
+            : models;
 
-            const response = await axios.post(url, payload, { headers });
-            console.log("model, ", response);
-            if (response) {
-                console.log("Status Code:", response.status);
-                console.log("Response Headers:", response.headers);
-                console.log("Response Body:", response.data);
-                return response.data.generatedOutput;
-            } else {*/
-                const responseGPT = await fetch(process.env.OPENAI_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-3.5-turbo',
-                        messages: [
-                            { role: 'system', content: 'You are a teacher whose primary purpose is to explain every concept in meticulous detail, ensuring clarity and understanding for the student. Your explanations should be thorough, step-by-step, and consider that the student may have no prior knowledge of the subject. Please use clear language, provide examples, and make complex ideas as simple as possible.' },
-                            { role: 'user', content: query }
-                        ],
-                        max_tokens: 150,
-                        temperature: 0,
-                        top_p: 1,
-                        n: 1,
-                        stop: ["\n"]
-                    })
-                });
-                const data = await responseGPT.json();
-                const evaluationResult = data.choices[0].message.content.trim();
+        // Further filter out models containing 'ckpt-step'
+        const filteredWithoutStep = filteredModels.filter(model => !model.id.includes('ckpt-step'));
 
-                /*const completion = await openai.chat.completions.create({
-                    messages: [{ role: "system", content: "You are a teacher whose primary purpose is to explain every concept in meticulous detail, ensuring clarity and understanding for the student. Your explanations should be thorough, step-by-step, and consider that the student may have no prior knowledge of the subject. Please use clear language, provide examples, and make complex ideas as simple as possible." }],
-                    model: "ft:gpt-4o-mini-2024-07-18:personal::9wcAcylo",
-                  });
-                console.log(completion.choices[0]);*/
-
-                
-                return evaluationResult;
-            //}
-        } catch (error) {
-            console.error("Error:", error.response ? error.response.data : error.message);
+        if (filteredWithoutStep.length === 0) {
+            console.warn(`No models found for the domain "${domain}". Falling back to default model.`);
+            return 'gpt-4-turbo';
         }
+
+        // Find the most recent model
+        const lastModel = filteredWithoutStep.reduce((latest, model) => {
+            return new Date(model.created * 1000) > new Date(latest.created * 1000) ? model : latest;
+        }, filteredWithoutStep[0]);
+
+        // Save filtered model IDs to a file (for debugging or auditing)
+        const outputFilePath = './filtered_model_ids.json';
+        fs.writeFileSync(outputFilePath, JSON.stringify(filteredWithoutStep.map(model => model.id), null, 2));
+
+        // Return the ID of the last (most recent) model or default model if not found
+        return lastModel ? lastModel.id : 'gpt-4-turbo';
+
+    } catch (error) {
+        console.error("Error fetching model IDs from OpenAI API: ", error.response ? error.response.data : error.message);
+        return 'gpt-4-turbo'; // Fallback to a default model ID
     }
+}
+
+static async chatBox(modelId, query) {
+    try {
+        const response = await axios.post(
+            'https://api.openai.com/v1/chat/completions',
+            {
+                model: modelId,
+                messages: [
+                    { role: 'system', content: 'You are a teacher whose primary purpose is to explain every concept in meticulous detail, ensuring clarity and understanding for the student. Your explanations should be thorough, step-by-step, and consider that the student may have no prior knowledge of the subject. Please use clear language, provide examples, and make complex ideas as simple as possible. You cannot generate code.' },
+                    { role: 'user', content: query },
+                ],
+                max_tokens: 150,
+                temperature: 0.7,
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                },
+            }
+        );
+        return response.data.choices[0].message.content.trim();
+    } catch (error) {
+        if (error.response && error.response.data && error.response.data.error) {
+            const errorMsg = error.response.data.error.message;
+            console.error("Error communicating with OpenAI API: ", errorMsg);
+
+            if (errorMsg.includes('model')) {
+                // If the error is related to the model, log it and fallback to a default model
+                console.warn('Falling back to default model: gpt-4-turbo');
+                return await this.chatBox('gpt-4-turbo', query);
+            }
+        }
+        return 'Sorry, something went wrong while trying to generate a response.';
+    }
+}
 
     static async updateModel(id) {
         try {

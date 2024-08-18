@@ -8,6 +8,7 @@ import shutil
 from openai import OpenAI
 from PyPDF2 import PdfReader
 from dotenv import load_dotenv
+#comment cuz reasons...
 
 load_dotenv()
 client = OpenAI()
@@ -60,11 +61,12 @@ def upload_training_file(file_path):
         print(f"Error uploading file: {e}")
         sys.exit(1)
 
-def create_fine_tuning_job(training_file_id):
+def create_fine_tuning_job(training_file_id,ime):
     try:
         response = client.fine_tuning.jobs.create(
             training_file=training_file_id,
-            model="gpt-3.5-turbo"
+            model="gpt-3.5-turbo",
+            suffix=ime
         )
         job_id = response.id
         print(f"Fine-tuning job created with ID: {job_id}")
@@ -92,7 +94,7 @@ def get_fine_tuned_model_id(job_id):
         print("Fine-tuning job failed.")
         return None
 
-def main(temp_file_path):
+def main(temp_file_path, ime_podrocja):
     print("Fine-tuning script started")
 
     print("Loading data...")
@@ -161,7 +163,7 @@ def main(temp_file_path):
 
     training_file_path = "sample_data.jsonl"
     training_file_id = upload_training_file(training_file_path)
-    job_id = create_fine_tuning_job(training_file_id)
+    job_id = create_fine_tuning_job(training_file_id,ime_podrocja)
     id_modela = get_fine_tuned_model_id(job_id)
     print(id_modela)
 
@@ -169,4 +171,4 @@ if __name__ == "__main__":
     # Use a relative path to the temp.json file
     script_dir = os.path.dirname(os.path.realpath(__file__))
     temp_file_path = os.path.join(script_dir, 'temp.json')
-    main(temp_file_path)
+    main(temp_file_path,ime_podrocja="martin")

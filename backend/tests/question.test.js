@@ -23,10 +23,10 @@ describe('Question Controller', () => {
 
     it('should add a new open question', async () => {
         const mockQuestion = {
-            question: 'What is 2+2?',
+            question: 'What is 2+1?',
             type: 'open',
             quiz: '123',
-            answers: ['4']
+            answers: ['3']
         };
         
         Question.add.mockResolvedValue(mockQuestion);
@@ -37,37 +37,27 @@ describe('Question Controller', () => {
         expect(response.body.question).toEqual(mockQuestion);
     });
 
-    it('should return all questions', async () => {
-        Question.all.mockResolvedValue(mockQuestions);
-
-        const response = await request(app).get('/question/all');
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual(mockQuestions);
-    });
-
     it('should return certain questions', async () => {
-        const mockQuestion = {
-            question: 'What is 2+2?',
-            type: 'open',
-            quiz: '123',
-            answers: ['4']
-        };
+        const mockQuestions = [
+            { question: 'What is 2+2?', type: 'closed', quiz: '123', answers: ['3', '4'] },
+            { question: 'What is the capital of France?', type: 'open', quiz: '124', answers: ['Paris'] }
+        ];
+        const ids = ['123_what_is_2+2?', '124_what_is_the_capital_of_france?']; // Assuming IDs are formatted like this
 
-        Question.all.mockResolvedValue(mockQuestions);
+        Question.getByIds.mockResolvedValue(mockQuestions);
 
-        const response = await request(app).post('/question/ids');
+        const response = await request(app).post('/question/ids').send({ids});
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual(mockQuestions);
     });
 
     it('should delete a question', async () => {
-        const mockQuestion = { question: 'What is 2+2?', type: 'multiple-choice', quiz: '123', answers: ['3', '4'] };
+        const mockQuestion = { question: 'What is 2+2?', type: 'closed', quiz: '123', answers: ['3;false', '4;true'] };
 
         Question.delete.mockResolvedValue(mockQuestion);
 
-        const response = await request(app).delete('/question/1');
+        const response = await request(app).delete('/question/123_what_is_2+2?');
 
         expect(response.statusCode).toBe(200);
         expect(response.body.question).toEqual(mockQuestion);

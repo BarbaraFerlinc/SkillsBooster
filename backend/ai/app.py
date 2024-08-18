@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, BackgroundTasks, HTTPException
+from fastapi import FastAPI, UploadFile, File, BackgroundTasks, HTTPException, Form
 from fastapi.responses import JSONResponse
 import shutil
 import os
@@ -6,10 +6,10 @@ from finetuning import main, get_fine_tuned_model_id  # Assuming your original s
 
 app = FastAPI()
 
-def run_fine_tuning(temp_file_path: str, result_file: str):
+def run_fine_tuning(temp_file_path: str, result_file: str, ime_podrocja: str):
     try:
         # Run the fine-tuning process and get the job ID
-        job_id = main(temp_file_path)
+        job_id = main(temp_file_path, ime_podrocja)
         
         # Wait for the fine-tuning process to complete and get the model ID
         model_id = get_fine_tuned_model_id(job_id)
@@ -23,7 +23,7 @@ def run_fine_tuning(temp_file_path: str, result_file: str):
             f.write(f"Error: {str(e)}")
 
 @app.post("/fine-tune")
-async def fine_tune(temp_file: UploadFile = File(...), background_tasks: BackgroundTasks = BackgroundTasks()):
+async def fine_tune(temp_file: UploadFile = File(...), ime_podrocja: str = Form(...), background_tasks: BackgroundTasks = BackgroundTasks()):
     try:
         # Save the uploaded file to the local file system
         temp_file_path = temp_file.filename
@@ -34,7 +34,7 @@ async def fine_tune(temp_file: UploadFile = File(...), background_tasks: Backgro
         result_file = f"{temp_file.filename}_result.txt"
         
         # Add the fine-tuning process to the background tasks
-        background_tasks.add_task(run_fine_tuning, temp_file_path, result_file)
+        background_tasks.add_task(run_fine_tuning, temp_file_path, result_file, ime_podrocja)
         
         # Return the result file path so the client can check the status later
         return JSONResponse(content={"status": "success", "message": "Fine-tuning started in the background.", "result_file": result_file})

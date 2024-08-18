@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
 import space from "../images/space-svgrepo-com.png";
 import { UserAuth } from '../context/AuthContext.jsx';
 import api from '../services/api.js';
 import DomainList from "../pages/Domain/DomainList.jsx";
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
-  const location = useLocation();
-  const { pathname } = location;
   const [currentUser, setCurrentUser] = useState(null);
   const [domains, setDomains] = useState([]);
   const [showAddDomainCard, setShowAddDomainCard] = useState(false);

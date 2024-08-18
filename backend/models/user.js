@@ -113,26 +113,6 @@ class User {
         }
     }
 
-    static async change(id, full_name, email, password, role, admin) {
-        try {
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-            const user = {
-                full_name: full_name,
-                email: email,
-                password: hashedPassword,
-                role: role,
-                admin: admin
-            };
-
-            db.collection("Users").doc(id).update(user);
-            return { message: 'Successful user update', user: user };
-        } catch (error) {
-            throw new Error('Error updating user in database: ' + error.message);
-        }
-    }
-
     static async delete(id) {
         try {
             const userRef = db.collection("Users").doc(id);

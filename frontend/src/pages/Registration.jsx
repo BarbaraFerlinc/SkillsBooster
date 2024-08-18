@@ -127,23 +127,19 @@ function Registration() {
                 user.password = password;
                 company.admin_email = email;
 
-                //console.log('Sending user data:', user);
                 const response1 = await api.post("/user/add", user, {
                     headers: {
                         "Content-Type": "application/json",
                         Accept: "application/json",
                     },
                 });
-                //console.log('User response:', response1.data);
 
-                //console.log('Sending company data:', company);
                 const response2 = await api.post("/company/add", company, {
                     headers: {
                         "Content-Type": "application/json",
                         Accept: "application/json",
                     },
                 });
-                //console.log('Company response:', response2.data);
 
                 if (response1.status === 200 && response2.status === 200) {
                     console.log('Both requests successful');
