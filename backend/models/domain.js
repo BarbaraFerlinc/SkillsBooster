@@ -419,12 +419,10 @@ static async updateModel(folderName, imePodrocja) {
         // Convert the file data to a JSON string
         const jsonData = JSON.stringify(datoteke, null, 2);
 
-        // Create a form data object and append the JSON data as a blob (in-memory)
+        // Prepare the FormData object for the file upload using form-data package
         const formData = new FormData();
-        formData.append('files_data', jsonData, {
-            filename: 'temp_data.json',
-            contentType: 'application/json'
-        });
+        // Append the JSON data as a Blob
+        formData.append('temp_file', Buffer.from(jsonData), 'temp_data.json');
         formData.append('ime_podrocja', imePodrocja);
 
         console.log('Sending POST request to API...');
@@ -435,7 +433,6 @@ static async updateModel(folderName, imePodrocja) {
         const response = await axios.post(apiUrl, formData, {
             headers: {
                 ...formData.getHeaders(),
-                'Content-Type': 'multipart/form-data'
             },
             timeout: 5 * 60 * 1000 // 5 minutes
         });
