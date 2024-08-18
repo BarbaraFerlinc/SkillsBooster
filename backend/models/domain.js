@@ -412,34 +412,39 @@ static async chatBox(modelId, query) {
 
 static async updateModel(folderName, imePodrocja) {
     try {
+        console.log(`Starting update model process for folder: ${folderName}, domain: ${imePodrocja}`);
+
         // Fetch file URLs using the existing fetchFileUrls method
         const datoteke = await this.fetchFileUrls(folderName);
-        console.log('Pridobljene datoteke:', datoteke);
+        console.log('Fetched files:', datoteke);
 
         // Check if datoteke array is valid
         if (!Array.isArray(datoteke) || datoteke.length === 0) {
             throw new Error('No files retrieved or datoteke is not an array.');
         }
 
-        // Define the path for the temporary JSON file
-        const tempDataFilePath = path.join(__dirname, 'temp_data.json');
+        // Convert the file data to a JSON string
+        const jsonData = JSON.stringify(datoteke, null, 2);
 
-        // Save file information to the temporary JSON file
-        fs.writeFileSync(tempDataFilePath, JSON.stringify(datoteke, null, 2));
-        console.log('temp_data.json has been updated.');
-
-        // Prepare the FormData object for the file upload using form-data package
+        // Create a form data object and append the JSON data as a blob (in-memory)
         const formData = new FormData();
-        formData.append('temp_file', fs.createReadStream(tempDataFilePath));
+        formData.append('files_data', jsonData, {
+            filename: 'temp_data.json',
+            contentType: 'application/json'
+        });
         formData.append('ime_podrocja', imePodrocja);
 
+        console.log('Sending POST request to API...');
         // Send a POST request to the FastAPI endpoint
         const apiUrl = 'https://skillsbooster.onrender.com/fine-tune'; // Replace with your actual deployed URL
 
-        // Axios request with extended timeout (30 minutes)
+        // Axios request with extended timeout (5 minutes)
         const response = await axios.post(apiUrl, formData, {
-            headers: formData.getHeaders(),
-            timeout: 5 * 60 * 1000 // 30 minutes
+            headers: {
+                ...formData.getHeaders(),
+                'Content-Type': 'multipart/form-data'
+            },
+            timeout: 5 * 60 * 1000 // 5 minutes
         });
 
         // Log the full server response
@@ -452,6 +457,7 @@ static async updateModel(folderName, imePodrocja) {
 
     } catch (error) {
         // Enhanced error logging
+        console.error('An error occurred during the update model process:', error.message);
         if (error.response) {
             console.error(`Error Status: ${error.response.status}`);
             console.error(`Error Data: ${JSON.stringify(error.response.data, null, 2)}`);
@@ -463,6 +469,7 @@ static async updateModel(folderName, imePodrocja) {
         console.error('Error during file retrieval or request submission:', error.config);
     }
 }
+
 
 static async fetchFileUrls(folderName) {
     try {
