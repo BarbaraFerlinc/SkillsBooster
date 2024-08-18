@@ -29,18 +29,14 @@ The solution aids management in ensuring the continuous growth of their team's s
 ### Technologies used
 <div style="width: 100%; text-align: center;">
 
-|                                                                                     React JSX                                                                                     |                                                                               JavaScript                                                                                |                                                                                Python                                                                                |                                                                                   Firebase                                                                                    |                                                                                     OpenAI                                                                                     |
-|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| :-----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | 
-| <a href="https://reactjs.org/docs/introducing-jsx.html" title="React JSX"><img src="https://github.com/get-icon/geticon/raw/master/icons/react.svg" alt="React JSX" width="50px" height="50px"></a> | <a href="https://www.javascript.com/" title="JavaScript"><img src="https://github.com/get-icon/geticon/raw/master/icons/javascript.svg" alt="JavaScript" width="50px" height="50px"></a> | <a href="https://www.python.org/" title="Python"><img src="https://github.com/get-icon/geticon/raw/master/icons/python.svg" alt="Python" width="50px" height="50px"></a> | <a href="https://firebase.google.com/" title="Firebase"><img src="https://github.com/get-icon/geticon/raw/master/icons/firebase.svg" alt="Firebase" width="50px" height="50px"></a> | <a href="https://openai.com/" title="OpenAI"><img src="https://assets-global.website-files.com/5e6aa3e3f001fae105b8e1e7/63920ffe0f48f96db746221d_open-ai-logo-8B9BFEDC26-seeklogo.com.png" alt="OpenAI" width="50px" height="50px"></a> |
+|                                                                                     React JSX                                                                                     |                                                                               JavaScript                                                                                |                                                                                Python                                                                                |                                                                                   Firebase                                                                                    |                                                                                     NoSQL                                                                                     |                                                                                     OpenAI                                                                                     |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| :-----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | 
+| <a href="https://reactjs.org/docs/introducing-jsx.html" title="React JSX"><img src="https://github.com/get-icon/geticon/raw/master/icons/react.svg" alt="React JSX" width="50px" height="50px"></a> | <a href="https://www.javascript.com/" title="JavaScript"><img src="https://github.com/get-icon/geticon/raw/master/icons/javascript.svg" alt="JavaScript" width="50px" height="50px"></a> | <a href="https://www.python.org/" title="Python"><img src="https://github.com/get-icon/geticon/raw/master/icons/python.svg" alt="Python" width="50px" height="50px"></a> | <a href="https://firebase.google.com/" title="Firebase"><img src="https://github.com/get-icon/geticon/raw/master/icons/firebase.svg" alt="Firebase" width="50px" height="50px"></a> | <a href="https://en.wikipedia.org/wiki/NoSQL" title="NoSQL"><img src="https://github.com/get-icon/geticon/raw/master/icons/mongodb-icon.svg" alt="NoSQL" width="50px" height="50px"></a> | <a href="https://openai.com/" title="OpenAI"><img src="https://assets-global.website-files.com/5e6aa3e3f001fae105b8e1e7/63920ffe0f48f96db746221d_open-ai-logo-8B9BFEDC26-seeklogo.com.png" alt="OpenAI" width="50px" height="50px"></a> |
 
 </div>
 
-<<<<<<< HEAD
 
 
-
-=======
->>>>>>> bed37531ca87eeb42b7908b65c58493ca1d1c658
 ## Backend
 ### Installation & development
 In `backend` directory first install all necessary node_modules with code:
@@ -115,7 +111,7 @@ npm run build
 ## Documentation
 If you want more detailed look at our work process or more information on how the app works, visit [SkillsBooster Documentation](https://github.com/BarbaraFerlinc/SkillsBooster/tree/main/documentation).
 
-<<<<<<< HEAD
+
 1. **Clone the Repository:**
 
    ```bash
@@ -163,4 +159,4 @@ To create a production build of the application on the **frontend**, run the fol
 * Barbara Ferlinc
 * Klara Kirbiš
 * Jaša Jernej Rakun Kokalj
->>>>>>> bed37531ca87eeb42b7908b65c58493ca1d1c658
+
