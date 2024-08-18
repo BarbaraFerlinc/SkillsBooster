@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { UserAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { Outlet } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import api from "../services/api";
 
 function BossRouting() {

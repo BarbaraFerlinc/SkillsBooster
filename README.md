@@ -2,7 +2,7 @@
 ## Description
 Our platform offers a comprehensive tool designed to support companies in 
 evaluating and developing their employees' knowledge through customizable
-self-assessment questionnaires and AI-generated learning contend.
+self-assessment questionnaires and AI-generated learning content.
 
 The solution aids management in ensuring the continuous growth of their team's skills.
 ## Key functionalities

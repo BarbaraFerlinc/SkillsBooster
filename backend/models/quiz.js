@@ -86,7 +86,7 @@ class Quiz {
             const response = await quizRef.get();
             const quiz = response.data();
 
-            if (quiz.results && quiz.results.some(r => {
+            if (quiz.results?.some(r => {
                 const [user] = r.split(';');
                 return user === `${userId}`;
             })) {

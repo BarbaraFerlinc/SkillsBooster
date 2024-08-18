@@ -128,9 +128,7 @@ function SolveQuiz() {
             }
         }
         let score = 0;
-        if (totalPoints == 0) {
-            score = 0;
-        } else {
+        if (totalPoints != 0) {
             score = Math.round((totalPoints / maxPoints) * 100);
         }
         return score;

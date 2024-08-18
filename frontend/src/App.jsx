@@ -24,38 +24,37 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 import SessionManager from './utils/SessionManager.jsx';
 
 function App() {
-  return (<>
-      <AuthContextProvider>
-        <SessionManager>
-          <Routes>
-            <Route path='' element={<Routing />}>
-              <Route exact path="/" element={<Dashboard />} />
-              <Route exact path="/register" element={<Registration />} />
-              <Route exact path="/login" element={<Login />} />
+  return (
+    <AuthContextProvider>
+      <SessionManager>
+        <Routes>
+          <Route path='' element={<Routing />}>
+            <Route exact path="/" element={<Dashboard />} />
+            <Route exact path="/register" element={<Registration />} />
+            <Route exact path="/login" element={<Login />} />
+          </Route>
+
+          <Route exact path="/reset" element={<ResetPassword />} />
+
+          <Route path='' element={<PrivateRouting />}>
+            <Route path="/profile" element={<Profile />} />
+            <Route exact path="/domain/:id" element={<Domain/>} />
+            <Route exact path="/logout" element={<LogOut/>} />
+
+            <Route path='' element={<BossRouting />}>
+              <Route exact path="/addQuiz/:domain" element={<AddQuiz/>} />
             </Route>
 
-            <Route exact path="/reset" element={<ResetPassword />} />
-
-            <Route path='' element={<PrivateRouting />}>
-              <Route path="/profile" element={<Profile />} />
-              <Route exact path="/domain/:id" element={<Domain/>} />
-              <Route exact path="/logout" element={<LogOut/>} />
-
-              <Route path='' element={<BossRouting />}>
-                <Route exact path="/addQuiz/:domain" element={<AddQuiz/>} />
-              </Route>
-
-              <Route path='' element={<UserRouting />}>
-                <Route exact path="/quiz/:id/:domain" element={<Quiz/>} />
-                <Route exact path="/solveQuiz/:id/:domain" element={<SolveQuiz/>} />
-              </Route>
+            <Route path='' element={<UserRouting />}>
+              <Route exact path="/quiz/:id/:domain" element={<Quiz/>} />
+              <Route exact path="/solveQuiz/:id/:domain" element={<SolveQuiz/>} />
             </Route>
+          </Route>
 
-            <Route path='*' element={<Navigate to="/" replace />} />
-          </Routes>
-        </SessionManager>
-      </AuthContextProvider>
-    </>
+          <Route path='*' element={<Navigate to="/" replace />} />
+        </Routes>
+      </SessionManager>
+    </AuthContextProvider>
   );
 }
 

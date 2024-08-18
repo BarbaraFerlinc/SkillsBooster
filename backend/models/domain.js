@@ -123,12 +123,12 @@ class Domain {
             const response = await domainRef.get();
             const domain = response.data();
 
-            if (domain.employees && domain.employees.includes(userId)) {
+            if (domain.employees?.includes(userId)) {
                 return { message: 'The user is already included in this domain', domain: domain };
             }
             const updatedEmployees = domain.employees ? [...domain.employees, userId] : [userId];
 
-            if (domain.results && domain.results.includes(`${userId};0`)) {
+            if (domain.results?.includes(`${userId};0`)) {
                 return { message: 'The user is already included in this domain', domain: domain };
             }
             const updatedResults = domain.results ? [...domain.results, `${userId};0`] : [`${userId};0`];
@@ -159,7 +159,7 @@ class Domain {
             const response = await domainRef.get();
             const domain = response.data();
 
-            if (domain.employees && domain.employees.includes(userId)) {
+            if (domain.employees?.includes(userId)) {
                 const updatedEmployees = domain.employees.filter(employeeId => employeeId !== userId);
 
                 await db.collection("Knowledge_domains").doc(id).update({ employees: updatedEmployees });
@@ -178,7 +178,7 @@ class Domain {
             const response = await domainRef.get();
             const domain = response.data();
 
-            if (domain.quizzes && domain.quizzes.includes(quizId)) {
+            if (domain.quizzes?.includes(quizId)) {
                 return { message: 'Quiz is already included in this domain', domain: domain };
             }
             const updatedQuizzes = domain.quizzes ? [...domain.quizzes, quizId] : [quizId];
@@ -209,7 +209,7 @@ class Domain {
             const response = await domainRef.get();
             const domain = response.data();
 
-            if (domain.quizzes && domain.quizzes.includes(quizId)) {
+            if (domain.quizzes?.includes(quizId)) {
                 const updatedQuizzes = domain.quizzes.filter(existingQuizId => existingQuizId !== quizId);
 
                 await db.collection("Knowledge_domains").doc(id).update({ quizzes: updatedQuizzes });
@@ -261,7 +261,7 @@ class Domain {
             const response = await domainRef.get();
             const domain = response.data();
 
-            if (domain.results && domain.results.some(r => {
+            if (domain.results?.some(r => {
                 const [user] = r.split(';');
                 return user === `${userId}`;
             })) {
@@ -313,7 +313,7 @@ class Domain {
             const response = await domainRef.get();
             const domain = response.data();
 
-            if (domain.results && domain.results.some(r => {
+            if (domain.results?.some(r => {
                 const [user] = r.split(';');
                 return user === `${userId}`;
             })) {
@@ -390,7 +390,7 @@ static async chatBox(modelId, query) {
         );
         return response.data.choices[0].message.content.trim();
     } catch (error) {
-        if (error.response && error.response.data && error.response.data.error) {
+        if (error.response?.data?.error) {
             const errorMsg = error.response.data.error.message;
             console.error("Error communicating with OpenAI API: ", errorMsg);
 
@@ -431,7 +431,7 @@ static async updateModel(folderName, nameDomain) {
 
         console.log('Response from the server:', JSON.stringify(response.data, null, 2));
 
-        if (response.data && response.data.model_id) {
+        if (response.data?.model_id) {
             await this.updateFolderDetails(folderName, response.data.model_id);
         }
 
