@@ -42,5 +42,9 @@ async function fetchModels(suffix = '') {
     }
 }
 
+<<<<<<< HEAD
+=======
+// Klic funkcije za pridobivanje modelov, lahko podaš sufiks za iskanje
+>>>>>>> 4662364b9afd418e80e78445d89444645d67f17e
 const suffix = 'personal'; // Zamenjaj z iskalnim nizom ali pusti prazno za vse modele
 fetchModels(suffix);
