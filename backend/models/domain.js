@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const dotenv = require('dotenv');
+const FormData = require('form-data');
 
 dotenv.config();
 
@@ -409,64 +410,114 @@ static async chatBox(modelId, query) {
     }
 }
 
-    static async updateModel(id) {
-        try {
-            const tempDataFilePath = path.join(__dirname, 'temp_data.json');
-            const folderDetailsPath = path.join(__dirname, 'model_info.json');
+static async updateModel(folderName, imePodrocja) {
+    try {
+        // Fetch file URLs using the existing fetchFileUrls method
+        const datoteke = await this.fetchFileUrls(folderName);
+        console.log('Pridobljene datoteke:', datoteke);
 
-            const folderRef = ref(storage, id);
-            const list = await listAll(folderRef);
-            const files = await Promise.all(list.items.map(async (itemRef) => {
-                const url = await getDownloadURL(itemRef);
-                return { name: itemRef.name, url: url };
-            }));
-            console.log('Retrieved files: ', files);
-
-            fs.writeFileSync(tempDataFilePath, JSON.stringify(files, null, 2));
-            console.log('temp_data.json has been updated.');
-
-            const apiUrl = process.env.API_URL;
-            console.log(apiUrl);
-            const response = await axios.post(apiUrl, {
-                files: files
-            }, {
-                timeout: 30 * 60 * 1000 // 30 minutes
-            });
-    
-            console.log('Response from the server:', JSON.stringify(response.data, null, 2));
-    
-            if (response.data && response.data.modelAdapterId) {
-                const modelAdapterId = response.data.modelAdapterId;
-                const folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
-                const folderDetail = folderDetails.find(detail => detail.name === id);
-
-                if (folderDetail) {
-                    folderDetail.model = modelAdapterId;
-                    folderDetail.modelCreationTime = new Date().toISOString();
-                } else {
-                    folderDetails.push({
-                        name: id,
-                        url: `gs://${firebaseConfig.storageBucket}/${id}`,
-                        model: modelAdapterId,
-                        modelCreationTime: new Date().toISOString()
-                    });
-                }
-                fs.writeFileSync(folderDetailsPath, JSON.stringify(folderDetails, null, 2));
-                console.log(`Folder details for ${id} updated.`);
-            }
-            return { message: 'Model update successful.' };
-        } catch (error) {
-            if (error.response) {
-                console.error('Error status: ' + error.response.status);
-                console.error('Error data: ' + JSON.stringify(error.response.data, null, 2));
-            } else if (error.request) {
-                console.error('No response received: ' + error.request);
-            } else {
-                console.error('Error in setup:: ' + error.message);
-            }
-            console.error('Error retrieving files or sending request:', error.config);
+        // Check if datoteke array is valid
+        if (!Array.isArray(datoteke) || datoteke.length === 0) {
+            throw new Error('No files retrieved or datoteke is not an array.');
         }
+
+        // Define the path for the temporary JSON file
+        const tempDataFilePath = path.join(__dirname, 'temp_data.json');
+
+        // Save file information to the temporary JSON file
+        fs.writeFileSync(tempDataFilePath, JSON.stringify(datoteke, null, 2));
+        console.log('temp_data.json has been updated.');
+
+        // Prepare the FormData object for the file upload using form-data package
+        const formData = new FormData();
+        formData.append('temp_file', fs.createReadStream(tempDataFilePath));
+        formData.append('ime_podrocja', imePodrocja);
+
+        // Send a POST request to the FastAPI endpoint
+        const apiUrl = 'https://skillsbooster.onrender.com/fine-tune'; // Replace with your actual deployed URL
+
+        // Axios request with extended timeout (30 minutes)
+        const response = await axios.post(apiUrl, formData, {
+            headers: formData.getHeaders(),
+            timeout: 5 * 60 * 1000 // 30 minutes
+        });
+
+        // Log the full server response
+        console.log('Response from the server:', JSON.stringify(response.data, null, 2));
+
+        // If the response contains a model ID, update the folder details
+        if (response.data && response.data.model_id) {
+            await this.updateFolderDetails(folderName, response.data.model_id);
+        }
+
+    } catch (error) {
+        // Enhanced error logging
+        if (error.response) {
+            console.error(`Error Status: ${error.response.status}`);
+            console.error(`Error Data: ${JSON.stringify(error.response.data, null, 2)}`);
+        } else if (error.request) {
+            console.error('No response received:', error.request);
+        } else {
+            console.error('Error in setup:', error.message);
+        }
+        console.error('Error during file retrieval or request submission:', error.config);
     }
+}
+
+static async fetchFileUrls(folderName) {
+    try {
+        const folderRef = ref(storage, folderName);
+        const list = await listAll(folderRef);
+
+        if (list.items.length === 0) {
+            console.log('No files found in the folder.');
+            return [];
+        }
+
+        const fileUrls = await Promise.all(list.items.map(async (itemRef) => {
+            const url = await getDownloadURL(itemRef);
+            // Use optional chaining to safely access the name property
+            const name = itemRef?.name || 'Unnamed File';
+            return { ime: name, url: url };
+        }));
+
+        return fileUrls;
+    } catch (error) {
+        console.error('Error fetching file URLs:', error.message);
+        throw error;
+    }
+}
+
+static async updateFolderDetails(folderName, modelId) {
+    try {
+        const folderDetailsPath = path.join(__dirname, 'folder_details.json'); // Ensure this is defined
+        let folderDetails = [];
+
+        if (fs.existsSync(folderDetailsPath)) {
+            folderDetails = JSON.parse(fs.readFileSync(folderDetailsPath, 'utf-8'));
+        }
+
+        const folderDetail = folderDetails.find(detail => detail.name === folderName);
+
+        if (folderDetail) {
+            folderDetail.model = modelId;
+            folderDetail.modelCreationTime = new Date().toISOString();
+        } else {
+            folderDetails.push({
+                name: folderName,
+                url: `gs://${firebaseConfig.storageBucket}/${folderName}`, // Ensure firebaseConfig is defined
+                model: modelId,
+                modelCreationTime: new Date().toISOString()
+            });
+        }
+
+        fs.writeFileSync(folderDetailsPath, JSON.stringify(folderDetails, null, 2));
+        console.log(`Folder details for ${folderName} updated.`);
+    } catch (error) {
+        console.error('Error updating folder details:', error.message);
+        throw error;
+    }
+}
 
     static async addLink(id, link) {
         try {

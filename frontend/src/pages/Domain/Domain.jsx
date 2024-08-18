@@ -193,14 +193,23 @@ function Domain() {
 
     const handleUpdateModel = () => {
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post(`/domain/update-model`, { id: newId })
+    
+        // Prepare the payload with newId used twice
+        const payload = {
+            id: newId,
+            nameDomain: newId
+        };
+    
+        // Send the POST request
+        api.post(`/domain/update-model`, payload)
             .then(res => {
-                console.log(res.data);
+                console.log(res.data); // Logs the server response
             })
             .catch(err => {
-                console.error(err);
+                console.error('Error:', err);
             });
     };
+    
     
     const handleAddLinkClick = () => {
         setShowInput(true);
