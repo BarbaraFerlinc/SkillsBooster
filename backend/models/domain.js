@@ -403,50 +403,39 @@ static async chatBox(modelId, query) {
     }
 }
 
-static async updateModel(folderName, imePodrocja) {
+static async updateModel(folderName, nameDomain) {
     try {
-        console.log(`Starting update model process for folder: ${folderName}, domain: ${imePodrocja}`);
+        console.log(`Starting update model process for folder: ${folderName}, domain: ${nameDomain}`);
 
-        // Fetch file URLs using the existing fetchFileUrls method
-        const datoteke = await this.fetchFileUrls(folderName);
-        console.log('Fetched files:', datoteke);
+        const files = await this.fetchFileUrls(folderName);
 
-        // Check if datoteke array is valid
-        if (!Array.isArray(datoteke) || datoteke.length === 0) {
-            throw new Error('No files retrieved or datoteke is not an array.');
+        if (!Array.isArray(files) || files.length === 0) {
+            throw new Error('No files retrieved or files is not an array.');
         }
 
-        // Convert the file data to a JSON string
-        const jsonData = JSON.stringify(datoteke, null, 2);
+        const jsonData = JSON.stringify(files, null, 2);
 
-        // Prepare the FormData object for the file upload using form-data package
         const formData = new FormData();
-        // Append the JSON data as a Blob
         formData.append('temp_file', Buffer.from(jsonData), 'temp_data.json');
-        formData.append('ime_podrocja', imePodrocja);
+        formData.append('domain_name', nameDomain);
 
         console.log('Sending POST request to API...');
-        // Send a POST request to the FastAPI endpoint
-        const apiUrl = 'https://skillsbooster.onrender.com/fine-tune'; // Replace with your actual deployed URL
+        const apiUrl = process.env.OPENAI_FINETUNE_URL;
 
-        // Axios request with extended timeout (5 minutes)
         const response = await axios.post(apiUrl, formData, {
             headers: {
                 ...formData.getHeaders(),
             },
-            timeout: 5 * 60 * 1000 // 5 minutes
+            timeout: 30 * 60 * 1000 // 30 minutes
         });
 
-        // Log the full server response
         console.log('Response from the server:', JSON.stringify(response.data, null, 2));
 
-        // If the response contains a model ID, update the folder details
         if (response.data && response.data.model_id) {
             await this.updateFolderDetails(folderName, response.data.model_id);
         }
 
     } catch (error) {
-        // Enhanced error logging
         console.error('An error occurred during the update model process:', error.message);
         if (error.response) {
             console.error(`Error Status: ${error.response.status}`);
@@ -501,7 +490,7 @@ static async updateFolderDetails(folderName, modelId) {
         } else {
             folderDetails.push({
                 name: folderName,
-                url: `gs://${firebaseConfig.storageBucket}/${folderName}`,
+                url: `gs://${process.env.EXPRESS_APP_STORAGE_BUCKET}/${folderName}`,
                 model: modelId,
                 modelCreationTime: new Date().toISOString()
             });

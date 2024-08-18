@@ -35,6 +35,8 @@ function Domain() {
     const [quizDeleted, setQuizDeleted] = useState(false);
     const [quizzes, setQuizzes] = useState([]);
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [showMessage, setShowMessage] = useState(false);
 
     const { id } = useParams();
     const { user } = UserAuth();
@@ -192,6 +194,7 @@ function Domain() {
     };
 
     const handleUpdateModel = () => {
+        setLoading(true);
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         const payload = {
             id: newId,
@@ -201,12 +204,18 @@ function Domain() {
         api.post(`/domain/update-model`, payload)
             .then(res => {
                 console.log(res.data);
+                setLoading(false);
+                setShowMessage(true);
             })
             .catch(err => {
                 console.error('Error:', err);
+                setLoading(false);
             });
     };
     
+    const handleCloseMessage = () => {
+        setShowMessage(false);
+    };
     
     const handleAddLinkClick = () => {
         setShowInput(true);
@@ -287,10 +296,22 @@ function Domain() {
                             <p className={`mt-4 ${subTextClass}`}>{currentDomain.key_skills || "No key skills available."}</p>
                         </div>
 
+                        {showMessage && (
+                            <div className="mt-4 p-4 bg-green-200 text-green-800 rounded-md flex justify-between items-center">
+                                <span>Model successfully updated! It is recommended not to update the model again for at least 30 minutes.</span>
+                                <button onClick={handleCloseMessage} className="btn btn-primary ml-4">
+                                    OK
+                                </button>
+                            </div>
+                        )}
                         {currentUser && (currentUser.role === "boss") && (
                             <div className='mt-8'>
                                 <button onClick={() => handleUpdateModel()}
-                                        className=" btn bg-green-500 text-white py-2 px-5 rounded">Update model</button>
+                                    className={`btn bg-green-500 text-white py-2 px-5 rounded ${loading || showMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    disabled={loading || showMessage}
+                                    >
+                                        {loading || showMessage ? 'Update model' : 'Update model'}
+                                    </button>
                             </div>
                         )}
 
