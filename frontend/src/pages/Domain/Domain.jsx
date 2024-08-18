@@ -193,17 +193,14 @@ function Domain() {
 
     const handleUpdateModel = () => {
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-    
-        // Prepare the payload with newId used twice
         const payload = {
             id: newId,
             nameDomain: newId
         };
     
-        // Send the POST request
         api.post(`/domain/update-model`, payload)
             .then(res => {
-                console.log(res.data); // Logs the server response
+                console.log(res.data);
             })
             .catch(err => {
                 console.error('Error:', err);

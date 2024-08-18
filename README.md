@@ -35,7 +35,22 @@ The solution aids management in ensuring the continuous growth of their team's s
 
 </div>
 
-
+## AI
+### Installation & development
+In `backend/ai` directory first install all necessary requirements with code:
+```bash
+pip install requirements.txt
+```
+To directory also upload an `.env` file and change values according to your Openai project:
+```bash
+# AI configuration
+OPENAI_API_KEY= <openai-api-key>
+```
+Run the following command
+```bash
+uvicorn app:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 3000
+```
+to start ai server on `port 8000`.
 
 ## Backend
 ### Installation & development
@@ -43,7 +58,7 @@ In `backend` directory first install all necessary node_modules with code:
 ```bash
 npm install
 ```
-To directory also upload an `.env` file and change values according to your Firebase/Openai project and your email:
+To directory also upload `key.json` file from your Firebase project and an `.env` file and change values according to your Firebase/Openai project and your email:
 ```bash
 # Access CORS
 ACCESS_CORS= <frontend-url>
@@ -65,10 +80,6 @@ SMTP_USER= <smtp-email>
 SMTP_PASSWORD= <smtp-password>
 ```
 Run
-```bash
-nodemon server.js
-```
-or
 ```bash
 node server.js
 ```
@@ -111,52 +122,7 @@ npm run build
 ## Documentation
 If you want more detailed look at our work process or more information on how the app works, visit [SkillsBooster Documentation](https://github.com/BarbaraFerlinc/SkillsBooster/tree/main/documentation).
 
-
-1. **Clone the Repository:**
-
-   ```bash
-   git clone https://github.com/BarbaraFerlinc/SkillsBooster.git
-   cd <repository-directory>
-
-Install dependencies in **frontend** directory by running:
-````bash
-npm install
-````
-
-### Development
-Create a new file .env in frontend directory
-___
-1. **Create .env file**
- 
-Before you can run the development server, you have to create a new **.env** file in **frontend** directory, with following content: 
-````
-VITE_APP_BASE_URL=
-
-VITE_API_KEY= 
-VITE_AUTH_DOMAIN=
-VITE_PROJECT_ID= 
-VITE_STORAGE_BUCKET= 
-VITE_MESSAGING_SENDER_ID= 
-VITE_APP_ID= 
-````
-in the **frontend** directory start the client on port 9000
-2. **Start the Development Server:**
-
-   To start the development server, run the following command:
-
-```bash
-   npm run dev
-```
-
-### Build
-To create a production build of the application on the **frontend**, run the following command:
-
-```bash
-   npm run build
-```
-=======
 ## Authors
 * Barbara Ferlinc
 * Klara Kirbiš
 * Jaša Jernej Rakun Kokalj
-

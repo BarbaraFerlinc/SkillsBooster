@@ -343,12 +343,10 @@ static async getModelId(domain) {
         });
         const models = responseModel.data.data;
 
-        // Filter models based on the domain
         const filteredModels = domain
             ? models.filter(model => model.id.includes(domain))
             : models;
 
-        // Further filter out models containing 'ckpt-step'
         const filteredWithoutStep = filteredModels.filter(model => !model.id.includes('ckpt-step'));
 
         if (filteredWithoutStep.length === 0) {
@@ -356,21 +354,17 @@ static async getModelId(domain) {
             return 'gpt-4-turbo';
         }
 
-        // Find the most recent model
         const lastModel = filteredWithoutStep.reduce((latest, model) => {
             return new Date(model.created * 1000) > new Date(latest.created * 1000) ? model : latest;
         }, filteredWithoutStep[0]);
 
-        // Save filtered model IDs to a file (for debugging or auditing)
         const outputFilePath = './filtered_model_ids.json';
         fs.writeFileSync(outputFilePath, JSON.stringify(filteredWithoutStep.map(model => model.id), null, 2));
 
-        // Return the ID of the last (most recent) model or default model if not found
         return lastModel ? lastModel.id : 'gpt-4-turbo';
-
     } catch (error) {
         console.error("Error fetching model IDs from OpenAI API: ", error.response ? error.response.data : error.message);
-        return 'gpt-4-turbo'; // Fallback to a default model ID
+        return 'gpt-4-turbo';
     }
 }
 
@@ -401,7 +395,6 @@ static async chatBox(modelId, query) {
             console.error("Error communicating with OpenAI API: ", errorMsg);
 
             if (errorMsg.includes('model')) {
-                // If the error is related to the model, log it and fallback to a default model
                 console.warn('Falling back to default model: gpt-4-turbo');
                 return await this.chatBox('gpt-4-turbo', query);
             }
@@ -410,21 +403,25 @@ static async chatBox(modelId, query) {
     }
 }
 
-static async updateModel(folderName, imePodrocja) {
+static async updateModel(folderName, domainName) {
     try {
         console.log(`Starting update model process for folder: ${folderName}, domain: ${imePodrocja}`);
 
         // Fetch file URLs using the existing fetchFileUrls method
         const datoteke = await this.fetchFileUrls(folderName);
         console.log('Fetched files:', datoteke);
+        const files = await this.fetchFileUrls(folderName);
 
-        // Check if datoteke array is valid
-        if (!Array.isArray(datoteke) || datoteke.length === 0) {
-            throw new Error('No files retrieved or datoteke is not an array.');
+        if (!Array.isArray(files) || files.length === 0) {
+            throw new Error('No files retrieved or files is not an array.');
         }
 
         // Convert the file data to a JSON string
         const jsonData = JSON.stringify(datoteke, null, 2);
+        const tempDataFilePath = path.join(__dirname, 'temp_data.json');
+
+        fs.writeFileSync(tempDataFilePath, JSON.stringify(files, null, 2));
+        console.log('temp_data.json has been updated.');
 
         // Create a form data object and append the JSON data as a blob (in-memory)
         const formData = new FormData();
@@ -433,24 +430,26 @@ static async updateModel(folderName, imePodrocja) {
             contentType: 'application/json'
         });
         formData.append('ime_podrocja', imePodrocja);
+        formData.append('temp_file', fs.createReadStream(tempDataFilePath));
+        formData.append('domain_name', domainName);
 
         console.log('Sending POST request to API...');
         // Send a POST request to the FastAPI endpoint
         const apiUrl = 'https://skillsbooster.onrender.com/fine-tune'; // Replace with your actual deployed URL
 
         // Axios request with extended timeout (5 minutes)
+        const apiUrl = process.env.OPENAI_FINETUNE_URL;
         const response = await axios.post(apiUrl, formData, {
             headers: {
                 ...formData.getHeaders(),
                 'Content-Type': 'multipart/form-data'
             },
             timeout: 5 * 60 * 1000 // 5 minutes
+            headers: formData.getHeaders(),
+            timeout: 5 * 60 * 1000 // 5 minutes
         });
 
-        // Log the full server response
         console.log('Response from the server:', JSON.stringify(response.data, null, 2));
-
-        // If the response contains a model ID, update the folder details
         if (response.data && response.data.model_id) {
             await this.updateFolderDetails(folderName, response.data.model_id);
         }
@@ -470,7 +469,6 @@ static async updateModel(folderName, imePodrocja) {
     }
 }
 
-
 static async fetchFileUrls(folderName) {
     try {
         const folderRef = ref(storage, folderName);
@@ -483,9 +481,8 @@ static async fetchFileUrls(folderName) {
 
         const fileUrls = await Promise.all(list.items.map(async (itemRef) => {
             const url = await getDownloadURL(itemRef);
-            // Use optional chaining to safely access the name property
             const name = itemRef?.name || 'Unnamed File';
-            return { ime: name, url: url };
+            return { name: name, url: url };
         }));
 
         return fileUrls;
@@ -497,7 +494,7 @@ static async fetchFileUrls(folderName) {
 
 static async updateFolderDetails(folderName, modelId) {
     try {
-        const folderDetailsPath = path.join(__dirname, 'folder_details.json'); // Ensure this is defined
+        const folderDetailsPath = path.join(__dirname, 'folder_details.json');
         let folderDetails = [];
 
         if (fs.existsSync(folderDetailsPath)) {
@@ -512,7 +509,7 @@ static async updateFolderDetails(folderName, modelId) {
         } else {
             folderDetails.push({
                 name: folderName,
-                url: `gs://${firebaseConfig.storageBucket}/${folderName}`, // Ensure firebaseConfig is defined
+                url: `gs://${firebaseConfig.storageBucket}/${folderName}`,
                 model: modelId,
                 modelCreationTime: new Date().toISOString()
             });
