@@ -81,10 +81,6 @@ SMTP_PASSWORD= <smtp-password>
 ```
 Run
 ```bash
-nodemon server.js
-```
-or
-```bash
 node server.js
 ```
 to start the server on `port 9000`.
