@@ -310,7 +310,7 @@ function Domain() {
                                     className={`btn bg-green-500 text-white py-2 px-5 rounded ${loading || showMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     disabled={loading || showMessage}
                                     >
-                                        {loading || showMessage ? 'Update model' : 'Update model'}
+                                        Update Model
                                     </button>
                             </div>
                         )}
