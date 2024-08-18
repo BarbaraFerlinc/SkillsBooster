@@ -126,52 +126,7 @@ npm run build
 ## Documentation
 If you want more detailed look at our work process or more information on how the app works, visit [SkillsBooster Documentation](https://github.com/BarbaraFerlinc/SkillsBooster/tree/main/documentation).
 
-
-1. **Clone the Repository:**
-
-   ```bash
-   git clone https://github.com/BarbaraFerlinc/SkillsBooster.git
-   cd <repository-directory>
-
-Install dependencies in **frontend** directory by running:
-````bash
-npm install
-````
-
-### Development
-Create a new file .env in frontend directory
-___
-1. **Create .env file**
- 
-Before you can run the development server, you have to create a new **.env** file in **frontend** directory, with following content: 
-````
-VITE_APP_BASE_URL=
-
-VITE_API_KEY= 
-VITE_AUTH_DOMAIN=
-VITE_PROJECT_ID= 
-VITE_STORAGE_BUCKET= 
-VITE_MESSAGING_SENDER_ID= 
-VITE_APP_ID= 
-````
-in the **frontend** directory start the client on port 9000
-2. **Start the Development Server:**
-
-   To start the development server, run the following command:
-
-```bash
-   npm run dev
-```
-
-### Build
-To create a production build of the application on the **frontend**, run the following command:
-
-```bash
-   npm run build
-```
-=======
 ## Authors
 * Barbara Ferlinc
 * Klara Kirbiš
 * Jaša Jernej Rakun Kokalj
-
