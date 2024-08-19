@@ -154,7 +154,7 @@ To create a production build of the application on the **frontend**, run the fol
 ```bash
    npm run build
 ```
-=======
+
 ## Authors
 * Barbara Ferlinc
 * Klara Kirbiš
