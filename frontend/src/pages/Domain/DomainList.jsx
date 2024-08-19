@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 function DomainList({ domains }) {
     return (
         <ul>
-            {domains && domains.map((domain, index) => (
+            {domains?.map((domain, index) => (
                 <li key={domain.id || index} className="flex items-center justify-between">
                     <div className="flex items-center">
                         <NavLink

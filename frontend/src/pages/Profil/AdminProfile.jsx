@@ -85,13 +85,13 @@ function AdminProfile() {
         if (validateForm()){
             setLoading(true);
 
-            var config = {apiKey: import.meta.env.VITE_API_KEY,
+            const config = {apiKey: import.meta.env.VITE_API_KEY,
                     authDomain: import.meta.env.VITE_AUTH_DOMAIN,
                     projectId: import.meta.env.VITE_PROJECT_ID,
                     storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
                     messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
                     appId: import.meta.env.VITE_APP_ID};
-            var secondaryApp = initializeApp(config, "Secondary");
+            const secondaryApp = initializeApp(config, "Secondary");
             let auth = getAuth(secondaryApp);
             
             const newUser = {
@@ -106,7 +106,7 @@ function AdminProfile() {
                 await createUserWithEmailAndPassword(auth, newUserEmail, newUser.password);
                 await signOut(auth);
 
-                const response = await api.post("/user/add", newUser, {
+                await api.post("/user/add", newUser, {
                     headers: {
                         "Content-Type": "application/json",
                         Accept: "application/json",
@@ -118,8 +118,10 @@ function AdminProfile() {
                 setNewUserName('');
                 setNewUserEmail('');
                 setNewUserRole('user');
+                setLoading(false);
             } catch (error) {
                 console.error("Error adding new user:", error);
+                setLoading(false);
             } finally {
                 if (secondaryApp) {
                     secondaryApp.delete();

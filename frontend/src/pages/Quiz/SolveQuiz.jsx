@@ -127,7 +127,10 @@ function SolveQuiz() {
                 maxPoints += 1;
             }
         }
-        const score = Math.round((totalPoints / maxPoints) * 100);
+        let score = 0;
+        if (totalPoints != 0) {
+            score = Math.round((totalPoints / maxPoints) * 100);
+        }
         return score;
     };
     

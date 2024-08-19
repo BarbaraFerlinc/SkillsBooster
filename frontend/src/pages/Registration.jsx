@@ -26,7 +26,6 @@ function Registration() {
     const [errors, setErrors] = useState({});
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [companies, setCompanies] = useState([]);
@@ -83,11 +82,11 @@ function Registration() {
             formErrors["email"] = "Please add your email";
         }
     
-        for (let i = 0; i < users.length; i++) {
-          if (users[i].email == email) {
-            formIsValid = false;
-            formErrors["email"] = "This email is already in use.";
-          }
+        for (let user of users){
+            if (user.email == email) {
+                formIsValid = false;
+                formErrors["email"] = "This email is already in use.";
+            }
         }
     
         if (!password) {
@@ -154,7 +153,7 @@ function Registration() {
                     navigate('/profile');
                 }, 3000);
             } catch (er) {
-                setError(er.message);
+                console.error(er.message);
             }
         }
     };

@@ -78,7 +78,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     try {
       if (validateForm()){
         newDomain.owner = currentUser.email;
-        const response = await api.post('/domain/add', newDomain, {
+        await api.post('/domain/add', newDomain, {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",

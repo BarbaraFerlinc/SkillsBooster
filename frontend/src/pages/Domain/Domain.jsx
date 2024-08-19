@@ -35,6 +35,8 @@ function Domain() {
     const [quizDeleted, setQuizDeleted] = useState(false);
     const [quizzes, setQuizzes] = useState([]);
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [showMessage, setShowMessage] = useState(false);
 
     const { id } = useParams();
     const { user } = UserAuth();
@@ -192,14 +194,27 @@ function Domain() {
     };
 
     const handleUpdateModel = () => {
+        setLoading(true);
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post(`/domain/update-model`, { id: newId })
+        const payload = {
+            id: newId,
+            nameDomain: newId
+        };
+    
+        api.post(`/domain/update-model`, payload)
             .then(res => {
                 console.log(res.data);
+                setLoading(false);
+                setShowMessage(true);
             })
             .catch(err => {
-                console.error(err);
+                console.error('Error:', err);
+                setLoading(false);
             });
+    };
+    
+    const handleCloseMessage = () => {
+        setShowMessage(false);
     };
     
     const handleAddLinkClick = () => {
@@ -280,13 +295,6 @@ function Domain() {
                             <h2 className={`text-xl font-bold ${textClass}`}>Key Skills</h2>
                             <p className={`mt-4 ${subTextClass}`}>{currentDomain.key_skills || "No key skills available."}</p>
                         </div>
-
-                        {currentUser && (currentUser.role === "boss") && (
-                            <div className='mt-8'>
-                                <button onClick={() => handleUpdateModel()}
-                                        className=" btn bg-green-500 text-white py-2 px-5 rounded">Update model</button>
-                            </div>
-                        )}
 
                         {/* Files & Links Section */}
                         <div className="mt-8">
@@ -427,6 +435,30 @@ function Domain() {
                                         <span className="ml-2">Add Quiz</span>
                                     </button>
                                 </NavLink>
+                            )}
+
+                            {currentUser && (currentUser.role === "boss") && (
+                                <div className='mt-16 w-full'>
+                                    <p className='mb-4 text-gray-500 text-justify'>
+                                    The Update Model button is used to refresh the AI model. When you press this button,
+                                        the system retrieves all uploaded training materials and retrains the model based on them. 
+                                        Since this process is resource-intensive and can take some time, it’s recommended to use the
+                                        button sparingly, preferably at night when the system is less busy.</p>
+                                    <button onClick={() => handleUpdateModel()}
+                                        className={`btn bg-green-500 text-white py-2 px-5 rounded ${loading || showMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        disabled={loading || showMessage}
+                                        >
+                                            Update Model
+                                        </button>
+                                </div>
+                            )}
+                            {showMessage && (
+                                <div className="mt-4 p-4 bg-green-200 text-green-800 rounded-md flex justify-between items-center">
+                                    <span>Model successfully updated! It is recommended not to update the model again for at least 30 minutes.</span>
+                                    <button onClick={handleCloseMessage} className="btn btn-primary ml-4">
+                                        OK
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </div>

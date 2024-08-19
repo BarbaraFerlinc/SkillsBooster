@@ -1,5 +1,5 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const domainController = require('../controllers/domainController');
 
 const multer = require('multer');
@@ -23,6 +23,7 @@ router.post('/find-result', domainController.findResultDomain);
 router.post('/change-result', domainController.changeResultDomain);
 router.put('/delete-result/:id', domainController.deleteResultDomain);
 router.post('/update-model', domainController.updateModelDomain);
+router.post('/modelId',domainController.modelIdDomain);
 router.post('/chat-box', domainController.chatBoxDomain);
 router.post('/add-link', domainController.addLinkDomain);
 router.post('/links', domainController.findLinksDomain);
@@ -32,6 +33,5 @@ router.post('/materials', domainController.findLearningMaterialsDomain);
 router.post('/read-material', domainController.readLearningMaterialDomain);
 router.post('/delete-material', domainController.deleteLearningMaterialDomain);
 router.delete('/:id', domainController.deleteDomain);
-router.post('/modelId',domainController.modelIdDomain);
 
 module.exports = router;

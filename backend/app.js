@@ -1,17 +1,17 @@
 const express = require("express");
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
 require('dotenv').config();
 
-var companyRouter = require('./routes/companyRouter');
-var domainRouter = require('./routes/domainRouter');
-var questionRouter = require('./routes/questionRouter');
-var quizRouter = require('./routes/quizRouter');
-var userRouter = require('./routes/userRouter');
+const companyRouter = require('./routes/companyRouter');
+const domainRouter = require('./routes/domainRouter');
+const questionRouter = require('./routes/questionRouter');
+const quizRouter = require('./routes/quizRouter');
+const userRouter = require('./routes/userRouter');
 
 const app = express();
 
@@ -37,9 +37,5 @@ app.use('/domain/', domainRouter);
 app.use('/question/', questionRouter);
 app.use('/quiz/', quizRouter);
 app.use('/user/', userRouter);
-/*
-app.listen(process.env.PORT || 9001, () => {
-  console.log("Server on port " + 9001);
-});*/
 
 module.exports = app;
