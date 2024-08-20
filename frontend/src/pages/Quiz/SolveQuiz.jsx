@@ -86,7 +86,7 @@ function SolveQuiz() {
         setLoading(true);
         const score = await calculateScore();
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        await api.post(`/quiz/change-result`, { id: newId, userId: user.email, newValue: score });
+        await api.post(`/quiz/change-result`, { id: newId, userId: user.email, newValue: score, status:"solved" });
 
         setLoading(false);
         navigate(`/quiz/${id}/${domain}?score=${score}`);

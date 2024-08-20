@@ -37,6 +37,7 @@ function Domain() {
     const [links, setLinks] = useState([]);
     const [quizDeleted, setQuizDeleted] = useState(false);
     const [quizzes, setQuizzes] = useState([]);
+
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [loadMaterial, setLoadMaterial] = useState(false);
@@ -514,10 +515,17 @@ function Domain() {
                                             <li key={index} className="flex items-center justify-between mb-2">
                                                 <NavLink
                                                     to={`/quiz/${quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}
-                                                    className={`flex items-center justify-between mb-2 ${subTextClass}`}
+                                                    className={`flex items-center ${subTextClass}`}
                                                 >
                                                     {quiz.name}
                                                 </NavLink>
+                                                {currentUser && (currentUser.role !== "manager") && (
+                                                    <button
+                                                        className={`btn ${quiz.status ? 'bg-green-500' : 'bg-blue-500'} text-white ml-4`}
+                                                    >
+                                                        {quiz.status ? 'Solved' : 'Unsolved'}
+                                                    </button>
+                                                )}
                                                 {currentUser && (currentUser.role === "manager") && (
                                                     <button
                                                         onClick={() => handleQuizDelete(quiz.name)}
@@ -544,12 +552,13 @@ function Domain() {
                                     <div className='mt-16 w-full'>
                                         <p className='mb-4 text-gray-500 text-justify'>
                                             The Update Model button is used to refresh the AI model. When you press this
-                                            button,
-                                            the system retrieves all uploaded training materials and retrains the model
-                                            based on them.
-                                            Since this process is resource-intensive and can take some time, it’s
-                                            recommended to use the
-                                            button sparingly, preferably at night when the system is less busy.</p>
+                                            button, the system retrieves all uploaded training materials and retrains
+                                            the model
+                                            based on them. Since this process is resource-intensive and can take some
+                                            time, it’s
+                                            recommended to use the button sparingly, preferably at night when the system
+                                            is less busy.
+                                        </p>
                                         <button onClick={() => handleUpdateModel()}
                                                 className={`btn bg-green-500 text-white py-2 px-5 rounded ${loading || showMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 disabled={loading || showMessage}
@@ -568,6 +577,8 @@ function Domain() {
                                     </div>
                                 )}
                             </div>
+
+
                         </div>
 
                         {currentUser && currentUser.role === "employee" && (
@@ -578,7 +589,7 @@ function Domain() {
                 </div>
             </div>
         );
-    }
+}
 
 
 Domain.propTypes = {
