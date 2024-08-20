@@ -26,6 +26,7 @@ function ManagerProfile() {
     const [selectedDomain, setSelectedDomain] = useState(initialDomain);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [userResults, setUserResults] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const { user } = UserAuth();
     const { currentTheme } = useThemeProvider();
@@ -190,6 +191,7 @@ function ManagerProfile() {
 
     const handleSubmit = async () => {
         try {
+            setLoading(true);
             const newId = selectedDomain.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             for (const userId of selectedUsers) {
                 await api.put(`/domain/user/${newId}`, { userId: userId });
@@ -202,6 +204,7 @@ function ManagerProfile() {
             setSelectedUsers([]);
             setSelectedDomain(initialDomain);
             allUsers.forEach(fetchDomainsForUser);
+            setLoading(false);
         } catch (err) {
             console.log("Error adding user to domain", err);
         }
@@ -265,9 +268,10 @@ function ManagerProfile() {
                             </button>
                             <button
                                 onClick={handleSubmit}
-                                className="btn bg-green-500 text-white py-2 px-4 sm:px-5 rounded"
+                                className={`btn bg-green-500 text-white py-2 px-4 sm:px-5 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                disabled={loading}
                             >
-                                Submit
+                                Confirm
                             </button>
                         </div>
                     </div>

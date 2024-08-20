@@ -204,7 +204,7 @@ function AdminProfile() {
                                 className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 disabled={loading}
                             >
-                                {loading ? 'Confirm' : 'Confirm'}
+                                Confirm
                             </button>
                         </div>
                     </div>

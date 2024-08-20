@@ -10,7 +10,6 @@ import AIAssistant from "../../partials/AIAssistant.jsx";
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 import { useThemeProvider } from '../../utils/ThemeContext.jsx';
-//tu se nekaj ne dela
 
 const initialDomain = {
     key_skills: "",
@@ -31,6 +30,7 @@ function Domain() {
     const [currentDomain, setCurrentDomain] = useState(initialDomain);
     const [currentUser, setCurrentUser] = useState(null);
     const [fileAdded, setFileAdded] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
     const [files, setFiles] = useState([]);
     const [fileName, setFileName] = useState('');
     const [linkDeleted, setLinkDeleted] = useState(false);
@@ -39,7 +39,10 @@ function Domain() {
     const [quizzes, setQuizzes] = useState([]);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [loadMaterial, setLoadMaterial] = useState(false);
+    const [loadLink, setLoadLink] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
+    const [showCard, setShowCard] = useState(false);
 
     const {id} = useParams();
     const {user} = UserAuth();
@@ -99,6 +102,19 @@ function Domain() {
             });
     };
 
+    const fetchLinks = () => {
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post('/domain/links', {id: newId})
+            .then(res => {
+                const linksData = res.data;
+                setLinks(linksData);
+                setLinkDeleted(false);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    };
+
     const fetchQuizzes = () => {
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         api.post('/domain/quizzes', {id: newId})
@@ -113,27 +129,40 @@ function Domain() {
             });
     };
 
-    const fetchLinks = () => {
-        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post('/domain/links', {id: newId})
-            .then(res => {
-                const linksData = res.data;
-                setLinks(linksData);
-                setLinkDeleted(false);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+    const handleFileChange = async (e) => {
+        setSelectedFile(e.target.files[0]);
     };
 
-    const handleFileChange = async (e) => {
-        const selectedFile = e.target.files[0];
+    const handleFileInputChange = (e) => {
+        setFileName(e.target.value);
+    };
+
+    const validateFileForm = () => {
+        let formErrors = {};
+        let formIsValid = true;
+
+        if (!fileName) {
+            formIsValid = false;
+            formErrors["fileName"] = "Please add file name";
+        }
+
+        if (selectedFile == null) {
+            formIsValid = false;
+            formErrors["file"] = "Please add file";
+        }
+
+        setErrors(formErrors);
+        return formIsValid;
+    }
+
+    const handleConfirm = () => {
+        setLoadMaterial(true);
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
-        if (selectedFile) {
+        if (validateFileForm()) {
             const formData = new FormData();
             formData.append('id', newId);
-            formData.append('name', 'Ime gradiva');
+            formData.append('name', fileName);
             formData.append('link', selectedFile.name);
             formData.append('file', selectedFile);
 
@@ -148,6 +177,12 @@ function Domain() {
                 console.error(err);
             });
         }
+        setShowCard(false);
+        setLoadMaterial(false);
+    };
+
+    const handleCancel = () => {
+        setShowCard(false);
     };
 
     const handleFileDownload = (fileName) => {
@@ -166,6 +201,69 @@ function Domain() {
         api.post(`/domain/delete-material`, {id: newId, name: fileName})
             .then(res => {
                 setFileAdded(true);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    };
+
+    const handleAddLinkClick = () => {
+        setShowInput(true);
+    };
+
+    const handleInputChange = (e) => {
+        setLink(e.target.value);
+    };
+
+    const handleNameInputChange = (e) => {
+        setLinkName(e.target.value);
+    };
+    
+    const validateLinkForm = () => {
+        let formErrors = {};
+        let formIsValid = true;
+
+        if (!linkName) {
+            formIsValid = false;
+            formErrors["linkName"] = "Please add link name";
+        }
+
+        if (!link) {
+            formIsValid = false;
+            formErrors["link"] = "Please add link";
+        }
+
+        setErrors(formErrors);
+        return formIsValid;
+    }
+
+    const handleConfirmLink = () => {
+        setLoadLink(true);
+        if (validateLinkForm()){
+            const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            api.post(`/domain/add-link`, { id: newId, name: linkName, link: link })
+                .then(res => {
+                    setLinkDeleted(true);
+                    setLinkName('')
+                    setLink('');
+                    setShowInput(false);
+                    setLoadLink(false);
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        }
+    };
+
+    const handleOpenLink = async (link) => {
+        window.open(link.split('|')[1], '_blank');
+    };
+
+    const handleLinkDelete = async (link) => {
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        api.post(`/domain/delete-link`, {id: newId, name: link})
+            .then(res => {
+                setLinkDeleted(true);
             })
             .catch(err => {
                 console.error(err);
@@ -219,75 +317,6 @@ function Domain() {
 
     const handleCloseMessage = () => {
         setShowMessage(false);
-    };
-
-    const handleAddLinkClick = () => {
-        setShowInput(true);
-    };
-
-    const handleInputChange = (e) => {
-        setLink(e.target.value);
-    };
-
-    const handleNameInputChange = (e) => {
-        setLinkName(e.target.value);
-    };
-    const handleFileInputChange = (e) => {
-        setFileName(e.target.value);
-    };
-    const validateForm = () => {
-        let formErrors = {};
-        let formIsValid = true;
-
-        if (!link) {
-            formIsValid = false;
-            formErrors["link"] = "Please add link";
-        }
-
-        setErrors(formErrors);
-        return formIsValid;
-    }
-
-    const handleConfirmLink = () => {
-        if (validateForm()){
-            const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            api.post(`/domain/add-link`, { id: newId, name: linkName, link: link })
-                .then(res => {
-                    setLinkDeleted(true);
-                    setLinkName('')
-                    setLink('');
-                    setShowInput(false);
-                })
-                .catch(err => {
-                    console.error(err);
-                });
-        }
-    };
-
-    const handleOpenLink = async (link) => {
-        window.open(link.split('|')[1], '_blank');
-    };
-
-    const handleLinkDelete = async (link) => {
-        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post(`/domain/delete-link`, {id: newId, name: link})
-            .then(res => {
-                setLinkDeleted(true);
-            })
-            .catch(err => {
-                console.error(err);
-            });
-    };
-
-    const [showCard, setShowCard] = useState(false);
-
-    const handleConfirm = () => {
-        // Handle the confirm action here
-        console.log('File confirmed');
-        setShowCard(false); // Optionally hide the card after confirmation
-    };
-    const handleCancel = () => {
-        setShowCard(false); // Hide the card
     };
 
         const textClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
@@ -380,11 +409,15 @@ function Domain() {
                                                     </button>
                                                     <button
                                                         onClick={handleConfirm}
-                                                        className="btn bg-green-500 text-white py-2 px-4 rounded ml-2"
+                                                        className={`btn bg-green-500 text-white py-2 px-4 rounded ml-2 ${loadMaterial ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        disabled={loadMaterial}
                                                     >
                                                         Confirm
                                                     </button>
                                                 </div>
+                                                <small className="text-red-500">{errors.fileName}</small>
+                                                <br/>
+                                                <small className="text-red-500">{errors.file}</small>
                                             </div>
                                         )}
                                     </div>
@@ -447,13 +480,16 @@ function Domain() {
                                                         Cancel
                                                     </button>
                                                     <button
-                                                        className="ml-2 btn bg-green-500 text-white py-2 px-3 rounded"
                                                         onClick={handleConfirmLink}
+                                                        className={`ml-2 btn bg-green-500 text-white py-2 px-3 rounded ${loadLink ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        disabled={loadLink}
                                                     >
                                                         Confirm
                                                     </button>
 
                                                 </div>
+                                                <small className="text-red-500">{errors.linkName}</small>
+                                                <br/>
                                                 <small className="text-red-500">{errors.link}</small>
                                             </>
                                         )}
