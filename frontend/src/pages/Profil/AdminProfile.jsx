@@ -15,6 +15,8 @@ function AdminProfile() {
     const [newUserRole, setNewUserRole] = useState('employee');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [allUsers, setAllUsers] = useState([]);
+    const [sortedUsers, setSortedUsers] = useState([]);
 
     const { user } = UserAuth();
     const { currentTheme } = useThemeProvider();
@@ -48,6 +50,22 @@ function AdminProfile() {
         }
     }, [currentUser, userAdded]);
 
+    useEffect(() => {        
+        const fetchUsers = async () => {
+            try {
+                const response = await api.get('/user/all');
+                setAllUsers(response.data);
+            } catch (er) {
+                console.log("Error retrieving users", er);
+            }
+        }
+        fetchUsers();
+    }, [])
+
+    useEffect(() => {
+        setSortedUsers(users.sort((a, b) => a.full_name.localeCompare(b.full_name)));
+    }, [users])
+
     const handleAddUser = () => {
         setShowModal(true);
     };
@@ -69,6 +87,13 @@ function AdminProfile() {
             if (!emailPattern.test(newUserEmail)) {
                 formIsValid = false;
                 formErrors["email"] = "Please enter a valid email address";
+            }
+        }
+
+        for (let oneUser of allUsers){
+            if (oneUser.email == newUserEmail) {
+                formIsValid = false;
+                formErrors["email"] = "This email is already in use.";
             }
         }
         
@@ -139,6 +164,7 @@ function AdminProfile() {
     };
 
     const textClass = currentTheme === 'dark' ? 'text-black' : 'text-gray-800';
+
     return (
         <div className="overflow-x-auto mt-8">
             <button
@@ -221,15 +247,14 @@ function AdminProfile() {
                 </tr>
                 </thead>
                 <tbody>
-                {users.map(user => (
-                    <tr key={user.id}>
-
+                {sortedUsers.map(user => (
+                    <tr 
+                        key={user.id} 
+                        className={user.role === 'manager' ? 'bg-gray-100' : ''} 
+                    >
                         <td className={`py-2 px-15 border-b  ${textClass}`}>{user.full_name}</td>
                         <td className={`py-2 px-15  border-b ${textClass}`}>{user.email}</td>
                         <td className={`py-2 px-15  border-b ${textClass}`}>{user.role}</td>
-                        <td className={`py-2 px-15  border-b ${textClass}`}>
-
-                        </td>
                     </tr>
                 ))}
                 </tbody>

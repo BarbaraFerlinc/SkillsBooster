@@ -47,14 +47,14 @@ async function findQuizzes(req, res) {
 }
 
 async function addResultQuiz(req, res) {
-    const { id, userId, value } = req.body;
+    const { id, userId } = req.body;
 
-    if (!userId || !value ) {
+    if (!userId ) {
         return res.status(400).json({ error: 'All fields must be filled' });
     }
 
     try {
-        const updatedQuiz = await Quiz.addResult(id, userId, value);
+        const updatedQuiz = await Quiz.addResult(id, userId);
         
         res.status(200).json({ message: 'Successfully updated quiz', quiz: updatedQuiz });
     } catch (error) {
@@ -80,15 +80,33 @@ async function findResultQuiz(req, res) {
     }
 }
 
-async function changeResultQuiz(req, res) {
-    const { id, userId, newValue } = req.body;
+async function findStatusQuiz(req, res) {
+    const { id, userId } = req.body;
 
-    if (!userId || !newValue ) {
+    if (!userId ) {
+        return res.status(400).json({ error: 'A user must be selected' });
+    }
+
+    try {
+        const status = await Quiz.findStatus(id, userId);
+        if (!status) {
+            return res.json(null);
+        }
+        res.status(200).json(status);
+    } catch (error) {
+        res.status(500).json({ error: 'Error retrieving status from database', details: error.message });
+    }
+}
+
+async function changeResultQuiz(req, res) {
+    const { id, userId, newValue, newStatus } = req.body;
+
+    if (!userId || !newValue || !newStatus ) {
         return res.status(400).json({ error: 'All fields must be filled' });
     }
 
     try {
-        const updatedQuiz = await Quiz.changeResult(id, userId, newValue);
+        const updatedQuiz = await Quiz.changeResult(id, userId, newValue, newStatus);
         
         res.status(200).json({ message: 'Successfully updated quiz', quiz: updatedQuiz });
     } catch (error) {
@@ -125,6 +143,7 @@ module.exports = {
     findQuizzes,
     addResultQuiz,
     findResultQuiz,
+    findStatusQuiz,
     changeResultQuiz,
     checkAnswerQuiz,
     deleteQuiz

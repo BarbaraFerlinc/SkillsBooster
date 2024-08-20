@@ -157,7 +157,7 @@ function AddQuiz() {
             await api.post(`/domain/add-quiz`, { id: domain, quizId: newId });
 
             for (const userId of currentDomain.employees) {
-                await api.post(`/quiz/add-result`, { id: newId, userId: userId, value: '0' });
+                await api.post(`/quiz/add-result`, { id: newId, userId: userId });
             }
 
             setLoading(false);

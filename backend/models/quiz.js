@@ -47,13 +47,13 @@ class Quiz {
         }
     }
 
-    static async addResult(id, userId, value) {
+    static async addResult(id, userId) {
         try {
             const quizRef = db.collection("Quizzes").doc(id);
             const response = await quizRef.get();
             const quiz = response.data();
 
-            const result = `${userId};${value}`;
+            const result = `${userId};0;unsolved`;
 
             let updatedResults = [];
 
@@ -105,7 +105,32 @@ class Quiz {
         }
     }
 
-    static async changeResult(id, userId, newValue) {
+    static async findStatus(id, userId) {
+        try {
+            const quizRef = db.collection("Quizzes").doc(id);
+            const response = await quizRef.get();
+            const quiz = response.data();
+
+            if (quiz.results?.some(r => {
+                const [user] = r.split(';');
+                return user === `${userId}`;
+            })) {
+                const result = quiz.results.find(r => {
+                    const [user] = r.split(';');
+                    return user === `${userId}`;
+                });
+                const statusValue = result.split(';')[2];
+
+                return statusValue;
+            } else {
+                return null;
+            }
+        } catch (error) {
+            throw new Error('Error retrieving quiz from database: ' + error.message);
+        }
+    }
+
+    static async changeResult(id, userId, newValue, newStatus) {
         try {
             const quizRef = db.collection("Quizzes").doc(id);
             const response = await quizRef.get();
@@ -121,7 +146,7 @@ class Quiz {
             });
 
             if (index !== -1) {
-                quiz.results[index] = `${userId};${newValue}`;
+                quiz.results[index] = `${userId};${newValue};${newStatus}`;
                 await db.collection("Quizzes").doc(id).update({ results: quiz.results });
                 return { message: 'Result successfully updated', quiz: quiz };
             } else {

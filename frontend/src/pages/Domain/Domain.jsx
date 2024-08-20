@@ -36,6 +36,7 @@ function Domain() {
     const [linkDeleted, setLinkDeleted] = useState(false);
     const [links, setLinks] = useState([]);
     const [quizDeleted, setQuizDeleted] = useState(false);
+    const [domainQuizzes, setDomainQuizzes] = useState([]);
     const [quizzes, setQuizzes] = useState([]);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -43,6 +44,7 @@ function Domain() {
     const [loadLink, setLoadLink] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
     const [showCard, setShowCard] = useState(false);
+    const [quizStatuses, setQuizStatuses] = useState([]);
 
     const {id} = useParams();
     const {user} = UserAuth();
@@ -76,6 +78,21 @@ function Domain() {
                 });
         }
     }, [user]);
+
+    useEffect(() => {
+        if (currentUser) {
+            let statuses = [];
+            for (const quiz of domainQuizzes) {
+                statuses.push(findQuizStatus(quiz));
+            }
+            setQuizStatuses(statuses);
+        }
+    }, [domainQuizzes]);
+
+    const findQuizStatus = async (quizId) => {
+        const response = await api.post('/quiz/find-status', {id: quizId, userId: currentUser.email});
+        return response.data;
+    };
 
     useEffect(() => {
         fetchFiles();
@@ -121,6 +138,7 @@ function Domain() {
             .then(async res => {
                 const quizzesData = res.data;
                 const response = await api.post('/quiz/ids', {ids: quizzesData});
+                setDomainQuizzes(quizzesData);
                 setQuizzes(response.data);
                 setQuizDeleted(false);
             })
@@ -173,11 +191,12 @@ function Domain() {
             })
                 .then(() => {
                     setFileAdded(true);
+                    setShowCard(false);
+                    setLoadMaterial(false);
                 }).catch(err => {
                 console.error(err);
             });
         }
-        setShowCard(false);
         setLoadMaterial(false);
     };
 
@@ -253,6 +272,7 @@ function Domain() {
                     console.error(err);
                 });
         }
+        setLoadLink(false);
     };
 
     const handleOpenLink = async (link) => {
