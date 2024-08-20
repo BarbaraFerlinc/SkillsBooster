@@ -38,6 +38,7 @@ function Domain() {
     const [quizDeleted, setQuizDeleted] = useState(false);
     const [domainQuizzes, setDomainQuizzes] = useState([]);
     const [quizzes, setQuizzes] = useState([]);
+
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [loadMaterial, setLoadMaterial] = useState(false);
@@ -80,19 +81,24 @@ function Domain() {
     }, [user]);
 
     useEffect(() => {
-        if (currentUser) {
-            let statuses = [];
-            for (const quiz of domainQuizzes) {
-                statuses.push(findQuizStatus(quiz));
-            }
-            setQuizStatuses(statuses);
+        if (currentUser && domainQuizzes.length > 0) {
+            const fetchStatuses = async () => {
+                const statuses = {};
+                for (const quiz of domainQuizzes) {
+                    try {
+                        const response = await api.post('/quiz/find-status', { id: quiz, userId: currentUser.email });
+                        statuses[quiz] = response.data;
+                    } catch (error) {
+                        console.error(`Error fetching status for quiz ${quiz}:`, error);
+                        statuses[quiz] = 'unknown';
+                    }
+                }
+                setQuizStatuses(statuses);
+                console.log(statuses);
+            };
+            fetchStatuses();
         }
-    }, [domainQuizzes]);
-
-    const findQuizStatus = async (quizId) => {
-        const response = await api.post('/quiz/find-status', {id: quizId, userId: currentUser.email});
-        return response.data;
-    };
+    }, [domainQuizzes, currentUser]);
 
     useEffect(() => {
         fetchFiles();
@@ -352,7 +358,7 @@ function Domain() {
                     {/* Site header */}
                     <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
 
-                    <main>
+                    <main className={`${currentUser?.role == 'employee' ? 'pb-20' : ''}`}>
                         <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
                             {/* Main Header */}
                             <DynamicHeader domainName={currentDomain.name}/>
@@ -534,10 +540,19 @@ function Domain() {
                                             <li key={index} className="flex items-center justify-between mb-2">
                                                 <NavLink
                                                     to={`/quiz/${quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}
-                                                    className={`flex items-center justify-between mb-2 ${subTextClass}`}
+                                                    className={`flex items-center ${subTextClass}`}
                                                 >
                                                     {quiz.name}
                                                 </NavLink>
+                                                {currentUser && (currentUser.role == "employee") && (
+                                                    <button
+                                                        disabled={true}
+                                                        className={`btn ${quizStatuses[quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()] == 'unsolved' ? 'bg-blue-500' : 'bg-green-500'} text-white ml-4 w-24 h-10 flex items-center justify-center`}
+                                                    >
+                                                        {quizStatuses[quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()] == 'solved' ? 'Solved' : 'Unsolved'}
+                                                    </button>
+                                                )}
+                                                {console.log(quizStatuses[quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()])}
                                                 {currentUser && (currentUser.role === "manager") && (
                                                     <button
                                                         onClick={() => handleQuizDelete(quiz.name)}
@@ -564,12 +579,13 @@ function Domain() {
                                     <div className='mt-16 w-full'>
                                         <p className='mb-4 text-gray-500 text-justify'>
                                             The Update Model button is used to refresh the AI model. When you press this
-                                            button,
-                                            the system retrieves all uploaded training materials and retrains the model
-                                            based on them.
-                                            Since this process is resource-intensive and can take some time, it’s
-                                            recommended to use the
-                                            button sparingly, preferably at night when the system is less busy.</p>
+                                            button, the system retrieves all uploaded training materials and retrains
+                                            the model
+                                            based on them. Since this process is resource-intensive and can take some
+                                            time, it’s
+                                            recommended to use the button sparingly, preferably at night when the system
+                                            is less busy.
+                                        </p>
                                         <button onClick={() => handleUpdateModel()}
                                                 className={`btn bg-green-500 text-white py-2 px-5 rounded ${loading || showMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 disabled={loading || showMessage}
@@ -587,6 +603,7 @@ function Domain() {
                                         </button>
                                     </div>
                                 )}
+                                
                             </div>
                         </div>
 
@@ -598,7 +615,7 @@ function Domain() {
                 </div>
             </div>
         );
-    }
+}
 
 
 Domain.propTypes = {

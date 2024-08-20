@@ -71,7 +71,7 @@ function AIAssistant({ domain }) {
         <div>
             <div
                 ref={iconRef}
-                className="fixed bottom-16 right-16 z-50 p-3 bg-indigo-600 text-white rounded-full cursor-pointer shadow-lg"
+                className="fixed bottom-10 right-16 z-50 p-3 bg-indigo-600 text-white rounded-full cursor-pointer shadow-lg"
                 onClick={toggleChat}
             >
                 <AiOutlineWechatWork size={33} />
