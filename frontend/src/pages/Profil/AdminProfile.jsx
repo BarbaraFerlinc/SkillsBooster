@@ -12,7 +12,7 @@ function AdminProfile() {
     const [showModal, setShowModal] = useState(false);
     const [newUserName, setNewUserName] = useState('');
     const [newUserEmail, setNewUserEmail] = useState('');
-    const [newUserRole, setNewUserRole] = useState('user');
+    const [newUserRole, setNewUserRole] = useState('employee');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
@@ -117,7 +117,7 @@ function AdminProfile() {
                 setShowModal(false);
                 setNewUserName('');
                 setNewUserEmail('');
-                setNewUserRole('user');
+                setNewUserRole('employee');
                 setLoading(false);
             } catch (error) {
                 console.error("Error adding new user:", error);
@@ -134,7 +134,7 @@ function AdminProfile() {
         setShowModal(false);
         setNewUserName('');
         setNewUserEmail('');
-        setNewUserRole('user');
+        setNewUserRole('employee');
         setErrors({});
     };
 
