@@ -37,7 +37,7 @@ function Profile() {
                 <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-                        <DynamicHeader domainName={`${currentUser?.full_name} Profile`} />
+                        <DynamicHeader domainName={`${currentUser?.full_name} `} />
 
                         {/* Profile Info Card */}
                         <ProfileInfo user={currentUser} />

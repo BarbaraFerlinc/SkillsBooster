@@ -10,7 +10,7 @@ const initialQuiz = {
     name: "No Quiz",
     results: [],
     questions: []
-}
+};
 
 function SolveQuiz() {
     const { id, domain } = useParams();
@@ -33,21 +33,21 @@ function SolveQuiz() {
                 })
                 .catch(err => {
                     console.error(err);
-            });
+                });
         }
     }, [id]);
 
     useEffect(() => {
         if (currentQuiz) {
-          api.post('/question/ids', { ids: currentQuiz.questions })
-            .then(res => {
-              const questionsData = res.data;
-              setQuestions(questionsData);
-              setAnswers(Array(questionsData.length).fill([]));
-            })
-            .catch(err => {
-              console.error(err);
-            });
+            api.post('/question/ids', { ids: currentQuiz.questions })
+                .then(res => {
+                    const questionsData = res.data;
+                    setQuestions(questionsData);
+                    setAnswers(Array(questionsData.length).fill([]));
+                })
+                .catch(err => {
+                    console.error(err);
+                });
         }
     }, [currentQuiz]);
 
@@ -87,7 +87,7 @@ function SolveQuiz() {
         const score = await calculateScore();
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         await api.post(`/quiz/change-result`, { id: newId, userId: user.email, newValue: score });
-        
+
         setLoading(false);
         navigate(`/quiz/${id}/${domain}?score=${score}`);
     };
@@ -95,35 +95,35 @@ function SolveQuiz() {
     const calculateScore = async () => {
         let totalPoints = 0;
         let maxPoints = 0;
-    
+
         for (let i = 0; i < questions.length; i++) {
             const question = questions[i];
             const userAnswer = answers[i];
-    
+
             if (!userAnswer || userAnswer.length === 0) {
                 continue;
             }
-    
+
             if (question.type === 'closed') {
                 const correctAnswersArray = question.answers
                     .filter(answer => answer.split(';')[1] === "true")
                     .map(answer => answer.split(';')[0]);
-    
+
                 const correctCount = userAnswer.filter(answer => correctAnswersArray.includes(answer)).length;
                 const possibleCorrectCount = correctAnswersArray.length;
-    
+
                 totalPoints += (correctCount / possibleCorrectCount);
-                maxPoints += 1;    
+                maxPoints += 1;
             } else if (question.type === 'open') {
                 await api.post('/quiz/check-answer', { query: question.question, rightAnswer: question.answers[0], answer: userAnswer })
-                .then(res => {
-                    if (res.data === true) {
-                        totalPoints += 1;
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                });
+                    .then(res => {
+                        if (res.data === true) {
+                            totalPoints += 1;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
                 maxPoints += 1;
             }
         }
@@ -133,7 +133,7 @@ function SolveQuiz() {
         }
         return score;
     };
-    
+
 
     return (
         <div className="flex h-screen overflow-hidden">
@@ -160,12 +160,16 @@ function SolveQuiz() {
                                         <ul className="list-disc pl-6">
                                             {questions[currentQuestionIndex].answers.map(
                                                 (option, index) => (
-                                                    <li
-                                                        key={index}
-                                                        className={`mb-2 cursor-pointer ${answers[currentQuestionIndex].includes(option.split(';')[0]) ? 'bg-indigo-200' : ''}`}
-                                                        onClick={() => handleSelectAnswer(index)}
-                                                    >
-                                                        {option.split(';')[0]}
+                                                    <li key={index} className="mb-2">
+                                                        <label className="cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={answers[currentQuestionIndex].includes(option.split(';')[0])}
+                                                                onChange={() => handleSelectAnswer(index)}
+                                                                className="mr-2"
+                                                            />
+                                                            {option.split(';')[0]}
+                                                        </label>
                                                     </li>
                                                 )
                                             )}
