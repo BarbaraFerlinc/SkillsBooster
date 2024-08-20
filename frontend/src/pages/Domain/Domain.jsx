@@ -10,6 +10,7 @@ import AIAssistant from "../../partials/AIAssistant.jsx";
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
 import { useThemeProvider } from '../../utils/ThemeContext.jsx';
+//tu se nekaj ne dela
 
 const initialDomain = {
     key_skills: "",
