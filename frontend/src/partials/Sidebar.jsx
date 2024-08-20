@@ -8,7 +8,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [domains, setDomains] = useState([]);
   const [showAddDomainCard, setShowAddDomainCard] = useState(false);
-  const [newDomain, setNewDomain] = useState({ naziv: '', opis: '', kljucna_znanja: '' });
+  const [newDomain, setNewDomain] = useState({ name: '', description: '', key_skills: '' });
   const [errors, setErrors] = useState({});
   const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
   const [sidebarExpanded, setSidebarExpanded] = useState(storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true');
@@ -37,10 +37,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   useEffect(() => {
     if (currentUser) {
       switch (currentUser.role) {
-        case "boss":
+        case "manager":
           fetchDomainsForOwner(currentUser);
           break;
-        case "user":
+        case "employee":
           fetchDomainsForUser(currentUser);
           break;
         case "admin":
@@ -215,7 +215,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                   <DomainList domains={domains} />
                 </li>
               </ul>
-              {currentUser && currentUser.role === "boss" && (
+              {currentUser && currentUser.role === "manager" && (
                   <div className="flex items-center justify-between mt-4">
                     <button
                         onClick={handleAddDomain}

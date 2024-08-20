@@ -16,8 +16,8 @@ import Quiz from "./pages/Quiz/Quiz.jsx";
 import AddQuiz from "./pages/Quiz/AddQuiz.jsx";
 import { AuthContextProvider } from './context/AuthContext.jsx';
 import PrivateRouting from './components/PrivateRouting.jsx';
-import BossRouting from './components/BossRouting.jsx';
-import UserRouting from './components/UserRouting.jsx';
+import ManagerRouting from './components/ManagerRouting.jsx';
+import EmployeeRouting from './components/EmployeeRouting.jsx';
 import Routing from './components/Routing.jsx';
 import SolveQuiz from "./pages/Quiz/SolveQuiz.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
@@ -41,11 +41,11 @@ function App() {
             <Route exact path="/domain/:id" element={<Domain/>} />
             <Route exact path="/logout" element={<LogOut/>} />
 
-            <Route path='' element={<BossRouting />}>
+            <Route path='' element={<ManagerRouting />}>
               <Route exact path="/addQuiz/:domain" element={<AddQuiz/>} />
             </Route>
 
-            <Route path='' element={<UserRouting />}>
+            <Route path='' element={<EmployeeRouting />}>
               <Route exact path="/quiz/:id/:domain" element={<Quiz/>} />
               <Route exact path="/solveQuiz/:id/:domain" element={<SolveQuiz/>} />
             </Route>

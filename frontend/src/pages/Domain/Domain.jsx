@@ -130,7 +130,8 @@ function Domain() {
         if (selectedFile) {
             const formData = new FormData();
             formData.append('id', newId);
-            formData.append('name', selectedFile.name);
+            formData.append('name', 'Ime gradiva');
+            formData.append('link', selectedFile.name);
             formData.append('file', selectedFile);
 
             api.post('/domain/add-material', formData, {
@@ -241,7 +242,7 @@ function Domain() {
     const handleConfirmLink = () => {
         if (validateForm()){
             const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            api.post(`/domain/add-link`, { id: newId, link: link })
+            api.post(`/domain/add-link`, { id: newId, name: 'Ime linka', link: link })
                 .then(res => {
                     setLinkDeleted(true);
                     setLink('');
@@ -254,12 +255,12 @@ function Domain() {
     };
 
     const handleOpenLink = async (link) => {
-        window.open(link, '_blank');
+        window.open(link.split('|')[1], '_blank');
     };
 
     const handleLinkDelete = async (link) => {
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        api.post(`/domain/delete-link`, { id: newId, link: link })
+        api.post(`/domain/delete-link`, { id: newId, name: link })
             .then(res => {
                 setLinkDeleted(true);
             })
@@ -318,8 +319,8 @@ function Domain() {
                                         {files.map((fileName, index) => (
                                             <li key={index}
                                                 className={`flex items-center justify-between mb-2 ${subTextClass}`}>
-                                                <a href="#" onClick={() => handleFileDownload(fileName)}>{fileName}</a>
-                                                {currentUser && (currentUser.role === "boss") && (
+                                                <a href="#" onClick={() => handleFileDownload(fileName)}>{fileName.split(';')[0]}</a>
+                                                {currentUser && (currentUser.role === "manager") && (
                                                     <button onClick={() => handleFileDelete(fileName)}
                                                             className="btn bg-red-500 hover:bg-red-600 text-white ml-4">Delete</button>
                                                 )}
@@ -329,7 +330,7 @@ function Domain() {
                                 )}
                             </div>
 
-                            {currentUser && (currentUser.role === "boss") && (
+                            {currentUser && (currentUser.role === "manager") && (
                                 <label htmlFor="fileInput"
                                        className="btn bg-indigo-500 text-white py-2 px-5 rounded ">
                                     <span className="ml-2">Add file</span>
@@ -344,8 +345,8 @@ function Domain() {
                                         {links.map((link, index) => (
                                             <li key={index}
                                                 className={`flex items-center justify-between mb-2 ${subTextClass}`}>
-                                                <a href="#" onClick={() => handleOpenLink(link)}>{link}</a>
-                                                {currentUser && (currentUser.role === "boss") && (
+                                                <a href="#" onClick={() => handleOpenLink(link)}>{link.split('|')[0]}</a>
+                                                {currentUser && (currentUser.role === "manager") && (
                                                     <button onClick={() => handleLinkDelete(link)}
                                                             className="btn bg-red-500 hover:bg-red-600 text-white ml-4">Delete</button>
                                                 )}
@@ -355,7 +356,7 @@ function Domain() {
                                 )}
                             </div>
 
-                            {currentUser && (currentUser.role === "boss") && (
+                            {currentUser && (currentUser.role === "manager") && (
                                 <div>
                                     <button
                                         className="btn bg-indigo-500 text-white py-2 px-5 rounded mt-2"
@@ -415,7 +416,7 @@ function Domain() {
                                             >
                                                 {quiz.name}
                                             </NavLink>
-                                            {currentUser && (currentUser.role === "boss") && (
+                                            {currentUser && (currentUser.role === "manager") && (
                                                 <button
                                                     onClick={() => handleQuizDelete(quiz.name)}
                                                     className="btn bg-red-500 hover:bg-red-600 text-white ml-4"
@@ -428,7 +429,7 @@ function Domain() {
                                 )}
                             </ul>
 
-                            {currentUser && (currentUser.role === "boss") && (
+                            {currentUser && (currentUser.role === "manager") && (
                                 <NavLink
                                     to={`/addQuiz/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
                                     <button className=" btn bg-indigo-500 text-white py-2 px-5 rounded">
@@ -437,7 +438,7 @@ function Domain() {
                                 </NavLink>
                             )}
 
-                            {currentUser && (currentUser.role === "boss") && (
+                            {currentUser && (currentUser.role === "manager") && (
                                 <div className='mt-16 w-full'>
                                     <p className='mb-4 text-gray-500 text-justify'>
                                     The Update Model button is used to refresh the AI model. When you press this button,
@@ -463,7 +464,7 @@ function Domain() {
                         </div>
                     </div>
 
-                    {currentUser && currentUser.role === "user" && (
+                    {currentUser && currentUser.role === "employee" && (
                         <AIAssistant domain={currentDomain.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()} />
                     )}
                 </main>

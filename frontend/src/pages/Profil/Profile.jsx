@@ -4,7 +4,7 @@ import Header from '../../partials/Header.jsx';
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
 import ProfileInfo from './ProfileInfo.jsx';
 import AdminProfile from './AdminProfile.jsx';
-import BossProfile from './BossProfile.jsx';
+import ManagerProfile from './ManagerProfile.jsx';
 import EmployeeProfile from './EmployeeProfile.jsx';
 import api from '../../services/api.js';
 import { UserAuth } from '../../context/AuthContext.jsx';
@@ -37,14 +37,14 @@ function Profile() {
                 <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-                        <DynamicHeader domainName={`${currentUser?.full_name} Profile`} />
+                        <DynamicHeader domainName={currentUser?.full_name} />
 
                         {/* Profile Info Card */}
                         <ProfileInfo user={currentUser} />
 
                         {currentUser?.role === 'admin' && <AdminProfile />}
-                        {currentUser?.role === 'boss' && <BossProfile />}
-                        {currentUser?.role === 'user' && <EmployeeProfile />}
+                        {currentUser?.role === 'manager' && <ManagerProfile />}
+                        {currentUser?.role === 'employee' && <EmployeeProfile />}
                     </div>
                 </main>
             </div>

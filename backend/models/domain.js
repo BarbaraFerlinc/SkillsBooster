@@ -449,7 +449,6 @@ static async updateModel(folderName, nameDomain) {
     }
 }
 
-
 static async fetchFileUrls(folderName) {
     try {
         const folderRef = ref(storage, folderName);
@@ -504,16 +503,18 @@ static async updateFolderDetails(folderName, modelId) {
     }
 }
 
-    static async addLink(id, link) {
+    static async addLink(id,name, link) {
         try {
             const domainRef = db.collection("Knowledge_domains").doc(id);
             const response = await domainRef.get();
             const domain = response.data();
 
-            if (domain.links && domain.links.includes(link)) {
+            const nameLink = `${name}|${link}`;
+
+            if (domain.links && domain.links.includes(nameLink)) {
                 return { message: 'The link is already included in this domain', domain: domain };
             }
-            const updatedLinks = domain.links ? [...domain.links, link] : [link];
+            const updatedLinks = domain.links ? [...domain.links, nameLink] : [nameLink];
 
             db.collection("Knowledge_domains").doc(id).update({links: updatedLinks});
             return { message: 'Domain update successful', domain: domain };
@@ -535,14 +536,16 @@ static async updateFolderDetails(folderName, modelId) {
         }
     }
 
-    static async deleteLink(id, link) {
+    static async deleteLink(id, name) {
         try {
             const domainRef = db.collection("Knowledge_domains").doc(id);
             const response = await domainRef.get();
             const domain = response.data();
 
-            if (domain.links && domain.links.includes(link)) {
-                const updatedLinks = domain.links.filter(existingLink => existingLink !== link);
+            const link = name.split('|')[1];
+
+            if (domain.links && domain.links.includes(name)) {
+                const updatedLinks = domain.links.filter(existingLink => existingLink !== name);
 
                 await db.collection("Knowledge_domains").doc(id).update({ links: updatedLinks });
                 return { message: 'Link successfully removed from domain', domain: domain };
@@ -554,20 +557,22 @@ static async updateFolderDetails(folderName, modelId) {
         }
     }
 
-    static async addLearningMaterial(id, name, fileBuffer) {
+    static async addLearningMaterial(id, name, link, fileBuffer) {
         try {
             const domainRef = db.collection("Knowledge_domains").doc(id);
             const response = await domainRef.get();
             const domain = response.data();
 
-            if (domain.learning_materials && domain.learning_materials.includes(name)) {
+            const nameLink = `${name};${link}`;
+
+            if (domain.learning_materials && domain.learning_materials.includes(nameLink)) {
                 return { message: 'The learning material is already part of this domain', domain: domain };
             }
         
-            const updatedLearningMaterials = [...(domain.learning_materials || []), name];
+            const updatedLearningMaterials = [...(domain.learning_materials || []), nameLink];
             await domainRef.update({ learning_materials: updatedLearningMaterials });
             
-            const storageRef = ref(storage, `${id}/${name}`);
+            const storageRef = ref(storage, `${id}/${link}`);
             
             const metadata = {
                 contentType: 'application/octet-stream'
@@ -584,7 +589,7 @@ static async updateFolderDetails(folderName, modelId) {
                     throw new Error('Upload failed: ' + error.message);
                 }, 
                 () => {
-                    return { message: 'Upload successful!', learning_material: name };
+                    return { message: 'Upload successful!', learning_material: link };
                 }
             );
         } catch (error) {
@@ -609,10 +614,13 @@ static async updateFolderDetails(folderName, modelId) {
         try {
             const folderRef = ref(storage, id);
             const res = await listAll(folderRef);
+
+            let link = name.split(';')[1];
+            console.log(link)
     
             let downloadURL = null;
             for (let itemRef of res.items) {
-                if (itemRef.name == name) {
+                if (itemRef.name == link) {
                     downloadURL = await getDownloadURL(itemRef);
                     console.log(`File: ${itemRef.name} - URL: ${downloadURL}`);
                     break;
@@ -634,7 +642,9 @@ static async updateFolderDetails(folderName, modelId) {
         const response = await domainRef.get();
         const domain = response.data();
 
-        if (!domain.learning_materials || !domain.learning_materials.includes(name)) {
+        let link = name.split(';')[1];
+
+        if (domain.learning_materials && !domain.learning_materials.includes(name)) {
             return { message: 'The learning material is not part of this domain', domain: domain };
         }
 
@@ -642,13 +652,13 @@ static async updateFolderDetails(folderName, modelId) {
         await domainRef.update({ learning_materials: updatedLearningMaterials });
 
         try {
-            const learningMaterialRef = ref(storage, `${id}/${name}`);
+            const learningMaterialRef = ref(storage, `${id}/${link}`);
             deleteObject(learningMaterialRef).then(() => {
                 console.log('File deleted');
             }).catch((error) => {
                 console.log('Error with file deletion');
             });
-            return { message: 'Learning material deleted successfully', learningMaterial: name };
+            return { message: 'Learning material deleted successfully', learningMaterial: link };
         } catch (error) {
             throw new Error('Error retrieving domain from database: ' + error.message);
         }

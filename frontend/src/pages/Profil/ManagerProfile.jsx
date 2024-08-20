@@ -16,7 +16,7 @@ const initialDomain = {
     learning_materials: []
 }
 
-function BossProfile() {
+function ManagerProfile() {
     const [currentUser, setCurrentUser] = useState(null);
     const [allUsers, setAllUsers] = useState([]);
     const [domains, setDomains] = useState([]);
@@ -64,7 +64,7 @@ function BossProfile() {
         if (currentUser) {
             const fetchUsers = async () => {
                 try {
-                    const response = await api.post('/user/bossEmail', { bossEmail: user.email, adminEmail: currentUser.admin });
+                    const response = await api.post('/user/managerEmail', { managerEmail: user.email, adminEmail: currentUser.admin });
                     setAllUsers(response.data);
                     response.data.forEach(fetchDomainsForUser);
                 } catch (err) {
@@ -221,14 +221,14 @@ function BossProfile() {
                     className={buttonClass}
                     disabled={domains.length === 0}
                 >
-                    Add User to Domain
+                    Add Employee to Knowledge Domain
                 </button>
             </div>
 
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
                     <div className={`p-6 rounded-md shadow-md w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl ${bgClass}`}>
-                        <h2 className={`text-lg sm:text-xl md:text-2xl font-semibold mb-4 ${textClass}`}>Add User to Domain</h2>
+                        <h2 className={`text-lg sm:text-xl md:text-2xl font-semibold mb-4 ${textClass}`}>Add Employeee to Knowledge Domain</h2>
                         <div className="mb-4">
                             <label className="block text-sm md:text-base mb-2">Select Domain:</label>
                             <select
@@ -278,10 +278,10 @@ function BossProfile() {
                 <div className="w-full mt-4">
                     <div className="flex items-center mb-4">
                         <img src={domene} alt="Icon" className="w-16 h-16 mr-4"/>
-                        <h2 className={`text-xl font-bold ${textClass}`}>Domains</h2>
+                        <h2 className={`text-xl font-bold ${textClass}`}>Knowledge Domains</h2>
                     </div>
                     {domains.length === 0 ? (
-                        <p>No domains</p>
+                        <p>No knowledge domains</p>
                     ) : (
                         <>
                             <div className="flex mb-4">
@@ -315,7 +315,7 @@ function BossProfile() {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="2" className="py-2 px-4 text-center">This domain has no users yet</td>
+                                                    <td colSpan="2" className="py-2 px-4 text-center">This domain has no employees yet</td>
                                                 </tr>
                                             )}
                                             </tbody>
@@ -330,7 +330,7 @@ function BossProfile() {
             <div className="mt-8">
                 <div className="flex items-center mb-4">
                     <img src={stat} alt="Icon" className="w-16 h-16 mr-4"/>
-                    <h2 className={`text-xl font-bold ${textClass}`}>Kowledge Matrix</h2>
+                    <h2 className={`text-xl font-bold ${textClass}`}>Knowledge Matrix</h2>
                 </div>
                 {domains.length === 0 ? (
                     <p>Add domains to see results</p>
@@ -365,4 +365,4 @@ function BossProfile() {
     );
 }
 
-export default BossProfile;
+export default ManagerProfile;

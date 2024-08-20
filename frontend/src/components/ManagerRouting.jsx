@@ -3,7 +3,7 @@ import { UserAuth } from "../context/AuthContext";
 import { useNavigate, Outlet } from "react-router-dom";
 import api from "../services/api";
 
-function BossRouting() {
+function ManagerRouting() {
     const { user } = UserAuth();
     const navigate = useNavigate();
     const [currentUser, setCurrentUser] = useState(null);
@@ -32,7 +32,7 @@ function BossRouting() {
         if (!loading) {
             if (!user) {
                 navigate("/login");
-            } else if (currentUser && currentUser.role !== "boss") {
+            } else if (currentUser && currentUser.role !== "manager") {
                 navigate("/profile");
             }
         }
@@ -44,4 +44,4 @@ function BossRouting() {
 
     return <Outlet />;
 }
-export default BossRouting;
+export default ManagerRouting;

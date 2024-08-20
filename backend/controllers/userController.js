@@ -59,10 +59,10 @@ async function findUsersAdmin(req, res) {
     }
 }
 
-async function findUsersBoss(req, res) {
-    const { bossEmail, adminEmail } = req.body;
+async function findUsersManager(req, res) {
+    const { managerEmail, adminEmail } = req.body;
     try {
-        const users = await User.getByBoss(bossEmail, adminEmail);
+        const users = await User.getByManager(managerEmail, adminEmail);
         if (!users) {
         return res.status(404).json({ error: 'Users do not exist' });
         }
@@ -90,6 +90,6 @@ module.exports = {
     allUsers,
     findUser,
     findUsersAdmin,
-    findUsersBoss,
+    findUsersManager,
     deleteUser
 };

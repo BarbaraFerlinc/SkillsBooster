@@ -34,7 +34,7 @@ class User {
                 from: process.env.SMTP_USER,
                 to: email,
                 subject: 'Login to SkillsBooster',
-                text: `Hello,\n\n${admin} has added you to the SkillsBooster app as a ${role}.\nYour password is: ${original_password}\nYou can change it at ${process.env.ACCESS_CORS}/reset.\n\nYour SkillsBooster team`
+                text: `Hello,\n\n${admin} has added you to the SkillsBooster app as '${role}'.\nYour password is: ${original_password}\nYou can change it at ${process.env.ACCESS_CORS}/reset.\n\nYour SkillsBooster team`
             };
         
             await transporter.sendMail(mailOptions);
@@ -93,7 +93,7 @@ class User {
         }
     }
 
-    static async getByBoss(bossEmail, adminEmail) {
+    static async getByManager(managerEmail, adminEmail) {
         try {
             const usersRef = db.collection("Users");
             const response = await usersRef.get();
@@ -102,9 +102,9 @@ class User {
                 const data = doc.data();
                 const admin = data.admin;
                 const email = data.email;
-                if (email && admin && admin === adminEmail && email != adminEmail && email != bossEmail) {
+                if (email && admin && admin === adminEmail && email != adminEmail && email != managerEmail) {
                     users.push(data);
-            }
+                }
             });
 
             return users;

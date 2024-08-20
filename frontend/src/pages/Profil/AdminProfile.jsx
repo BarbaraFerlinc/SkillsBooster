@@ -186,8 +186,8 @@ function AdminProfile() {
                                 onChange={(e) => setNewUserRole(e.target.value)}
                                 className="bg-white  rounded p-2 w-full"
                             >
-                                <option value="user">User</option>
-                                <option value="boss">Manager</option>
+                                <option value="employee">Employee</option>
+                                <option value="manager">Manager</option>
                             </select>
                             <small className="text-red-500">{errors.role}</small>
                         </div>

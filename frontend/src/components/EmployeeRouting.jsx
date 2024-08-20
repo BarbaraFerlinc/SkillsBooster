@@ -3,7 +3,7 @@ import { UserAuth } from "../context/AuthContext";
 import { useNavigate, Outlet } from "react-router-dom";
 import api from "../services/api";
 
-function UserRouting() {
+function EmployeeRouting() {
     const { user } = UserAuth();
     const navigate = useNavigate();
     const [currentUser, setCurrentUser] = useState(null);
@@ -32,7 +32,7 @@ function UserRouting() {
         if (!loading) {
             if (!user) {
                 navigate("/login");
-            } else if (currentUser && currentUser.role !== "user") {
+            } else if (currentUser && currentUser.role !== "employee") {
                 navigate("/profile");
             }
         }
@@ -44,4 +44,4 @@ function UserRouting() {
 
     return <Outlet />;
 }
-export default UserRouting;
+export default EmployeeRouting;

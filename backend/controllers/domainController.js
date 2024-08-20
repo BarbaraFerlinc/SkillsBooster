@@ -291,14 +291,14 @@ async function updateModelDomain(req, res) {
 }
 
 async function addLinkDomain(req, res) {
-    const { id, link } = req.body;
+    const { id,name, link } = req.body;
 
-    if (!link ) {
+    if (!name || !link ) {
         return res.status(400).json({ error: 'The link must be selected' });
     }
 
     try {
-        const updatedDomain = await Domain.addLink(id, link);
+        const updatedDomain = await Domain.addLink(id, name, link);
         
         res.status(200).json({ message: 'Domain successfully updated', domain: updatedDomain });
     } catch (error) {
@@ -320,14 +320,14 @@ async function findLinksDomain(req, res) {
 }
 
 async function deleteLinkDomain(req, res) {
-    const { id, link } = req.body;
+    const { id, name } = req.body;
 
-    if (!link ) {
+    if (!name ) {
         return res.status(400).json({ error: 'The link must be selected' });
     }
 
     try {
-        const updatedDomain = await Domain.deleteLink(id, link);
+        const updatedDomain = await Domain.deleteLink(id, name);
         
         res.status(200).json({ message: 'Domain successfully updated', domena: updatedDomain });
     } catch (error) {
@@ -336,10 +336,10 @@ async function deleteLinkDomain(req, res) {
 }
 
 async function addLearningMaterialDomain(req, res) {
-    const { id, name } = req.body;
+    const { id, name, link } = req.body;
     const file = req.file;
 
-    if (!id || !name || !file ) {
+    if (!id || !name || !link || !file ) {
         return res.status(400).json({ error: 'All fields must be filled' });
     }
 
@@ -347,7 +347,7 @@ async function addLearningMaterialDomain(req, res) {
     fileStream.end(file.buffer);
 
     try {
-        const updatedDomain = await Domain.addLearningMaterial(id, name, file.buffer);
+        const updatedDomain = await Domain.addLearningMaterial(id, name, link, file.buffer);
         
         res.status(200).json({ message: 'Domain successfully updated', domain: updatedDomain });
     } catch (error) {
@@ -387,6 +387,7 @@ async function readLearningMaterialDomain(req, res) {
 async function deleteLearningMaterialDomain(req, res) {
     const { id, name } = req.body;
     
+    console.log(name);
     if (!id || !name ) {
         return res.status(400).json({ error: 'All fields must be filled' });
     }
