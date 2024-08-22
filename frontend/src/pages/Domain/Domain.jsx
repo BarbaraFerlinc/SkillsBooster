@@ -544,16 +544,24 @@ function Domain() {
                                                 >
                                                     {quiz.name}
                                                 </NavLink>
-                                                {currentUser && (currentUser.role == "employee") && (
+                                                {currentUser && currentUser.role === "employee" && (
                                                     <button
                                                         disabled={true}
-                                                        className={`btn ${quizStatuses[quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()] == 'unsolved' ? 'bg-blue-500' : 'bg-green-500'} text-white ml-4 w-24 h-10 flex items-center justify-center`}
+                                                        className={`btn ${quizStatuses[quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()] === 'solved' ? 'bg-lime-600' : 'bg-sky-700'} text-white ml-4 w-24 h-10 flex items-center justify-center`}
                                                     >
-                                                        {quizStatuses[quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()] == 'solved' ? 'Solved' : 'Unsolved'}
+                                                        {quizStatuses[quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()] === 'solved' ? (
+                                                            <>
+                                                                <span className="mr-2">&#10003;</span> Solved
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <span className="mr-2">&#10007;</span> Unsolved
+                                                            </>
+                                                        )}
                                                     </button>
                                                 )}
                                                 {console.log(quizStatuses[quiz.name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()])}
-                                                {currentUser && (currentUser.role === "manager") && (
+                                                {currentUser && currentUser.role === "manager" && (
                                                     <button
                                                         onClick={() => handleQuizDelete(quiz.name)}
                                                         className="btn bg-red-500 hover:bg-red-600 text-white ml-4"
@@ -565,6 +573,7 @@ function Domain() {
                                         ))
                                     )}
                                 </ul>
+
 
                                 {currentUser && (currentUser.role === "manager") && (
                                     <NavLink
@@ -603,7 +612,7 @@ function Domain() {
                                         </button>
                                     </div>
                                 )}
-                                
+
                             </div>
                         </div>
 
