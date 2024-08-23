@@ -364,7 +364,7 @@ function ManagerProfile() {
                             </tbody>
                         </table>
                         <div>
-                            <p> ** / means, the user is not added in that knowledge domain</p>
+                            <p> ** / means, the user is not added to that knowledge domain</p>
                         </div>
                     </div>
 
