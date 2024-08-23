@@ -209,7 +209,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 <span className="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">
                   •••
                 </span>
-                <span className="lg:hidden lg:sidebar-expanded:block 2xl:block">Domains</span>
+                <span className="lg:hidden lg:sidebar-expanded:block 2xl:block">Knowledge domains</span>
               </h3>
               <ul className="mt-3">
 
@@ -233,13 +233,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         onClick={handleAddDomain}
                         className="text-md font-medium ml-3 text-white lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200"
                     >
-                      Add Domain
+                      Add Knowledge Domain
                     </button>
                   </div>
               )}
               {showAddDomainCard && (
                   <div ref={addDomainCardRef} className="bg-white p-4 rounded shadow-md mt-4 relative">
-                    <h4 className="text-lg font-semibold mb-2">Add New Domain</h4>
+                    <h4 className="text-lg font-semibold mb-2">Add New Knowledge Domain</h4>
                     <div className="mb-2">
                       <label className="block text-sm font-medium mb-1">Name</label>
                       <input

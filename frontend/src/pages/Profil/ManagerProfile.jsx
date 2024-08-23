@@ -233,13 +233,13 @@ function ManagerProfile() {
                     <div className={`p-6 rounded-md shadow-md w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl ${bgClass}`}>
                         <h2 className={`text-lg sm:text-xl md:text-2xl font-semibold mb-4 ${textClass}`}>Add Employeee to Knowledge Domain</h2>
                         <div className="mb-4">
-                            <label className="block text-sm md:text-base mb-2">Select Domain:</label>
+                            <label className="block text-sm md:text-base mb-2">Select Knowledge Domain:</label>
                             <select
                                 value={selectedDomain.name}
                                 onChange={handleDomainSelection}
                                 className="w-full p-2 border rounded-md"
                             >
-                                <option value="">Select a domain</option>
+                                <option value="">Select a knowledge domain</option>
                                 {domains.map((domain, index) => (
                                     <option key={index} value={domain}>{domain}</option>
                                 ))}
