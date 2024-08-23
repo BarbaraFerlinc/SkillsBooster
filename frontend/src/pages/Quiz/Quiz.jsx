@@ -10,7 +10,7 @@ const initialQuiz = {
     name: "No Quiz",
     results: [],
     questions: []
-}
+};
 
 function Quiz() {
     const { id, domain } = useParams();
@@ -30,7 +30,7 @@ function Quiz() {
                 })
                 .catch(err => {
                     console.error(err);
-            });
+                });
         }
     }, [id]);
 
@@ -56,38 +56,50 @@ function Quiz() {
     return (
         <div className="flex h-screen overflow-hidden">
             {/* Sidebar */}
-            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+
             {/* Content area */}
             <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                 {/* Site header */}
-                <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+                <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-                        {/* Main Header */}
-                        <DynamicHeader domainName={currentQuiz?.naziv}/>
+                        {/* Dynamic Header with Quiz Name */}
+                        <DynamicHeader domainName={currentQuiz?.name}/>
 
                         {/* Conditionally render Solve Quiz link only if quizResult is null */}
                         <NavLink
                             to={`/solveQuiz/${id}/${domain}`}
                             className="block py-2 px-4 text-lg text-blue-700 hover:text-gray-900 mb-4"
-                            style={{ textDecoration: 'none' }}
+                            style={{textDecoration: 'none'}}
                         >
                             Solve Quiz
                         </NavLink>
 
-                        {/* Display quiz result percentage */}
-                        {quizResult !== null && (
-                            <div className="mb-4">
-                                <p>Your score: {quizResult}%</p>
+                        <div className="flex flex-col sm:flex-row justify-between items-center my-4">
+                            <div className="flex items-center space-x-4">
+                                {/* Conditionally render Solve Quiz link only if quizResult is null */}
+                                {quizResult === null ? (
+                                    <NavLink
+                                        to={`/solveQuiz/${id}/${domain}`}
+                                        className="btn bg-blue-500 text-white py-2 px-5 rounded hover:bg-indigo-500"
+                                    >
+                                        Start Quiz
+                                    </NavLink>
+                                ) : (
+                                    <div className="text-lg font-medium text-gray-700">
+                                        Your Score: <span className="text-indigo-500">{quizResult}%</span>
+                                    </div>
+                                )}
                             </div>
-                        )}
 
-                        <div className="result">
+                            {/* Back Button */}
                             <Link
                                 to={`/domain/${domain}`}
-                                className="btn bg-indigo-500 text-white py-2 px-5 rounded mr-1"
+                                className="btn bg-indigo-500 text-white py-2 px-5 rounded mt-4 sm:mt-0 hover:bg-indigo-600"
                             >
-                                Back
+                                Back to Domain
                             </Link>
                         </div>
                     </div>

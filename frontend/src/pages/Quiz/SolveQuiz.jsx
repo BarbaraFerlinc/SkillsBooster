@@ -157,23 +157,21 @@ function SolveQuiz() {
                                         Q: {questions[currentQuestionIndex].question}
                                     </h3>
                                     {questions[currentQuestionIndex].type === 'closed' ? (
-                                        <ul className="list-disc pl-6">
-                                            {questions[currentQuestionIndex].answers.map(
-                                                (option, index) => (
-                                                    <li key={index} className="mb-2">
-                                                        <label className="cursor-pointer">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={answers[currentQuestionIndex].includes(option.split(';')[0])}
-                                                                onChange={() => handleSelectAnswer(index)}
-                                                                className="mr-2"
-                                                            />
-                                                            {option.split(';')[0]}
-                                                        </label>
-                                                    </li>
-                                                )
-                                            )}
-                                        </ul>
+                                        <div className="space-y-2">  {/* Space between each row */}
+                                            {questions[currentQuestionIndex].answers.map((option, index) => (
+                                                <div key={index} className="flex items-center">  {/* Flexbox to align checkbox and text */}
+                                                    <label className="cursor-pointer flex items-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={answers[currentQuestionIndex].includes(option.split(';')[0])}
+                                                            onChange={() => handleSelectAnswer(index)}
+                                                            className="mr-2"
+                                                        />
+                                                        {option.split(';')[0]}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
                                     ) : (
                                         <textarea
                                             rows="4"

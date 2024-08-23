@@ -5,6 +5,7 @@ import Header from "../../partials/Header.jsx";
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
 import reading from "../../images/read-svgrepo-com.png";
 import writing from "../../images/writing-svgrepo-com.png";
+import score from "../../images/score-svgrepo-com.png";
 import PropTypes from "prop-types";
 import AIAssistant from "../../partials/AIAssistant.jsx";
 import api from '../../services/api.js';
@@ -344,6 +345,25 @@ function Domain() {
     const handleCloseMessage = () => {
         setShowMessage(false);
     };
+    const handleDeleteDomain = () => {
+        setLoading(true);
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
+        api.post(`/domain/delete`, { id: newId })
+            .then(() => {
+                setLoading(false);
+                setShowMessage(true);
+                setTimeout(() => {
+                    history.push('/domains'); // Navigate to the domains list page after deletion
+                }, 3000);
+            })
+            .catch(err => {
+                console.error('Error deleting domain:', err);
+                setLoading(false);
+            });
+    };
+
+
 
         const textClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
         const subTextClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
@@ -448,7 +468,10 @@ function Domain() {
                                         )}
                                     </div>
                                 )}
-
+                                <div className="flex items-center mt-8">
+                                    <img src={score} alt="Icon" className="w-16 h-16 mr-4"/>
+                                    <h4 className={`text-xl font-bold ${textClass}`}>Extra Resources</h4>
+                                </div>
                                 <div className="gap-6 mt-4">
                                     {links.length === 0 ? (
                                         <p>No links</p>
@@ -613,6 +636,32 @@ function Domain() {
                                     </div>
                                 )}
 
+                                {currentUser && currentUser.role === "manager" && (
+                                    <div className="mt-16 w-full">
+
+                                            <div className="flex items-center mb-4">
+                                                <h3 className={`text-xl font-bold ${textClass}`}>Danger Zone</h3>
+                                            </div>
+                                        <p className="mb-4 text-gray-500 text-justify ">
+                                            If you wish to delete this Knowledge Domain, click the button below.
+                                        </p>
+                                        <button
+                                            onClick={handleDeleteDomain}
+                                            className={`btn bg-red-500 text-white py-2 px-5 rounded ${loading || showMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            disabled={loading || showMessage}
+                                        >
+                                            Delete Domain
+                                        </button>
+                                    </div>
+                                )}
+                                {showMessage && (
+                                    <div className="mt-4 p-4 bg-green-200 text-green-800 rounded-md flex justify-between items-center">
+                                        <span>Knowledge Domain has been deleted.</span>
+                                        <button onClick={handleCloseMessage} className="btn btn-primary ml-4">
+                                            OK
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

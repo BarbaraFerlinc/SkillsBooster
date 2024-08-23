@@ -324,6 +324,7 @@ function ManagerProfile() {
                                             )}
                                             </tbody>
                                         </table>
+
                                     </div>
                                 )
                             ))}
@@ -355,14 +356,18 @@ function ManagerProfile() {
                                     <td className="border px-4 py-2">{user.full_name}</td>
                                     {domains.map((domain, domainIndex) => (
                                         <td key={domainIndex} className="border px-4 py-2 text-center">
-                                        {userResults[user.email] && userResults[user.email][domain] !== undefined ? userResults[user.email][domain] : '/'}
+                                            {userResults[user.email] && userResults[user.email][domain] !== undefined ? userResults[user.email][domain] : '/'}
                                         </td>
                                     ))}
                                 </tr>
                             ))}
                             </tbody>
                         </table>
+                        <div>
+                            <p> ** / means, the user is not added in that knowledge domain</p>
+                        </div>
                     </div>
+
                 )}
             </div>
         </div>
