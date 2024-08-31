@@ -44,7 +44,8 @@ function Domain() {
     const [loading, setLoading] = useState(false);
     const [loadMaterial, setLoadMaterial] = useState(false);
     const [loadLink, setLoadLink] = useState(false);
-    const [showMessage, setShowMessage] = useState(false);
+    const [showModelMessage, setShowModelMessage] = useState(false);
+    const [showDeleteMessage, setShowDeleteMessage] = useState(false);
     const [showCard, setShowCard] = useState(false);
     const [quizStatuses, setQuizStatuses] = useState([]);
     const navigate = useNavigate();
@@ -335,7 +336,7 @@ function Domain() {
             .then(res => {
                 console.log(res.data);
                 setLoading(false);
-                setShowMessage(true);
+                setShowModelMessage(true);
             })
             .catch(err => {
                 console.error('Error:', err);
@@ -343,9 +344,14 @@ function Domain() {
             });
     };
 
-    const handleCloseMessage = () => {
-        setShowMessage(false);
+    const handleCloseModelMessage = () => {
+        setShowModelMessage(false);
     };
+
+    const handleCloseDeleteMessage = () => {
+        setShowDeleteMessage(false);
+    };
+
     const handleDeleteDomain = () => {
         setLoading(true);
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
@@ -353,7 +359,7 @@ function Domain() {
         api.delete(`/domain/${newId}`)
             .then(() => {
                 setLoading(false);
-                setShowMessage(true);
+                setShowDeleteMessage(true);
                 navigate('/profile');
             })
             .catch(err => {
@@ -616,18 +622,18 @@ function Domain() {
                                         is less busy.
                                     </p>
                                     <button onClick={() => handleUpdateModel()}
-                                            className={`btn bg-green-500 text-white py-2 px-5 rounded ${loading || showMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                            disabled={loading || showMessage}
+                                            className={`btn bg-green-500 text-white py-2 px-5 rounded ${loading || showModelMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            disabled={loading || showModelMessage}
                                     >
                                         Update Model
                                     </button>
                                 </div>
                             )}
-                            {showMessage && (
+                            {showModelMessage && (
                                 <div
                                     className="mt-4 p-4 bg-green-200 text-green-800 rounded-md flex justify-between items-center">
                                     <span>Model successfully updated! It is recommended not to update the model again for at least 30 minutes.</span>
-                                    <button onClick={handleCloseMessage} className="btn btn-primary ml-4">
+                                    <button onClick={handleCloseModelMessage} className="btn btn-primary ml-4">
                                         OK
                                     </button>
                                 </div>
@@ -644,17 +650,17 @@ function Domain() {
                                     </p>
                                     <button
                                         onClick={handleDeleteDomain}
-                                        className={`btn bg-red-500 text-white py-2 px-5 rounded ${loading || showMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        disabled={loading || showMessage}
+                                        className={`btn bg-red-500 text-white py-2 px-5 rounded ${loading || showDeleteMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        disabled={loading || showDeleteMessage || showModelMessage}
                                     >
                                         Delete Domain
                                     </button>
                                 </div>
                             )}
-                            {showMessage && (
+                            {showDeleteMessage && (
                                 <div className="mt-4 p-4 bg-green-200 text-green-800 rounded-md flex justify-between items-center">
                                     <span>Knowledge Domain has been deleted.</span>
-                                    <button onClick={handleCloseMessage} className="btn btn-primary ml-4">
+                                    <button onClick={handleCloseDeleteMessage} className="btn btn-primary ml-4">
                                         OK
                                     </button>
                                 </div>
