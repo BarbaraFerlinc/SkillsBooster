@@ -367,18 +367,17 @@ function Domain() {
                 setLoading(false);
             });
     };
-    const [toggleQuizRoute, setToggleQuizRoute] = useState(true);
     const handleAddQuiz = () => {
         const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
-        if (toggleQuizRoute) {
+        // 50% možnost – Math.random vrne 0–1
+        const goToFirst = Math.random() < 0.5;
+
+        if (goToFirst) {
             navigate(`/addQuiz/${newId}`);
         } else {
             navigate(`/addQuiz2/${newId}`);
         }
-
-        // flip the boolean
-        setToggleQuizRoute(!toggleQuizRoute);
     };
 
 

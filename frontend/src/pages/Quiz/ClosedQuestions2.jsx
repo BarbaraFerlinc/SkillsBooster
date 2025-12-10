@@ -16,6 +16,7 @@ function ClosedQuestion2({ question, options, onQuestionChange, onOptionChange, 
             </div>
             <div className="mb-4">
                 <label className="block text-lg font-semibold mb-2">Options:</label>
+                <p> Add correctness to each answer</p>
 
                 {options.map((option, index) => (
                     <div key={index} className="mb-3">
