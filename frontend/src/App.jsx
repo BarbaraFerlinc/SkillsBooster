@@ -8,7 +8,6 @@ import './css/style.css';
 
 import Dashboard from './pages/Dashboard';
 import Profile from "./pages/Profil/Profile.jsx";
-import Profile2 from "./pages/Profil/Profile2.jsx";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Domain from "./pages/Domain/Domain.jsx";
@@ -41,7 +40,7 @@ function App() {
           <Route path='' element={<PrivateRouting />}>
             <Route path="/profile" element={<Profile />} />
             <Route exact path="/domain/:id" element={<Domain/>} />
-            <Route path="/profile2" element={<Profile2 />} />
+
 
             <Route exact path="/logout" element={<LogOut/>} />
 
