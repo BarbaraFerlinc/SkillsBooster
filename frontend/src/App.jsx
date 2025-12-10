@@ -40,6 +40,7 @@ function App() {
 
           <Route path='' element={<PrivateRouting />}>
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile2" element={<Profile2 />} />
             <Route exact path="/domain/:id" element={<Domain/>} />
             <Route exact path="/logout" element={<LogOut/>} />
 
