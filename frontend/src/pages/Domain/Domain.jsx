@@ -367,6 +367,20 @@ function Domain() {
                 setLoading(false);
             });
     };
+    const [toggleQuizRoute, setToggleQuizRoute] = useState(true);
+    const handleAddQuiz = () => {
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
+        if (toggleQuizRoute) {
+            navigate(`/addQuiz/${newId}`);
+        } else {
+            navigate(`/addQuiz2/${newId}`);
+        }
+
+        // flip the boolean
+        setToggleQuizRoute(!toggleQuizRoute);
+    };
+
 
     const textClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
     const subTextClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
@@ -602,12 +616,12 @@ function Domain() {
 
 
                             {currentUser && (currentUser.role === "manager") && (
-                                <NavLink
-                                    to={`/addQuiz/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
-                                    <button className=" btn bg-indigo-500 text-white py-2 px-5 rounded">
+                                    <button
+                                        onClick={handleAddQuiz}
+                                        className="btn bg-indigo-500 text-white py-2 px-5 rounded"
+                                    >
                                         <span className="ml-2">Add Quiz</span>
                                     </button>
-                                </NavLink>
                             )}
 
                             {currentUser && (currentUser.role === "manager") && (
