@@ -246,7 +246,7 @@ function Domain() {
     const handleNameInputChange = (e) => {
         setLinkName(e.target.value);
     };
-    
+
     const validateLinkForm = () => {
         let formErrors = {};
         let formIsValid = true;
@@ -374,7 +374,7 @@ function Domain() {
     return (
         <div className="flex h-screen overflow-hidden">
             {/* Sidebar */}
-            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+            <Sidebar2 sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
 
             {/* Content area */}
             <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -413,7 +413,7 @@ function Domain() {
                                             <li key={index}
                                                 className={`flex items-center justify-between mb-2 ${subTextClass}`}>
                                                 <a href="#"
-                                                    onClick={() => handleFileDownload(fileName)}>{fileName.split(';')[0]}</a>
+                                                   onClick={() => handleFileDownload(fileName)}>{fileName.split(';')[0]}</a>
                                                 {currentUser && (currentUser.role === "manager") && (
                                                     <button onClick={() => handleFileDelete(fileName)}
                                                             className="btn bg-red-500 hover:bg-red-600 text-white ml-4">Delete</button>
@@ -484,7 +484,7 @@ function Domain() {
                                             <li key={index}
                                                 className={`flex items-center justify-between mb-2 ${subTextClass}`}>
                                                 <a href="#"
-                                                    onClick={() => handleOpenLink(link)}>{link.split('|')[0]}</a>
+                                                   onClick={() => handleOpenLink(link)}>{link.split('|')[0]}</a>
                                                 {currentUser && (currentUser.role === "manager") && (
                                                     <button onClick={() => handleLinkDelete(link)}
                                                             className="btn bg-red-500 hover:bg-red-600 text-white ml-4">Delete</button>
@@ -603,7 +603,7 @@ function Domain() {
 
                             {currentUser && (currentUser.role === "manager") && (
                                 <NavLink
-                                    to={`/addQuiz/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
+                                    to={`/addQuiz2/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
                                     <button
                                         onClick={handleAddQuiz}
                                         className="btn bg-indigo-500 text-white py-2 px-5 rounded"
@@ -645,9 +645,9 @@ function Domain() {
                             {currentUser && currentUser.role === "manager" && (
                                 <div className="mt-16 w-full">
 
-                                        <div className="flex items-center mb-4">
-                                            <h3 className={`text-xl font-bold ${textClass}`}>Danger Zone</h3>
-                                        </div>
+                                    <div className="flex items-center mb-4">
+                                        <h3 className={`text-xl font-bold ${textClass}`}>Danger Zone</h3>
+                                    </div>
                                     <p className="mb-4 text-gray-500 text-justify ">
                                         If you wish to delete this Knowledge Domain, click the button below.
                                     </p>

@@ -12,6 +12,7 @@ import Profile2 from "./pages/Profil/Profile2.jsx";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Domain from "./pages/Domain/Domain.jsx";
+import Domain2 from "./pages/Domain/Domain2.jsx";
 import LogOut from "./pages/LogOut.jsx";
 import Quiz from "./pages/Quiz/Quiz.jsx";
 import AddQuiz from "./pages/Quiz/AddQuiz.jsx";
@@ -40,8 +41,9 @@ function App() {
 
           <Route path='' element={<PrivateRouting />}>
             <Route path="/profile" element={<Profile />} />
-            <Route path="/profile2" element={<Profile2 />} />
             <Route exact path="/domain/:id" element={<Domain/>} />
+            <Route path="/profile2" element={<Profile2 />} />
+            <Route exact path="/domain2/:id" element={<Domain2/>} />
             <Route exact path="/logout" element={<LogOut/>} />
 
             <Route path='' element={<ManagerRouting />}>
