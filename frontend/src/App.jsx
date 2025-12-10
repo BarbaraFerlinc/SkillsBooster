@@ -48,7 +48,7 @@ function App() {
 
             <Route path='' element={<ManagerRouting />}>
               <Route exact path="/addQuiz/:domain" element={<AddQuiz/>} />
-              <Route exact path="/addQuiz2/:domain" element={<AddQuiz2/>} />
+              <Route exact path="/addQuiz2/:domain2" element={<AddQuiz2/>} />
             </Route>
 
             <Route path='' element={<EmployeeRouting />}>
