@@ -8,6 +8,7 @@ import './css/style.css';
 
 import Dashboard from './pages/Dashboard';
 import Profile from "./pages/Profil/Profile.jsx";
+import Profile2 from "./pages/Profil/Profile2.jsx";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Domain from "./pages/Domain/Domain.jsx";
