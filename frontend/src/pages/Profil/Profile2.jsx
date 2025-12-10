@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar2 from '../../partials/Sidebar2.jsx';
+import Sidebar from '../../partials/Sidebar.jsx';
 import Header from '../../partials/Header.jsx';
 import DynamicHeader from "../../partials/dashboard/DynamicHeader.jsx";
 import ProfileInfo from './ProfileInfo.jsx';

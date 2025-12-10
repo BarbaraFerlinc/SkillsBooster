@@ -367,6 +367,19 @@ function Domain() {
                 setLoading(false);
             });
     };
+    const handleAddQuiz = () => {
+        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
+        // 50% možnost – Math.random vrne 0–1
+        const goToFirst = Math.random() < 0.5;
+
+        if (goToFirst) {
+            navigate(`/addQuiz/${newId}`);
+        } else {
+            navigate(`/addQuiz2/${newId}`);
+        }
+    };
+
 
     const textClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
     const subTextClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
@@ -602,15 +615,13 @@ function Domain() {
 
 
                             {currentUser && (currentUser.role === "manager") && (
-                                <NavLink
-                                    to={`/addQuiz/${id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`}>
-                                    <button
-                                        onClick={handleAddQuiz}
-                                        className="btn bg-indigo-500 text-white py-2 px-5 rounded"
-                                    >
-                                        <span className="ml-2">Add Quiz</span>
-                                    </button>
-                                </NavLink>
+                                <button
+                                    onClick={handleAddQuiz}
+                                    className="btn bg-indigo-500 text-white py-2 px-5 rounded"
+                                >
+                                    <span className="ml-2">Add Quiz</span>
+                                </button>
+
                             )}
 
                             {currentUser && (currentUser.role === "manager") && (
