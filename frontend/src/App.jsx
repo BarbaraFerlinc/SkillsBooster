@@ -14,6 +14,7 @@ import Domain from "./pages/Domain/Domain.jsx";
 import LogOut from "./pages/LogOut.jsx";
 import Quiz from "./pages/Quiz/Quiz.jsx";
 import AddQuiz from "./pages/Quiz/AddQuiz.jsx";
+import AddQuiz2 from "./pages/Quiz/AddQuiz2.jsx";
 import { AuthContextProvider } from './context/AuthContext.jsx';
 import PrivateRouting from './components/PrivateRouting.jsx';
 import ManagerRouting from './components/ManagerRouting.jsx';
@@ -39,10 +40,13 @@ function App() {
           <Route path='' element={<PrivateRouting />}>
             <Route path="/profile" element={<Profile />} />
             <Route exact path="/domain/:id" element={<Domain/>} />
+
+
             <Route exact path="/logout" element={<LogOut/>} />
 
             <Route path='' element={<ManagerRouting />}>
               <Route exact path="/addQuiz/:domain" element={<AddQuiz/>} />
+              <Route exact path="/addQuiz2/:domain" element={<AddQuiz2/>} />
             </Route>
 
             <Route path='' element={<EmployeeRouting />}>
