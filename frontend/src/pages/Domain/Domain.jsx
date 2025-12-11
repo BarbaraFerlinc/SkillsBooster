@@ -367,18 +367,35 @@ function Domain() {
                 setLoading(false);
             });
     };
+    const [appVariant, setAppVariant] = useState(null);
+
+    useEffect(() => {
+        let variant = localStorage.getItem("appVariant");
+
+        if (!variant) {
+            variant = Math.random() < 0.5 ? "A" : "B";
+            localStorage.setItem("appVariant", variant);
+        }
+
+        setAppVariant(variant);
+    }, []);
+
     const handleAddQuiz = () => {
-        const newId = id.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        if (!appVariant) return; // prevents early clicks if not loaded yet
 
-        // 50% možnost – Math.random vrne 0–1
-        const goToFirst = Math.random() < 0.5;
+        const newId = id
+            .replace(/\s+/g, '')
+            .replace(/[^a-zA-Z0-9]/g, '')
+            .toLowerCase();
 
-        if (goToFirst) {
+        if (appVariant === "A") {
             navigate(`/addQuiz/${newId}`);
         } else {
             navigate(`/addQuiz2/${newId}`);
         }
     };
+
+
 
 
     const textClass = currentTheme === 'dark' ? 'text-white' : 'text-black';
